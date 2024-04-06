@@ -2,8 +2,8 @@
 Password management application for a college group project. 
 
 ## Features
-- Account sign up (incomplete)
-- Login (incomplete)
+- Account sign up (working)
+- Login (working)
 - Add password items (incomplete)
 - Read password items (incomplete)
 - Generate random passwords (incomplete)
