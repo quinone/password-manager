@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Items View</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+        }
+
+        .left-pane, .right-pane {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .left-pane ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .left-pane li {
+            margin-bottom: 10px;
+        }
+
+        .left-pane a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .left-pane a:hover {
+            text-decoration: underline;
+        }
+
+        .right-pane table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .right-pane th, .right-pane td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        .right-pane th {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .right-pane tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .right-pane tbody tr:hover {
+            background-color: #ddd;
+        }
+
+        .right-pane button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .right-pane button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Left pane with options -->
+    <div class="left-pane">
+        <h2>Options</h2>
+        <ul>
+            <li><a href="#">Tools</a></li>
+            <li><a href="#">Settings</a></li>
+        </ul>
+    </div>
+
+    <!-- Right pane with items table -->
+    <div class="right-pane">
+        <h2>Items</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Type</th>
+                    <th>Name</th>
+                    <th>Folder</th>
+                    <th>Username</th>
+                    <!-- Add more columns as needed -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Populate table rows with items data -->
+                <tr>
+                    <td>Type 1</td>
+                    <td>Item 1</td>
+                    <td>Folder A</td>
+                    <td>user123</td>
+                    <!-- Add more columns as needed -->
+                </tr>
+                <!-- Add more rows for each item -->
+            </tbody>
+        </table>
+        <button onclick="location.href='/new_item'">Create New Item</button>
+    </div>
+</body>
+</html>
