@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capstone Project</title>
+    <title>Registration</title>
      <!-- Include the reCAPTCHA script -->
     <script src="/MyJavaScript.js" async defer></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -70,35 +69,42 @@
             margin-bottom: 20px; /* Optional margin adjustment */
         }
     </style>
+</head>
 <body>
-<div id="login-form-wrap">
-
-    <form action="/loginAction" id="login-form" method="post">
-        <p>
-           <h2>Capstone Password Manager</h2>
-           <label for="email">Email Address:</label>
-            <input id="email" name="email" placeholder="Email Address"  value="{{email|e}}" required type="email"><i
-                class="validation"><span></span></i>
-        </p>
-        <p>
-            <label for="password">Password:</label>
-            <input id="password" name="password" placeholder="Password"  value="{{password|e}}"required type="password"><i
-                class="validation"><span></span></i>
-        </p>
-        <p>
-             <td colspan="2"><button id="login" value="Login" type="submit">Login</button></td>
-        </p>
-        <p>Not having an account yet <a href="/registration">Please register</a></p>
-        <p>
-            {{ recaptcha }}
-        </p>
-         <div class="recaptcha-container">
+    <h1>Create Account</h1>
+    <form action="/create_account" method="post">
+        <table>
+            <tr>
+                <td><label for="email_address">Email Address:</label></td>
+                <td><input type="email" id="email_address" name="email_address" required></td>
+            </tr>
+            <tr>
+                <td><label for="name">Name:</label></td>
+                <td><input type="text" id="name" name="name" required></td>
+            </tr>
+            <tr>
+                <td><label for="master_password">Master Password:</label></td>
+                <td><input type="password" id="master_password" name="master_password" required></td>
+            </tr>
+            <tr>
+                <td><label for="retype_password">Re-type Password:</label></td>
+                <td><input type="password" id="retype_password" name="retype_password" required></td>
+            </tr>
+            <tr>
+                <td><label for="manager_password">Manager Password:</label></td>
+                <td><input type="password" id="manager_password" name="manager_password" required></td>
+            </tr>
+            <tr>
+                <td><label for="hint">Password Hint:</label></td>
+                <td><input type="text" id="hint" name="hint"></td>
+            </tr>
+            <tr>
+                <td colspan="2"><button type="submit">Create Account</button></td>
+            </tr>
+            <div class="recaptcha-container">
             <div class="g-recaptcha" data-sitekey="6LclpwIlAAAAAJJGxZAVGD3a6emxmCccHn5rb_ZB"></div>
         </div>
+        </table>
     </form>
-    <div id="create-account-wrap">
-
-    </div><!--create-account-wrap-->
-</div>
 </body>
 </html>
