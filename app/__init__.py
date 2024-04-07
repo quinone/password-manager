@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, render_template, url_for
 
 
 def create_app(test_config=None):
@@ -23,16 +23,22 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
-    
+
     # a simple page that says hello
     @app.route("/hello")
     def hello():
         return "Hello, World!"
-    
+
+    @app.route("/")
+    def index():
+        return render_template("index.html")
+
     from . import db
+
     db.init_app(app)
 
-    from . import auth 
+    from . import auth
+
     app.register_blueprint(auth.bp)
 
     return app
