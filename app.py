@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from flask_mail import Mail, Message
 import random
 import string
 import pyperclip
@@ -6,6 +7,17 @@ import database
 
 app = Flask(__name__)
 
+secret_key = secrets.token_hex(16)  # Generates a random hex string of 16 bytes (32 characters)
+print("Generated Secret Key:", secret_key)
+
+app.config['SECRET_KEY'] = 'secret_key'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = ''
+app.config['MAIL_PASSWORD'] = ''
+
+mail = Mail(app)
 
 def generate_password(
     length, min_length, min_numbers, min_special_chars, special_chars, avoid_ambiguous
