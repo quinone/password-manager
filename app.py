@@ -7,17 +7,6 @@ import database
 
 app = Flask(__name__)
 
-secret_key = secrets.token_hex(16)  # Generates a random hex string of 16 bytes (32 characters)
-print("Generated Secret Key:", secret_key)
-
-app.config['SECRET_KEY'] = 'secret_key'
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = ''
-app.config['MAIL_PASSWORD'] = ''
-
-mail = Mail(app)
 
 def generate_password(
     length, min_length, min_numbers, min_special_chars, special_chars, avoid_ambiguous
@@ -105,10 +94,10 @@ def index():
             return render_template('index.html', password=encrypted_password)
 
     return render_template("index.html", password="")
-
+    
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    return render_template('index.html')
 
 @app.route('/loginAction', methods=['GET', 'POST'])
 def loginAction():
@@ -120,13 +109,15 @@ def loginAction():
         if conn is None:
             flash("Failed to connect to the database.")
             return redirect(url_for('login'))
+
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM REGISTRATION WHERE EMAIL = ? AND MASTER_PASSWORD = ?", (email, password))
         user = cursor.fetchone()
+
         if user:
             session['email'] = email
             flash("Login successful.")
-            return redirect(url_for('comp'))
+            return redirect(url_for('profile'))
         else:
             flash("Invalid email or password. Please try again.")
         cursor.close()
@@ -134,9 +125,11 @@ def loginAction():
 
     return render_template('index.html')
 
+
 @app.route('/registration')
 def registration():
     return render_template('registration.html')
+
 
 @app.route('/registrationAction', methods=['POST'])
 def registrationAction():
@@ -149,6 +142,7 @@ def registrationAction():
         conn = database.connect(db_file)
         if conn is None:
             raise Exception("Failed to connect to the database.")
+
         cursor = conn.cursor()
         cursor.execute("INSERT INTO REGISTRATION (EMAIL, NAME, MASTER_PASSWORD, PASSWORD_HINT) VALUES (?, ?, ?, ?)",
                        (email, name, master_password, password_hint))
@@ -157,19 +151,13 @@ def registrationAction():
         conn.close()
 
         return redirect(url_for('profile'))
-    except Exception as e:
-
-        flash("Failed to create your account. Try again!")
-        print("Error:", e)  # Print error for debugging purposes
-
-        return redirect(url_for('registration'))
-
-@app.route('/profile')
-def comp():
-    return render_template('profile.html')
 
 @app.route('/profile')
 def profile():
+    return render_template('profile.html')
+
+@app.route('/profile')
+def profileaction():
     # Check if user is logged in
     if 'email' in session:
         email = session['email']
@@ -189,7 +177,6 @@ def profile():
     else:
         flash("You are not logged in.")
         return redirect(url_for('login'))
-
 
 @app.route('/encryption_helper', methods=['GET', 'POST'])
 def encryption_helper():
