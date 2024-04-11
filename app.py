@@ -110,9 +110,86 @@ def index():
 def login():
     return render_template('login.html')
 
+@app.route('/loginAction', methods=['GET', 'POST'])
+def loginAction():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        conn = database.connect(db_file)
+        if conn is None:
+            flash("Failed to connect to the database.")
+            return redirect(url_for('login'))
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM REGISTRATION WHERE EMAIL = ? AND MASTER_PASSWORD = ?", (email, password))
+        user = cursor.fetchone()
+        if user:
+            session['email'] = email
+            flash("Login successful.")
+            return redirect(url_for('comp'))
+        else:
+            flash("Invalid email or password. Please try again.")
+        cursor.close()
+        conn.close()
+
+    return render_template('index.html')
+
 @app.route('/registration')
 def registration():
     return render_template('registration.html')
+
+@app.route('/registrationAction', methods=['POST'])
+def registrationAction():
+    email = request.form.get("email_address")
+    name = request.form.get("name")
+    master_password = request.form.get("master_password")
+    password_hint = request.form.get("hint")
+
+    try:
+        conn = database.connect(db_file)
+        if conn is None:
+            raise Exception("Failed to connect to the database.")
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO REGISTRATION (EMAIL, NAME, MASTER_PASSWORD, PASSWORD_HINT) VALUES (?, ?, ?, ?)",
+                       (email, name, master_password, password_hint))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return redirect(url_for('profile'))
+    except Exception as e:
+
+        flash("Failed to create your account. Try again!")
+        print("Error:", e)  # Print error for debugging purposes
+
+        return redirect(url_for('registration'))
+
+@app.route('/profile')
+def comp():
+    return render_template('profile.html')
+
+@app.route('/profile')
+def profile():
+    # Check if user is logged in
+    if 'email' in session:
+        email = session['email']
+        # Connect to the database
+        conn = database.connect(db_file)
+        if conn is None:
+            flash("Failed to connect to the database.")
+            return redirect(url_for('login'))
+
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM REGISTRATION WHERE EMAIL = ?", (email,))
+        user_info = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        return render_template('profile.html', user_info=user_info)
+    else:
+        flash("You are not logged in.")
+        return redirect(url_for('login'))
+
 
 @app.route('/encryption_helper', methods=['GET', 'POST'])
 def encryption_helper():
