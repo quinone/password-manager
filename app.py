@@ -1,5 +1,12 @@
+<<<<<<< HEAD
+from flask import Flask, render_template, request, make_response, redirect, url_for
+=======
 from flask import Flask, render_template, request
 from flask_mail import Mail, Message
+<<<<<<< Updated upstream
+=======
+>>>>>>> f08ba4792b5b09093931c907e956dea518e68487
+>>>>>>> Stashed changes
 import random
 import string
 import pyperclip
@@ -208,7 +215,30 @@ def vault():
 def test():
     return render_template('test.html')
 
+<<<<<<< Updated upstream
 @app.route("/copy", methods=["POST"])
+=======
+<<<<<<< HEAD
+
+@app.route('/preferences')
+def preferences():
+    return render_template('MyPreferences.html')
+
+
+
+@app.route('/tools')
+def tools():
+    return render_template('encryption_helper.html')
+
+
+
+
+
+@app.route('/copy', methods=['POST'])
+=======
+@app.route("/copy", methods=["POST"])
+>>>>>>> f08ba4792b5b09093931c907e956dea518e68487
+>>>>>>> Stashed changes
 def copy():
     password = request.form.get("password")
     pyperclip.copy(password)

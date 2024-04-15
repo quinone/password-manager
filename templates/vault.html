@@ -16,8 +16,15 @@
         }
 
         .left-pane, .right-pane {
-            flex: 1;
             padding: 20px;
+        }
+
+        .left-pane {
+            flex: 1; /* Set the left pane to take up 1/6 of the screen width */
+        }
+
+        .right-pane {
+            flex: 5; /* Set the right pane to take up 5/6 of the screen width */
         }
 
         h2 {
@@ -91,8 +98,8 @@
     <div class="left-pane">
         <h2>Options</h2>
         <ul>
-            <li><a href="#">Tools</a></li>
-            <li><a href="#">Settings</a></li>
+            <li><a href="/tools">Tools</a></li>
+            <li><a href="preferences">Preferences</a></li>
         </ul>
     </div>
 

@@ -189,7 +189,12 @@ button[type="submit"] {
     </form>
     <!-- Generated password field -->
     <p id="password_field">Generated Password: {{ encrypted_password }}</p>
+
+    <!-- NOT WORKING CORECTLY -->
     <button type="button" id="copy_button" style="display: none;">Copy Password</button>
+
+
+
     <script>
         document.getElementById('options').addEventListener('change', function() {
             var button = document.getElementById('generate_button');

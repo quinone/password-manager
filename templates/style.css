@@ -238,4 +238,17 @@ table tr:nth-child(odd) {
     font-size: 16px;
     cursor: pointer;
 }
+/* Center and style the generated password field */
+#password_field {
+    width: calc(100% - 40px); /* Adjust width to fit inside form */
+    margin: 20px auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+#generated_password {
+    word-wrap: break-word; /* Allow wrapping of long words */
+}
 

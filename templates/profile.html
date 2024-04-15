@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,4 +16,23 @@
     <p>No user information available.</p>
     {% endif %}
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Welcome to the profile</h1>
+    {% if user_info %}
+    <p>Email: {{ user_info[0] }}</p>
+    <p>Username: {{ user_info[1] }}</p>
+    <!-- Add more user info fields as needed -->
+    {% else %}
+    <p>No user information available.</p>
+    {% endif %}
+</body>
+>>>>>>> Stashed changes
 </html>
