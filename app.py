@@ -142,22 +142,53 @@ def registration():
 def registrationAction():
     email = request.form.get("email_address")
     name = request.form.get("name")
-    master_password = request.form.get("master_password")
+    password = request.form.get("master_password")
     password_hint = request.form.get("hint")
 
+    messages = []  # List to store messages
+    message_type = "error"  # Default message type
+
     try:
+        # Establish database connection
         conn = database.connect(db_file)
-        if conn is None:
-            raise Exception("Failed to connect to the database.")
-
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO REGISTRATION (EMAIL, NAME, MASTER_PASSWORD, PASSWORD_HINT) VALUES (?, ?, ?, ?)",
-                       (email, name, master_password, password_hint))
-        conn.commit()
-        cursor.close()
-        conn.close()
 
-        return redirect(url_for('profile'))
+        # Check if username already exists in the database
+        cursor.execute("SELECT email FROM REGISTRATION WHERE email = ?", (email,))
+        existing_user = cursor.fetchone()
+        if existing_user:
+            messages.append("Email already taken. Please choose a different email.")
+
+        # Check if password and password hint match
+        if password == password_hint:
+            messages.append("Password hint should not be the same as the password.")
+
+        # Check password complexity
+        if len(password) < 8 or not re.search("[A-Z]", password) or not re.search("[!@#$%^&*]", password):
+            messages.append("Password must be at least 8 characters long, contain at least one capital letter, and at least one symbol.")
+
+        # Check if passwords match
+        if request.form.get("master_password") != request.form.get("confirm_password"):
+            messages.append("Passwords do not match.")
+
+        if not messages:
+            # Execute SQL query
+            cursor.execute("INSERT INTO REGISTRATION (EMAIL, NAME, MASTER_PASSWORD, PASSWORD_HINT) VALUES (?, ?, ?, ?)",
+                           (email, name, password, password_hint))
+            conn.commit()
+            messages.append("Account created successfully.")
+            message_type = "success"
+
+    except database.Error as e:
+        messages.append("Failed to signup. Try again!")
+        print("Database Error:", e)
+
+    except Exception as e:
+        messages.append("Failed to create your account. Try again!")
+        print("Error:", e)
+
+    # Render the template with the messages and message type
+    return render_template('registration.html', messages=messages, message_type=message_type)
 
 @app.route('/profile')
 def profile():
