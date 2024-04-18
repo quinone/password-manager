@@ -1,14 +1,44 @@
 from flask import Flask, render_template, request, make_response, redirect, url_for
 from flask_mail import Mail, Message
-
-
-
+import time
+from datetime import datetime, timedelta
+import re
 import random
 import string
 import pyperclip
 import database
 
 app = Flask(__name__)
+
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=1)
+# Define session timeout
+SESSION_TIMEOUT = 60  
+
+@app.before_request
+def before_request():
+    # Check if user is logged in and session is active
+    if 'email' in session:
+        # Check if the last activity time is stored in session
+        last_activity_time = session.get('last_activity_time')
+        if last_activity_time is not None:
+            # Calculate time elapsed since last activity
+            time_elapsed = time.time() - last_activity_time
+            # If time elapsed exceeds session timeout, log the user out
+            if time_elapsed > SESSION_TIMEOUT:
+                # Clear session and log out user
+                session.clear()
+                flash("Session timed out due to inactivity.")
+                return redirect(url_for('login'))
+        # Update last activity time in session
+        session['last_activity_time'] = time.time()
+
+@app.route('/logout')
+def logout():
+    # Clear the session
+    session.clear()
+    flash('You have been logged out due to inactivity.')
+    return redirect(url_for('login'))
+
 
 
 def generate_password(
@@ -108,23 +138,26 @@ def loginAction():
         email = request.form.get('email')
         password = request.form.get('password')
 
+        # Connect to the database
         conn = database.connect(db_file)
         if conn is None:
             flash("Failed to connect to the database.")
             return redirect(url_for('login'))
 
         cursor = conn.cursor()
+
+        # Check if user exists in the database
         cursor.execute("SELECT * FROM REGISTRATION WHERE EMAIL = ? AND MASTER_PASSWORD = ?", (email, password))
         user = cursor.fetchone()
 
         if user:
+            # User exists, set session variables or redirect to dashboard
             session['email'] = email
             flash("Login successful.")
             return redirect(url_for('profile'))
         else:
-            flash("Invalid email or password. Please try again.")
-        cursor.close()
-        conn.close()
+            error_message = "Invalid email or password. Please try again."
+            return render_template('index.html', error_message=error_message)
 
     return render_template('index.html')
 
@@ -202,8 +235,12 @@ def profileaction():
             return redirect(url_for('login'))
 
         cursor = conn.cursor()
+
+        # Fetch user info from the database
         cursor.execute("SELECT * FROM REGISTRATION WHERE EMAIL = ?", (email,))
         user_info = cursor.fetchone()
+
+        # Close cursor and connection
         cursor.close()
         conn.close()
 
@@ -230,13 +267,17 @@ def encryption_helper():
 
     return render_template('encryption_helper.html', encrypted_password='')
 
-@app.route('/new_item')
-def new_item():
-    return render_template('new_item.html')
-
 @app.route('/vault')
 def vault():
     return render_template('vault.html')
+
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
+
+@app.route('/new_item')
+def new_item():
+    return render_template('new_item.html')
 
 @app.route('/test')
 def test():
