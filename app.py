@@ -267,9 +267,6 @@ def encryption_helper():
 
     return render_template('encryption_helper.html', encrypted_password='')
 
-@app.route('/vault')
-def vault():
-    return render_template('vault.html')
 
 @app.route('/settings')
 def settings():
@@ -290,12 +287,75 @@ def test():
 def preferences():
     return render_template('MyPreferences.html')
 
-
-
 @app.route('/tools')
 def tools():
     return render_template('encryption_helper.html')
 
+@app.route('/new_folder')
+def new_folder():
+    return render_template('new_folder.html')
+
+@app.route('/add_folder', methods=['POST'])
+def add_folder():
+    folder_name = request.form.get("folder_name")
+
+    messages = []  # List to store messages
+    message_type = "error"  # Default message type
+
+    try:
+        # Establish database connection
+        conn = database.connect(db_file)
+        cursor = conn.cursor()
+
+        # Check if folder name is provided
+        if not folder_name:
+            messages.append("Please provide a folder name.")
+        else:
+            # Add folder to the database
+            cursor.execute("INSERT INTO FOLDER (FOLDER_NAME) VALUES (?)", (folder_name,))
+            conn.commit()
+            messages.append("Folder added successfully.")
+            message_type = "success"
+
+    except database.Error as e:
+        messages.append("Failed to add folder. Try again!")
+        print("Database Error:", e)
+
+    except Exception as e:
+        messages.append("Failed to add folder. Try again!")
+        print("Error:", e)
+
+    finally:
+        # Close the database connection
+        if conn:
+            conn.close()
+
+    # Redirect back to the vault page after adding the folder
+    return redirect(url_for('vault'))
+
+
+@app.route('/vault')
+def vault():
+    try:
+        # Establish database connection
+        conn = database.connect(db_file)
+        cursor = conn.cursor()
+
+        # Retrieve folders from the database
+        cursor.execute("SELECT FOLDER_NAME FROM FOLDER")
+        folders = cursor.fetchall()
+
+    except database.Error as e:
+        print("Database Error:", e)
+        folders = []
+
+    finally:
+        # Close the database connection
+        if conn:
+            conn.close()
+
+    # Render the template with the list of folders
+    return render_template('vault.html', folders=folders)
 
 
 
