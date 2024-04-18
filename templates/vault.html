@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Items View</title>
+    <script src="/MyJavaScript.js" async defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,15 +18,8 @@
         }
 
         .left-pane, .right-pane {
+            flex: 1;
             padding: 20px;
-        }
-
-        .left-pane {
-            flex: 1; /* Set the left pane to take up 1/6 of the screen width */
-        }
-
-        .right-pane {
-            flex: 5; /* Set the right pane to take up 5/6 of the screen width */
         }
 
         h2 {
@@ -93,15 +88,6 @@
         }
     </style>
 </head>
-<body>
-    <!-- Left pane with options -->
-    <div class="left-pane">
-        <h2>Options</h2>
-        <ul>
-            <li><a href="/tools">Tools</a></li>
-            <li><a href="preferences">Preferences</a></li>
-        </ul>
-    </div>
 
     <!-- Right pane with items table -->
     <div class="right-pane">
@@ -128,7 +114,11 @@
                 <!-- Add more rows for each item -->
             </tbody>
         </table>
-        <button onclick="location.href='/new_item'">Create New Item</button>
+        <button id="newItemButton">Create New Item</button>
+        <button onclick="/new_item">Create New Item</button>
+        <a href="/new_item">Create New Item</a>
+        <a href="/profile">Back</a>
+
     </div>
 </body>
 </html>
