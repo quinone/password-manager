@@ -357,7 +357,28 @@ def vault():
     # Render the template with the list of folders
     return render_template('vault.html', folders=folders)
 
+@app.route('/vault/<folder_name>')
+def view_folder(folder_name):
+    try:
+        # Establish database connection
+        conn = database.connect(db_file)
+        cursor = conn.cursor()
 
+        # Retrieve items from the selected folder
+        cursor.execute("SELECT * FROM ITEM WHERE FOLDER_ID = (SELECT ID FROM FOLDER WHERE FOLDER_NAME = ?)", (folder_name,))
+        items = cursor.fetchall()
+
+    except database.Error as e:
+        print("Database Error:", e)
+        items = []
+
+    finally:
+        # Close the database connection
+        if conn:
+            conn.close()
+
+    # Render the template with the items in the folder
+    return render_template('folder.html', folder_name=folder_name, items=items)
 
 
 @app.route('/copy', methods=['POST'])
