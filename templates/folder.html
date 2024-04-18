@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Head content -->
+</head>
+<body>
+    <h2>{{ folder_name }}</h2>
+    <div>
+        <h3>Items</h3>
+        <ul>
+            {% for item in items %}
+            <li>{{ item.NAME }}</li>
+            <!-- Display other item properties as needed -->
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
