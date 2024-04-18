@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Capstone Project</title>
@@ -69,6 +68,14 @@
             align-items: center;
             margin-bottom: 20px; /* Optional margin adjustment */
         }
+
+        /* Error message style */
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: center;
+        }
     </style>
 <body>
 <div id="login-form-wrap">
@@ -96,6 +103,12 @@
             <div class="g-recaptcha" data-sitekey="6LclpwIlAAAAAJJGxZAVGD3a6emxmCccHn5rb_ZB"></div>
         </div>
     </form>
+
+    <!-- Error message container -->
+    {% if error_message %}
+    <div class="error-message">{{ error_message }}</div>
+    {% endif %}
+
     <div id="create-account-wrap">
 
     </div><!--create-account-wrap-->
