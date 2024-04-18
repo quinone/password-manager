@@ -65,3 +65,20 @@ document.getElementById("newItemButton").addEventListener("click", function() {
     window.location.href = "/new_item";
 });
 </script>
+
+<script>
+        // Fetch folders data from the server
+        fetch('/get_folders')
+            .then(response => response.json())
+            .then(data => {
+                const folderList = document.getElementById('folderList');
+                data.forEach(folder => {
+                    const row = document.createElement('tr');
+                    const cell = document.createElement('td');
+                    cell.textContent = folder.folder_name;
+                    row.appendChild(cell);
+                    folderList.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching folders:', error));
+    </script>
