@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Items View</title>
+    <title>Add New Item</title>
     <script src="/MyJavaScript.js" async defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,67 +13,62 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            display: flex;
         }
 
-        .left-pane, .right-pane {
-            flex: 1;
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
             padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
 
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .left-pane ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .left-pane li {
-            margin-bottom: 10px;
-        }
-
-        .left-pane a {
-            text-decoration: none;
-            color: #007bff;
+        label {
             font-weight: bold;
-        }
-
-        .left-pane a:hover {
-            text-decoration: underline;
-        }
-
-        .right-pane table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .right-pane th, .right-pane td {
-            padding: 10px;
-            border: 1px solid #ccc;
-            text-align: center;
-        }
-
-        .right-pane th {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .right-pane tbody tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        .right-pane tbody tr:hover {
-            background-color: #ddd;
-        }
-
-        .right-pane button {
             display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        textarea {
             width: 100%;
             padding: 10px;
-            margin-top: 20px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') no-repeat right 10px center;
+            background-size: 18px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 0;
             border: none;
             border-radius: 5px;
             background-color: #007bff;
@@ -83,42 +77,29 @@
             cursor: pointer;
         }
 
-        .right-pane button:hover {
+        button[type="submit"]:hover {
             background-color: #0056b3;
         }
     </style>
 </head>
+<body>
+  <body>
+    <h2>Vault</h2>
+    <div class="left-pane">
+        <h3>Folders</h3>
+        <ul>
+    {% for folder in folders %}
+    <li><a href="{{ url_for('view_folder', folder_name=folder[0]) }}">{{ folder[0] }}</a></li>
+    {% endfor %}
+</ul>
 
-    <!-- Right pane with items table -->
-    <div class="right-pane">
-        <h2>Items</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Item Type</th>
-                    <th>Name</th>
-                    <th>Folder</th>
-                    <th>Username</th>
-                    <!-- Add more columns as needed -->
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Populate table rows with items data -->
-                <tr>
-                    <td>Type 1</td>
-                    <td>Item 1</td>
-                    <td>Folder A</td>
-                    <td>user123</td>
-                    <!-- Add more columns as needed -->
-                </tr>
-                <!-- Add more rows for each item -->
-            </tbody>
-        </table>
-        <button id="newItemButton">Create New Item</button>
-        <button onclick="/new_item">Create New Item</button>
-        <a href="/new_item">Create New Item</a>
-        <a href="/profile">Back</a>
+
 
     </div>
+        <a href="/new_item">Create New Item</a>
+        <a href="/new_folder">Create New folder</a>
+        <a href="/profile">Back</a>
+
 </body>
 </html>
+
