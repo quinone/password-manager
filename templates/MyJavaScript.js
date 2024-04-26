@@ -66,6 +66,7 @@ document.getElementById("newItemButton").addEventListener("click", function() {
 });
 </script>
 
+
 <script>
         // Fetch folders data from the server
         fetch('/get_folders')
@@ -82,3 +83,19 @@ document.getElementById("newItemButton").addEventListener("click", function() {
             })
             .catch(error => console.error('Error fetching folders:', error));
     </script>
+
+    <script>
+    // Fetch folders data from the server
+    fetch('/get_folders1')
+        .then(response => response.json())
+        .then(data => {
+            const folderSelect = document.getElementById('folder_id');
+            data.forEach(folder => {
+                const option = document.createElement('option');
+                option.value = folder.folder_id; // Assuming folder_id is the correct property name in your data
+                option.textContent = folder.folder_name;
+                folderSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching folders:', error));
+</script>
