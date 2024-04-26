@@ -72,8 +72,13 @@
 </head>
 <body>
     <h1>Welcome to the settings</h1>
-    <p><td colspan="2"><button type="submit">Delete account</button></td></p>
-<p>place holder</p>
-<p>place holder</p>
+    <form action="/delete_account" method="post" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+    <button type="submit">Delete account</button>
+</form>
+
+    <p><td colspan="2"><button type="submit">Change password</button></td></p>
+    <p><td colspan="2"><button type="submit">Back</button></td></p>
+
+
 </body>
 </html>
