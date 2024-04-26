@@ -71,22 +71,26 @@
     </style>
 </head>
 <body>
-    <h1>Welcome to the profile</h1>
+<div>
 
- <ul>
+    {% if user_info %}
+
+    <h1>Welcome {{ user_info[2] }}</h1>
+    <ul>
            <li><a href="/vault">Vault</a></li>
             <li><a href="/settings">Settings</a></li>
         </ul>
 
 
-    {% if user_info %}
-    <p>Email: {{ user_info[0] }}</p>
-    <p>Username: {{ user_info[1] }}</p>
+
+    <p>Email: {{ user_info[2] }}</p>
+    <p>Name: {{ user_info[3] }}</p>
+    <p>Password: {{ user_info[4] }}</p>
     <!-- Add more user info fields as needed -->
     {% else %}
     <p>No user information available.</p>
     {% endif %}
 
-
+</div>
 </body>
 </html>
