@@ -24,3 +24,7 @@ Initialize the database with
 
 Run application with
 ```flask run```
+
+## Testing 
+Using Pytest while in the parent directory
+```pytest```
