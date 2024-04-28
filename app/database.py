@@ -25,20 +25,21 @@ def create_connection(db_file):
                       EMAIL VARCHAR(250) UNIQUE,
                       NAME VARCHAR(250),
                       MASTER_PASSWORD VARCHAR(250),
+                      PASSWORD_HASH VARCHAR(250),
                       PASSWORD_HINT VARCHAR(250),
                       PREFERENCES_ID INTEGER,
                       EMAIL_CONFIRMED BOOLEAN DEFAULT 'N',
-                      FOREIGN KEY (USER_ID) REFERENCES LOGIN(ID) ON DELETE CASCADE,
+                      /* FOREIGN KEY (USER_ID) REFERENCES LOGIN(ID) ON DELETE CASCADE, */
                       FOREIGN KEY (PREFERENCES_ID) REFERENCES PREFERENCES(ID) ON DELETE CASCADE
                   ) ''')
-
-            cursor.execute('''
+            # Not required password_hash moved to registration table
+            """cursor.execute('''
                     CREATE TABLE IF NOT EXISTS LOGIN (
                           ID INTEGER PRIMARY KEY,
                           EMAIL VARCHAR(250) UNIQUE,
                           PASSWORD_HASH VARCHAR(250)
                       )
-                      ''')
+                      ''')"""
 
             cursor.execute('''
             CREATE TABLE IF NOT EXISTS FOLDER (

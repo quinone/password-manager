@@ -72,7 +72,7 @@
 </head>
 <body>
     <h1>Create Account</h1>
-    <form action="/registrationAction" method="post">
+    <form action="/auth/register" method="post">
         <table>
             {% for message in messages %}
             <p class="{{ message_type }}">{{ message }}</p>
@@ -87,8 +87,8 @@
                 <td><input type="text" id="name" name="name" required></td>
             </tr>
             <tr>
-                <td><label for="master_password">Master Password:</label></td>
-                <td><input type="password" id="master_password" name="master_password" required></td>
+                <td><label for="password">Master Password:</label></td>
+                <td><input type="password" id="password" name="password" required></td>
             </tr>
             <tr>
                 <td><label for="retype_password">Re-type Password:</label></td>
