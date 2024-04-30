@@ -1,1 +1,117 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone Project</title>
+     <!-- Include the reCAPTCHA script -->
+    <script src="/MyJavaScript.js" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="email"],
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+                /* Center the reCAPTCHA widget */
+        .recaptcha-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px; /* Optional margin adjustment */
+        }
+
+        /* Error message style */
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: center;
+        }
+    </style>
+<body>
+<div id="login-form-wrap">
+
+    <form action="/auth/login" id="login-form" method="post">
+        <p>
+           <h2>Capstone Password Manager</h2>
+           <label for="email">Email Address:</label>
+            <input id="email" name="email" placeholder="Email Address" required type="email"><i
+                class="validation"><span></span></i>
+        </p>
+        <p>
+            <label for="password">Password:</label>
+            <input id="password" name="password" placeholder="Password" required type="password"><i
+                class="validation"><span></span></i>
+        </p>
+        <p>
+             <td colspan="2"><button id="login" value="Login" type="submit">Login</button></td>
+        </p>
+        <p>Not having an account yet <a href="/auth/register">Please register</a></p>
+        <p>
+            {{ recaptcha }}
+        </p>
+         <div class="recaptcha-container">
+            <div class="g-recaptcha" data-sitekey="6LclpwIlAAAAAJJGxZAVGD3a6emxmCccHn5rb_ZB"></div>
+        </div>
+    </form>
+
+    <!-- Error message container -->
+    {% if error_message %}
+    <div class="error-message">{{ error_message }}</div>
+    {% endif %}
+
+    <div id="create-account-wrap">
+
+    </div><!--create-account-wrap-->
+</div>
+</body>
+</html>
