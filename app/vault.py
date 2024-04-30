@@ -18,13 +18,13 @@ def vault():
        try:
            # Establish database connection
            conn = get_db() #database.connect(db_file)
-           cursor = conn.cursor()
+           #cursor = conn.cursor()
            # Retrieve folders for the current user
-           cursor.execute(
+           conn.execute(
                "SELECT FOLDER_NAME FROM FOLDER WHERE USER_ID = ? AND USER_ID = ? ",
                (user_id, user_id),
            )
-           folders = cursor.fetchall()
+           folders = conn.fetchall()
        except Exception as e:
            print("Error:", e)
            folders = []
@@ -35,7 +35,7 @@ def vault():
        # Render the template with the list of folders
        return render_template("vault.html", folders=folders)
    flash("You are not logged in.")
-   return redirect(url_for("login"))
+   return redirect(url_for("auth.login"))
 
 
 @bp.route("/profile")

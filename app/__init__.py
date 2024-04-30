@@ -87,12 +87,7 @@ def create_app(test_config=None):
     def hello():
         return "Hello, World!"
 
-    @app.route("/logout")
-    def logout():
-        # Clear the session
-        session.clear()
-        flash("You have been logged out due to inactivity.")
-        return redirect(url_for("login"))
+    
 
     @app.route("/new_folder")
     def new_folder():
