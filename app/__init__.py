@@ -104,12 +104,9 @@ def create_app(test_config=None):
 
         messages = []  # List to store messages
         message_type = "error"  # Default message type
+        conn = db.get_db()
 
         try:
-            # Establish database connection
-            conn = database.connect(db_file)
-            cursor = conn.cursor()
-
             # Check if folder name is provided
             if not folder_name:
                 messages.append("Please provide a folder name.")
@@ -118,7 +115,7 @@ def create_app(test_config=None):
                 user_id = session.get("user_id")
                 if user_id:
                     # Add folder to the database with the associated user_id
-                    cursor.execute(
+                    conn.execute(
                         "INSERT INTO FOLDER (USER_ID, FOLDER_NAME) VALUES (?, ?)",
                         (user_id, folder_name),
                     )
@@ -206,16 +203,19 @@ def create_app(test_config=None):
     def new_itemAction():
         if "user_id" in session:
             user_id = session.get("user_id")
+            conn = db.get_db()
             if request.method == "POST":
+                
                 try:
                     # Handle form submission
                     item_type_id = request.form["item_type_id"]
                     name = request.form["name"]
                     folder_id = request.form["folder_id"]
 
-                    conn = database.connect(db_file)
-                    cursor = conn.cursor()
-                    cursor.execute(
+                    #conn = database.connect(db_file)
+                    #cursor = conn.cursor()
+
+                    conn.execute(
                         "INSERT INTO items (item_type_id, name, folder_id, user_id) VALUES (?, ?, ?, ?)",
                         (item_type_id, name, folder_id, user_id),
                     )
@@ -231,12 +231,12 @@ def create_app(test_config=None):
                     # Handle the error appropriately, e.g., render an error page
 
             # Retrieve folders belonging to the logged-in user
-            conn = database.connect(db_file)
-            cursor = conn.cursor()
-            cursor.execute(
+            #conn = database.connect(db_file)
+            #cursor = conn.cursor()
+            conn.execute(
                 "SELECT FOLDER_NAME FROM FOLDER WHERE USER_ID = ?", (user_id,)
             )
-            folders = cursor.fetchall()
+            folders = conn.fetchall()
             print("Folders:", folders)
 
             conn.close()
@@ -252,13 +252,14 @@ def create_app(test_config=None):
         # Check if the user is authenticated
         if "user_id" in session:
             user_id = session["user_id"]
+            conn = db.get_db()
             try:
                 # Connect to the database
-                conn = database.connect(db_file)
-                cursor = conn.cursor()
+                #conn = database.connect(db_file)
+                #cursor = conn.cursor()
 
                 # Delete user's data from related tables
-                cursor.execute("DELETE FROM REGISTRATION WHERE USER_ID = ?", (user_id,))
+                conn.execute("DELETE FROM REGISTRATION WHERE USER_ID = ?", (user_id,))
                 # You may need additional delete operations for related tables, such as items, folders, etc.
 
                 conn.commit()
@@ -285,17 +286,18 @@ def create_app(test_config=None):
 
     @app.route("/vault/<folder_name>")
     def view_folder(folder_name):
+        conn = db.get_db()
         try:
             # Establish database connection
-            conn = database.connect(db_file)
-            cursor = conn.cursor()
+            #conn = database.connect(db_file)
+            #cursor = conn.cursor()
 
             # Retrieve items from the selected folder
-            cursor.execute(
+            conn.execute(
                 "SELECT * FROM ITEM WHERE FOLDER_ID = (SELECT ID FROM FOLDER WHERE LOWER(FOLDER_NAME) = LOWER(?))",
                 (folder_name,),
             )
-            items = cursor.fetchall()
+            items = conn.fetchall()
 
         except database.Error as e:
             print("Database Error:", e)
@@ -363,5 +365,5 @@ def generate_password(
     return password
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+#if __name__ == "__main__":
+#    app.run(debug=True)
