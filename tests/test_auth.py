@@ -42,6 +42,7 @@ valid_hint = "Test Hint"
         (valid_email, valid_password, valid_password, valid_name, "", b"Password hint is required."),
     ),
 )
+
 def test_register_validate_input(client, email, password, retype_password, name, password_hint, message):
     response = client.post(
         "/auth/register",
