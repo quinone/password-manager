@@ -69,6 +69,7 @@ def test_login(client, auth):
     (
         ("a", "test", b"Invalid email or password. Please try again."),
         ("test", "a", b"Invalid email or password. Please try again."),
+        (valid_email, "a", b"Invalid email or password. Please try again."),
     ),
 )
 def test_login_validate_input(auth, email, password, message):
