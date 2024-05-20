@@ -74,11 +74,11 @@ def new_item():
                 # Handle form submission
                 item_type_id = request.form["item_type_id"]
                 name = request.form["name"]
-                folder_id = request.form.get('folder_id', False)
+                folder_id = request.form.get("folder_id", False)
 
                 # conn = database.connect(db_file)
                 # cursor = conn.cursor()
-                print('try to add item')
+                print("try to add item")
                 conn.execute(
                     "INSERT INTO items (item_type_id, name, folder_id, user_id) VALUES (?, ?, ?, ?)",
                     (item_type_id, name, folder_id, user_id),
@@ -86,7 +86,7 @@ def new_item():
                 conn.commit()
                 if conn:
                     conn.close()
-                flash('Successfully submitted new item')
+                flash("Successfully submitted new item")
                 return redirect(url_for("vault"))
 
             except Error as e:
@@ -95,7 +95,7 @@ def new_item():
         # Retrieve folders belonging to the logged-in user
         # conn = database.connect(db_file)
         # cursor = conn.cursor()]
-        flash('Please enter item to be saved')
+        flash("Please enter item to be saved")
         conn.execute("SELECT FOLDER_NAME FROM FOLDER WHERE USER_ID = ?", (user_id,))
         folders = conn.cursor().fetchall()
         print("Folders:", folders)
@@ -105,52 +105,54 @@ def new_item():
 
     # Redirect to login page or handle unauthorized access
     return redirect(url_for("auth.login"))
-    
-    #return render_template("new_item.html")
+
+    # return render_template("new_item.html")
+
 
 @bp.route("/new_itemAction", methods=["GET", "POST"])
 def new_itemAction():
-        if "user_id" in session:
-            user_id = session.get("user_id")
-            conn = get_db()
-            if request.method == "POST":
-                try:
-                    # Handle form submission
-                    item_type_id = request.form["item_type_id"]
-                    name = request.form["name"]
-                    folder_id = request.form["folder_id"]
+    if "user_id" in session:
+        user_id = session.get("user_id")
+        conn = get_db()
+        if request.method == "POST":
+            try:
+                # Handle form submission
+                item_type_id = request.form["item_type_id"]
+                name = request.form["name"]
+                folder_id = request.form["folder_id"]
 
-                    # conn = database.connect(db_file)
-                    # cursor = conn.cursor()
+                # conn = database.connect(db_file)
+                # cursor = conn.cursor()
 
-                    conn.execute(
-                        "INSERT INTO items (item_type_id, name, folder_id, user_id) VALUES (?, ?, ?, ?)",
-                        (item_type_id, name, folder_id, user_id),
-                    )
-                    conn.commit()
+                conn.execute(
+                    "INSERT INTO items (item_type_id, name, folder_id, user_id) VALUES (?, ?, ?, ?)",
+                    (item_type_id, name, folder_id, user_id),
+                )
+                conn.commit()
 
-                    if conn:
-                        conn.close()
+                if conn:
+                    conn.close()
 
-                    return redirect(url_for("success_page"))
+                return redirect(url_for("success_page"))
 
-                except Error as e:
-                    print("Database Error:", e)
-                    # Handle the error appropriately, e.g., render an error page
+            except Error as e:
+                print("Database Error:", e)
+                # Handle the error appropriately, e.g., render an error page
 
-            # Retrieve folders belonging to the logged-in user
-            # conn = database.connect(db_file)
-            # cursor = conn.cursor()
-            conn.execute("SELECT FOLDER_NAME FROM FOLDER WHERE USER_ID = ?", (user_id,))
-            folders = conn.fetchall()
-            print("Folders:", folders)
+        # Retrieve folders belonging to the logged-in user
+        # conn = database.connect(db_file)
+        # cursor = conn.cursor()
+        conn.execute("SELECT FOLDER_NAME FROM FOLDER WHERE USER_ID = ?", (user_id,))
+        folders = conn.fetchall()
+        print("Folders:", folders)
 
-            conn.close()
+        conn.close()
 
-            return render_template("new_item.html", folders=folders)
-        else:
-            # Redirect to login page or handle unauthorized access
-            return redirect(url_for("login_page"))
+        return render_template("new_item.html", folders=folders)
+    else:
+        # Redirect to login page or handle unauthorized access
+        return redirect(url_for("login_page"))
+
 
 @bp.route("/new_folder")
 def new_folder():

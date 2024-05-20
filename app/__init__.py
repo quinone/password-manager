@@ -42,16 +42,22 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    # Imports db.py which includes get_db()
     from . import db
 
     db.init_app(app)
 
+    # Imports auth.py
     from . import auth
 
+    # Blueprint allows prefix in url of '/auth/' and points to the templates folder
+    # and access the actions/methods in the auth.py by using auth.methods
     app.register_blueprint(auth.bp)
 
     from . import vault
 
+    # Blueprint allows prefix in url of '/vault/' and points to the templates folder
+    # and access the actions/methods in the auth.py by using vault.methods
     app.register_blueprint(vault.bp)
 
     # app = Flask(__name__)
@@ -144,8 +150,6 @@ def create_app(test_config=None):
     def settings():
         return render_template("settings.html")
 
-    
-
     # Add this route to handle account deletion// not deleting data related to user just user profile
     @app.route("/delete_account", methods=["POST"])
     def delete_account():
@@ -183,8 +187,6 @@ def create_app(test_config=None):
             return redirect(url_for("login"))
 
     # Update your settings HTML template to include a form or button to trigger the account deletion
-
-    
 
     return app
 
@@ -224,5 +226,8 @@ def generate_password(
     return password
 
 
+
 # if __name__ == "__main__":
 #    app.run(debug=True)
+# no longer required when __init__.py is in a folder called app
+# instead use flask run --debug

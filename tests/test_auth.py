@@ -10,7 +10,7 @@ def test_register(client, app):
         data={
             "email_address": "a@a.com",
             "password": "1StrongPassword!",
-            "retype_password":"1StrongPassword!",
+            "retype_password": "1StrongPassword!",
             "name": "a",
             "hint": "One strong password!",
         },
@@ -27,12 +27,13 @@ def test_register(client, app):
             is not None
         )
 
+
 valid_password = "Testpassword1!"
 valid_email = "test@test.com"
 valid_name = "Test Name"
 valid_hint = "Test Hint"
 
-'''
+"""
 @pytest.mark.parametrize(
     ("email", "password","retype_password", "name", "password_hint", "message"),
     (
@@ -50,7 +51,8 @@ def test_register_validate_input(client, email, password, retype_password, name,
         data={"email_address": email, "password": password,"retype_password": retype_password, "name": name, "hint": password_hint},
     )
     assert message in response.data
-'''
+"""
+
 
 def test_login(client, auth):
     assert client.get("/auth/login").status_code == 200
@@ -61,7 +63,7 @@ def test_login(client, auth):
         response = client.get("/vault/profile")
         db = get_db()
         assert session["user_id"] == 1
-        assert g.user['name'] == 'test'
+        assert g.user["name"] == "test"
 
 
 @pytest.mark.parametrize(
