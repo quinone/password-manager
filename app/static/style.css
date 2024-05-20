@@ -1,0 +1,254 @@
+body {
+    background-color: #9f9da7;
+    font-size: 1.6rem;
+    font-family: "Open Sans", sans-serif;
+    color: #2b3e51;
+}
+
+h2 {
+    font-weight: 300;
+    text-align: center;
+}
+
+.form-container {
+    border: 5px solid black;
+    padding: 10px;
+}
+
+p {
+    position: relative;
+}
+
+a,
+a:link,
+a:visited,
+a:active {
+    color: #3ca9e2;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+a:focus, a:hover,
+a:link:focus,
+a:link:hover,
+a:visited:focus,
+a:visited:hover,
+a:active:focus,
+a:active:hover {
+    color: #329dd5;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+#login-form-wrap {
+    background-color: #fff;
+    width: 35%;
+    margin: 30px auto;
+    text-align: center;
+    padding: 20px 0 0 0;
+    border-radius: 4px;
+    box-shadow: 0px 30px 50px 0px rgba(0, 0, 0, 0.2);
+}
+
+#login-form {
+    padding: 0 60px;
+}
+
+input {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    outline: none;
+    height: 60px;
+    line-height: 60px;
+    border-radius: 4px;
+}
+
+input[type="text"],
+input[type="email"] {
+    width: 100%;
+    padding: 0 0 0 10px;
+    margin: 0;
+    color: #8a8b8e;
+    border: 1px solid #c2c0ca;
+    font-style: normal;
+    font-size: 14px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    position: relative;
+    display: inline-block;
+    background: none;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus {
+    border-color: #3ca9e2;
+}
+
+input[type="text"]:focus:invalid,
+input[type="email"]:focus:invalid {
+    color: #cc1e2b;
+    border-color: #cc1e2b;
+}
+
+input[type="text"]:valid ~ .validation,
+input[type="email"]:valid ~ .validation {
+    display: block;
+    border-color: #0C0;
+}
+
+input[type="text"]:valid ~ .validation span,
+input[type="email"]:valid ~ .validation span {
+    background: #0C0;
+    position: absolute;
+    border-radius: 6px;
+}
+
+input[type="text"]:valid ~ .validation span:first-child,
+input[type="email"]:valid ~ .validation span:first-child {
+    top: 30px;
+    left: 14px;
+    width: 20px;
+    height: 3px;
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+input[type="text"]:valid ~ .validation span:last-child,
+input[type="email"]:valid ~ .validation span:last-child {
+    top: 35px;
+    left: 8px;
+    width: 11px;
+    height: 3px;
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.validation {
+    display: none;
+    position: absolute;
+    content: " ";
+    height: 60px;
+    width: 30px;
+    right: 15px;
+    top: 0px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.column {
+    flex: 1;
+}
+
+input[type="submit"] {
+    border: none;
+    display: block;
+    background-color: #3ca9e2;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+    font-size: 18px;
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+}
+
+input[type="submit"]:hover {
+    background-color: #329dd5;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+label {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#create-account-wrap {
+    background-color: #eeedf1;
+    color: #8a8b8e;
+    font-size: 14px;
+    width: 100%;
+    padding: 10px 0;
+    border-radius: 0 0 4px 4px;
+}
+
+table {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+button {
+    width: 350px;
+    height: 150px;
+    font-size: 28px;
+    border-radius: 10px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    margin: 20px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+table th b {
+    text-align: center;
+    font-weight: bold;
+}
+
+table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+table tr:nth-child(odd) {
+    background-color: #b3d9ff;
+}
+#login-form-wrap {
+   background-color: #fff;
+    width: 50%; /* Adjust the width as per your preference */
+    margin: 50px auto; /* Center the form horizontally and add some top margin */
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px; /* Add some border radius for a rounded appearance */
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+#copy_button {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+/* Center and style the generated password field */
+#password_field {
+    width: calc(100% - 40px); /* Adjust width to fit inside form */
+    margin: 20px auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+#generated_password {
+    word-wrap: break-word; /* Allow wrapping of long words */
+}
+

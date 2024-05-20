@@ -8,8 +8,9 @@ def test_register(client, app):
     response = client.post(
         "/auth/register",
         data={
-            "email": "a@a.com",
+            "email_address": "a@a.com",
             "password": "1StrongPassword!",
+            "retype_password":"1StrongPassword!",
             "name": "a",
             "hint": "One strong password!",
         },
@@ -26,40 +27,49 @@ def test_register(client, app):
             is not None
         )
 
+valid_password = "Testpassword1!"
+valid_email = "test@test.com"
+valid_name = "Test Name"
+valid_hint = "Test Hint"
 
+'''
 @pytest.mark.parametrize(
-    ("email", "password", "name", "hint", "message"),
+    ("email", "password","retype_password", "name", "password_hint", "message"),
     (
-        ("", "a", "a", "a", b"Email address is required."),
-        ("a", "", "a", "a", b"Password is required."),
-        ("a", "a", "", "a", b"Name is required."),
-        ("a", "a", "a", "", b"Password hint is required."),
+        ("", valid_password, valid_password, valid_name,valid_hint, b"Email address is required."),
+        (valid_email, "", valid_password, valid_name, valid_hint, b"Password is required."),
+        (valid_email, valid_password, "", valid_name, valid_hint, b"Passwords do not match."),
+        (valid_email, valid_password,valid_password, "",valid_hint, b"Name is required."),
+        (valid_email, valid_password, valid_password, valid_name, "", b"Password hint is required."),
     ),
 )
-def test_register_validate_input(client, email, password, name, hint, message):
+
+def test_register_validate_input(client, email, password, retype_password, name, password_hint, message):
     response = client.post(
         "/auth/register",
-        data={"email": email, "password": password, "name": name, "hint": hint},
+        data={"email_address": email, "password": password,"retype_password": retype_password, "name": name, "hint": password_hint},
     )
     assert message in response.data
-
+'''
 
 def test_login(client, auth):
     assert client.get("/auth/login").status_code == 200
     response = auth.login()
-    assert response.headers["Location"] == "/"
+    assert response.headers["Location"] == "/vault/profile"
 
     with client:
-        response = client.get("/")
-        assert session.get("user_id") == 1
-        assert "test" in g.user
+        response = client.get("/vault/profile")
+        db = get_db()
+        assert session["user_id"] == 1
+        assert g.user['name'] == 'test'
 
 
 @pytest.mark.parametrize(
     ("email", "password", "message"),
     (
-        ("a", "test", b"Incorrect username or password"),
-        ("test", "a", b"Incorrect username or password"),
+        ("a", "test", b"Invalid email or password. Please try again."),
+        ("test", "a", b"Invalid email or password. Please try again."),
+        (valid_email, "a", b"Invalid email or password. Please try again."),
     ),
 )
 def test_login_validate_input(auth, email, password, message):

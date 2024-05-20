@@ -71,40 +71,14 @@
     </style>
 </head>
 <body>
-    <h1>Create Account</h1>
-    <form action="/auth/register" method="post">
-        <table>
-            {% for message in messages %}
-            <p class="{{ message_type }}">{{ message }}</p>
-        {% endfor %}
-        <br>
-            <tr>
-                <td><label for="email_address">Email Address:</label></td>
-                <td><input type="email" id="email_address" name="email_address" ></td>
-            </tr>
-            <tr>
-                <td><label for="name">Name:</label></td>
-                <td><input type="text" id="name" name="name" required></td>
-            </tr>
-            <tr>
-                <td><label for="password">Password:</label></td>
-                <td><input type="password" id="password" name="password" required></td>
-            </tr>
-            <tr>
-                <td><label for="retype_password">Confirm Password:</label></td>
-                <td><input type="password" id="retype_password" name="retype_password" required></td>
-            </tr>
-            <tr>
-                <td><label for="hint">Password Hint:</label></td>
-                <td><input type="text" id="hint" name="hint"></td>
-            </tr>
-            <tr>
-                <td colspan="2"><button type="submit">Create Account</button></td>
-            </tr>
-            <div class="recaptcha-container">
-            <div class="g-recaptcha" data-sitekey="6LclpwIlAAAAAJJGxZAVGD3a6emxmCccHn5rb_ZB"></div>
-        </div>
-        </table>
-    </form>
+    <h1>Welcome to the settings</h1>
+    <form action="/delete_account" method="post" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+    <button type="submit">Delete account</button>
+</form>
+
+    <p><td colspan="2"><button type="submit">Change password</button></td></p>
+    <p><td colspan="2"><button type="submit">Back</button></td></p>
+
+
 </body>
 </html>
