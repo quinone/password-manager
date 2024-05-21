@@ -177,7 +177,8 @@ def login():
 @bp.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("login"))
+    flash("You have been logged out.")
+    return redirect(url_for("auth.login"))
 
 
 def login_required(view):

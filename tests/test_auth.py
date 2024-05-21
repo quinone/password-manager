@@ -77,3 +77,23 @@ def test_login(client, auth):
 def test_login_validate_input(auth, email, password, message):
     response = auth.login(email, password)
     assert message in response.data
+
+
+def test_logout(client, auth):
+    ## Simulate a login
+    response = auth.login()
+    with client:
+        response = client.get('/vault/profile')
+        assert session["user_id"] == 1
+    #with client.session_transaction() as sess:
+    #    sess['user_id'] = 1
+    ## Ensure the user_id is set in the session
+        assert session.get('user_id') == 1
+
+#
+    ## Perform the logout
+        response = client.get('/auth/logout', follow_redirects=True)
+        assert 'user_id' not in session
+        assert b'You have been logged out.' in response.data
+        assert response.headers['Location'] == '/auth/login'
+    #pass
