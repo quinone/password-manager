@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- Head content -->
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}Folder{% endblock %}
+
+{% block content %}
+
     <h2>{{ folder_name }}</h2>
     <div>
         <h3>Items</h3>
@@ -14,6 +13,6 @@
             {% endfor %}
         </ul>
     </div>
+{% endblock %}
 
-</body>
 </html>

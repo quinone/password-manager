@@ -226,7 +226,6 @@ def generate_password(
     return password
 
 
-
 # if __name__ == "__main__":
 #    app.run(debug=True)
 # no longer required when __init__.py is in a folder called app
