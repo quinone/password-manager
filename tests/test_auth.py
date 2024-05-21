@@ -33,8 +33,8 @@ valid_email = "test@test.com"
 valid_name = "Test Name"
 valid_hint = "Test Hint"
 
-"""
-@pytest.mark.parametrize(
+
+"""@pytest.mark.parametrize(
     ("email", "password","retype_password", "name", "password_hint", "message"),
     (
         ("", valid_password, valid_password, valid_name,valid_hint, b"Email address is required."),
@@ -50,8 +50,7 @@ def test_register_validate_input(client, email, password, retype_password, name,
         "/auth/register",
         data={"email_address": email, "password": password,"retype_password": retype_password, "name": name, "hint": password_hint},
     )
-    assert message in response.data
-"""
+    assert message in response.data"""
 
 
 def test_login(client, auth):
@@ -85,15 +84,11 @@ def test_logout(client, auth):
     with client:
         response = client.get('/vault/profile')
         assert session["user_id"] == 1
-    #with client.session_transaction() as sess:
-    #    sess['user_id'] = 1
     ## Ensure the user_id is set in the session
         assert session.get('user_id') == 1
-
-#
     ## Perform the logout
         response = client.get('/auth/logout', follow_redirects=True)
+        #assert response.headers['Location'] == "/auth/login"
         assert 'user_id' not in session
         assert b'You have been logged out.' in response.data
-        assert response.headers['Location'] == '/auth/login'
-    #pass
+

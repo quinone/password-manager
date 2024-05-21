@@ -1,5 +1,17 @@
-<!doctype html>
-<title>{% block title %}{% endblock %} - Password Manager</title>
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - Password Manager</title>
+     <!-- Include the reCAPTCHA script -->
+    <script src="/MyJavaScript.js" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+
+    </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
   <h1>Password Manager</h1>
