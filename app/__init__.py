@@ -19,6 +19,9 @@ from flask import (
 import random
 import string
 import app.database as database
+from flask_bootstrap import Bootstrap
+
+bootstrap = Bootstrap()
 
 
 def create_app(test_config=None):
@@ -60,8 +63,9 @@ def create_app(test_config=None):
     # and access the actions/methods in the auth.py by using vault.methods
     app.register_blueprint(vault.bp)
 
-    # app = Flask(__name__)
-    # db_file = "CAPSTONE-PROJECT.db"
+    bootstrap.init_app(app)
+
+
     app.secret_key = "super secret key"  # secret key for captcha
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
 

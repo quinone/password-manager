@@ -10,7 +10,9 @@ from flask import (
     render_template,
 )
 
+from app.auth import login_required
 from app.db import get_db
+from app.forms import NewItemForm
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
 
@@ -65,6 +67,41 @@ def profile():
 
 
 @bp.route("/new-item", methods=["GET", "POST"])
+@login_required
+def new_item():
+    form = NewItemForm(request.form)
+    if request.method== 'POST' and form.validate():
+        userID = session.get('user_id')
+        name = form.name.data
+        username = form.username.data
+        password = form.password.data
+        uri = form.uri.data
+        notes = form.notes.data
+        folderID = form.folderID.data
+
+        try:
+            conn = get_db()
+            conn.cursor().execute(
+                "INSERT INTO ITEM (USER_ID, name, username, password, uri, NOTES, FOLDER_ID) VALUES (?,?,?,?,?,?,?)",
+                (userID, name, username, password, uri, notes, folderID)
+            )
+            conn.commit()
+
+            flash("Successfully submitted new item")
+            return redirect(url_for("vault.vault"))
+        except Error as e:
+            flash("Failed to save, please try again.")
+            print("Database Error:", e)
+        except Exception as e:
+            flash("Failed to save, please try again.")
+            print("Exception:", e)
+        finally:
+            if conn:
+                conn.close()
+    return render_template("new-item.html", form=form)
+
+"""
+@bp.route("/new-item", methods=["GET", "POST"])
 def new_item():
     if "user_id" in session:
         user_id = session.get("user_id")
@@ -108,8 +145,8 @@ def new_item():
 
     # return render_template("new_item.html")
 
-
-@bp.route("/new_itemAction", methods=["GET", "POST"])
+"""
+"""@bp.route("/new_itemAction", methods=["GET", "POST"])
 def new_itemAction():
     if "user_id" in session:
         user_id = session.get("user_id")
@@ -151,7 +188,7 @@ def new_itemAction():
         return render_template("new_item.html", folders=folders)
     else:
         # Redirect to login page or handle unauthorized access
-        return redirect(url_for("login_page"))
+        return redirect(url_for("login_page"))"""
 
 
 @bp.route("/new_folder")
