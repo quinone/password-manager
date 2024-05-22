@@ -64,7 +64,7 @@ def profile():
     return redirect(url_for("auth.login"))
 
 
-@bp.route("/new_item", methods=["GET", "POST"])
+@bp.route("/new-item", methods=["GET", "POST"])
 def new_item():
     if "user_id" in session:
         user_id = session.get("user_id")
@@ -101,7 +101,7 @@ def new_item():
         print("Folders:", folders)
         conn.close()
 
-        return render_template("new_item.html", folders=folders)
+        return render_template("new-item.html", folders=folders)
 
     # Redirect to login page or handle unauthorized access
     return redirect(url_for("auth.login"))

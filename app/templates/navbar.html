@@ -7,19 +7,22 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <a class="nav-link active" aria-current="page" href="/">Home</a>
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">  
           {% if g.user %}
           <li class="nav-item ">
-            <span class="nav-link">{{ g.user['name'] }}</span>
+            <a class="nav-link" href="{{ url_for('vault.new_item')}}">+</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
+          <li class="nav-item ">
+            <a class="nav-link" href="{{ url_for('vault.profile')}}">{{ g.user['name'] }}</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('vault.vault') }}">Vault</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
           </li>
           {% else %}
           <li class="nav-item">
