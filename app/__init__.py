@@ -18,7 +18,6 @@ from flask import (
 )
 import random
 import string
-import app.database as database
 from flask_bootstrap import Bootstrap
 
 bootstrap = Bootstrap()
