@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}Add New Item{% endblock %}
+{% block content %}
+{{ wtf.quick_form(form) }}
+<h1>New Item Form</h1>
+    <form method="POST">
+        <!-- Form fields for adding a new item -->
+        <label for="item_type_id">Item Type ID:</label>
+        <input type="text" id="item_type_id" name="item_type_id" required><br>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="folder_id">Folder:</label>
+            <label for="folder_id">Folder:</label>
+        <select id="folder_id" name="folder_id"></select><br>
+
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br>
+
+        <label for="uri">URI:</label>
+        <input type="text" id="uri" name="uri"><br>
+
+        <label for="notes">Notes:</label>
+        <textarea id="notes" name="notes"></textarea><br>
+
+        <label for="custom_field_name">Custom Field Name:</label>
+        <input type="text" id="custom_field_name" name="custom_field_name"><br>
+
+        <label for="custom_field_type">Custom Field Type:</label>
+        <input type="text" id="custom_field_type" name="custom_field_type"><br>
+
+        <label for="custom_field_value">Custom Field Value:</label>
+        <input type="text" id="custom_field_value" name="custom_field_value"><br>
+
+        <input type="submit" value="Submit">
+    </form>
+    {% endblock %}
+</html>

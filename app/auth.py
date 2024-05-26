@@ -127,7 +127,7 @@ def register():
                     conn.close()
         flash(error)
         # Render the template with the messages and message type
-        #return redirect(url_for("login"))
+        # return redirect(url_for("login"))
     return render_template("register.html")
 
 
@@ -148,17 +148,22 @@ def login():
         if user:
             # Debug: Print user data retrieved from the database
             print("User Data:", user)
-            # Check if passwords match
-            password_hasher = PasswordHasher()  # Using Argon2
-            # if bcrypt.checkpw(password.encode('utf-8'), user[4]):  # Compare hashed password
-            if password_hasher.verify(user["PASSWORD"], password):
-                # Passwords match, set session variables or redirect to dashboard
-                session.clear()
-                print(user['USER_ID'])
-                session["user_id"] = user["USER_ID"]  # Assuming user_id is in the first column
-                flash("Login successful.")
-                return redirect(url_for("vault.profile"))
-            else:
+            try:
+                # Check if passwords match
+                password_hasher = PasswordHasher()  # Using Argon2
+                # if bcrypt.checkpw(password.encode('utf-8'), user[4]):  # Compare hashed password
+                if password_hasher.verify(user["PASSWORD"], password):
+                    # Passwords match, set session variables or redirect to dashboard
+                    session.clear()
+                    print(user["USER_ID"])
+                    session["user_id"] = user[
+                        "USER_ID"
+                    ]  # Assuming user_id is in the first column
+                    flash("Login successful.")
+                    return redirect(url_for("vault.profile"))
+                else:
+                    error_message = "Invalid email or password. Please try again."
+            except Exception as e:
                 error_message = "Invalid email or password. Please try again."
         else:
             error_message = "Invalid email or password. Please try again."
@@ -172,7 +177,8 @@ def login():
 @bp.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("index"))
+    flash("You have been logged out.")
+    return redirect(url_for("auth.login"))
 
 
 def login_required(view):
