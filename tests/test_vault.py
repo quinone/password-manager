@@ -60,9 +60,42 @@ def test_unauthenticated_vault_access(client):
     assert response.request.path == '/auth/login'
 
 
-def test_authenticated_vault_view_users_items():
+def test_authenticated_vault_view_users_items(client, auth):
     ''' This test should check if the items are shown for the users items'''
     pass
+    
+    """# Simulate a login
+    response = auth.login()
+    with client:
+        # Check if login was successful
+        print("Login response status code:", response.status_code)
+        assert response.status_code == 302
+
+        # Access the new item page
+        response = client.get("/vault/")
+        print("Vault page response status code:", response.status_code)
+        assert response.status_code == 200
+
+        # Ensure the user_id is set in the session
+        with client.session_transaction() as session:
+            user_id = session.get("user_id")
+            print("Session user_id:", user_id)
+            assert user_id == 1
+
+        # Check for rendering of test items
+        assert b'test' in response.data 
+        for item in ['1',
+        '1',
+        'Fake Name',
+        'Fake Username',
+        'asdf1234',
+        'www.google.com',
+        'note' ]:
+            assert item.encode('utf-8') in response.data
+        # Print response to help debug
+        print("Post response status code:", response.status_code)
+        print("Post response headers:", response.headers)
+        print("Post response data:", response.data)"""
 
 
 def test_authenticated_vault_view_others_items():

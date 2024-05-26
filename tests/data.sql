@@ -18,7 +18,7 @@ INSERT INTO ITEM (USER_ID, FOLDER_ID, NAME, USERNAME, PASSWORD, URI, NOTES)
 VALUES 
     (
         '1',
-        '1',
+        '2',
         'Fake Name',
         'Fake Username',
         'asdf1234',
