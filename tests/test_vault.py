@@ -45,10 +45,18 @@ def test_new_item(client, auth, app):
         assert b"Successfully submitted new item" in response.data
 
 
-def test_unauthenticated_vault_access(client):
+# As new routes are created they can be added here
+@pytest.mark.parametrize("test_path",[
+    ("/vault/"),
+    ("/vault/profile"),
+    ("/vault/new-item"),
+    ("/vault/new-folder"),
+], ids= ["Check vault", "check profile", "check new-item", "check new-folder"])
+
+def test_unauthenticated_route_access(client, test_path):
     ''' This test should redirect to /auth/login '''
 
-    response = client.get("/vault", follow_redirects=True)
+    response = client.get(test_path, follow_redirects=True)
     # Print response to help debug
     print("Post response status code:", response.status_code)
     print("Post response headers:", response.headers)

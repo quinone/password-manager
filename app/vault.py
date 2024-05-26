@@ -18,30 +18,28 @@ bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="template
 
 
 @bp.route("/")
+@login_required
 def vault():
-    if "user_id" in session:
-        user_id = session.get("user_id")
-        try:
-            # Establish database connection
-            conn = get_db()  # database.connect(db_file)
-            # cursor = conn.cursor()
-            # Retrieve folders for the current user
-            conn.execute(
-                "SELECT FOLDER_NAME FROM FOLDER WHERE USER_ID = ? AND USER_ID = ? ",
-                (user_id, user_id),
-            )
-            folders = conn.cursor().fetchall()
-        except Exception as e:
-            print("Error:", e)
-            folders = []
-        finally:
-            # Close the database connection
-            if conn:
-                conn.close()
-        # Render the template with the list of folders
-        return render_template("vault.html", folders=folders)
-    flash("You are not logged in.")
-    return redirect(url_for("auth.login"))
+    user_id = session.get("user_id")
+    try:
+        # Establish database connection
+        conn = get_db()  # database.connect(db_file)
+        # cursor = conn.cursor()
+        # Retrieve folders for the current user
+        conn.execute(
+            "SELECT FOLDER_NAME FROM FOLDER WHERE USER_ID = ? AND USER_ID = ? ",
+            (user_id, user_id),
+        )
+        folders = conn.cursor().fetchall()
+    except Exception as e:
+        print("Error:", e)
+        folders = []
+    finally:
+        # Close the database connection
+        if conn:
+            conn.close()
+    # Render the template with the list of folders
+    return render_template("vault.html", folders=folders)
 
 
 @bp.route("/profile")
@@ -192,6 +190,7 @@ def new_itemAction():
 
 
 @bp.route("/new-folder")
+@login_required
 def new_folder():
     return render_template("new-folder.html")
 
