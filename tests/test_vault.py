@@ -43,4 +43,4 @@ def test_new_item(client, auth, app):
         
         # Test for successful message
         assert b"Successfully submitted new item" in response.data
-
+g

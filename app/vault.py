@@ -191,9 +191,9 @@ def new_itemAction():
         return redirect(url_for("login_page"))"""
 
 
-@bp.route("/new_folder")
+@bp.route("/new-folder")
 def new_folder():
-    return render_template("new_folder.html")
+    return render_template("new-folder.html")
 
 
 @bp.route("/<folder_name>")
