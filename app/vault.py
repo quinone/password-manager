@@ -43,33 +43,31 @@ def vault():
 
 
 @bp.route("/profile")
+@login_required
 def profile():
-    # Check if user is logged in
-    if "user_id" in session:
-        user_id = session["user_id"]
-        # Connect to the database
-        conn = get_db()  # database.connect(db_file)
-        if conn is None:
-            flash("Failed to connect to the database.")
-            return redirect(url_for("login"))
-        cursor = conn.cursor()
-        # Fetch user info from the database
-        cursor.execute("SELECT * FROM USER WHERE USER_ID = ?", (user_id,))
-        user_info = cursor.fetchone()
-        # Close cursor and connection
-        cursor.close()
-        conn.close()
-        return render_template("profile.html", user_info=user_info)
-    flash("You are not logged in.")
-    return redirect(url_for("auth.login"))
+    # Loads "user_id" in session:
+    user_id = session["user_id"]
+    # Connect to the database
+    conn = get_db()  # database.connect(db_file)
+    if conn is None:
+        flash("Failed to connect to the database.")
+        return redirect(url_for("login"))
+    cursor = conn.cursor()
+    # Fetch user info from the database
+    cursor.execute("SELECT * FROM USER WHERE USER_ID = ?", (user_id,))
+    user_info = cursor.fetchone()
+    # Close cursor and connection
+    cursor.close()
+    conn.close()
+    return render_template("profile.html", user_info=user_info)
 
 
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
     form = NewItemForm(request.form)
-    if request.method== 'POST' and form.validate():
-        userID = session.get('user_id')
+    if request.method == "POST" and form.validate():
+        userID = session.get("user_id")
         name = form.name.data
         username = form.username.data
         password = form.password.data
@@ -81,7 +79,7 @@ def new_item():
             conn = get_db()
             conn.cursor().execute(
                 "INSERT INTO ITEM (USER_ID, name, username, password, uri, NOTES, FOLDER_ID) VALUES (?,?,?,?,?,?,?)",
-                (userID, name, username, password, uri, notes, folderID)
+                (userID, name, username, password, uri, notes, folderID),
             )
             conn.commit()
 
@@ -98,7 +96,8 @@ def new_item():
                 conn.close()
     return render_template("new-item.html", form=form)
 
-"""
+
+""" Commented out to trial using flask-wtf extension
 @bp.route("/new-item", methods=["GET", "POST"])
 def new_item():
     if "user_id" in session:

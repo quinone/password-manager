@@ -18,15 +18,14 @@ def app():
         {
             "TESTING": True,
             "DATABASE": db_path,
-            
         }
     )
-    app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for testing,
+    app.config["WTF_CSRF_ENABLED"] = False  # Disable CSRF for testing,
 
     with app.app_context():
         init_db()
         get_db().executescript(_data_sql)
-        
+
     yield app
 
     os.close(db_fd)

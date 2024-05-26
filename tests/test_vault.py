@@ -2,6 +2,7 @@ from flask import g, session
 import pytest
 from app.db import get_db
 
+
 def test_new_item(client, auth, app):
     # Simulate a login
     response = auth.login()
@@ -32,7 +33,7 @@ def test_new_item(client, auth, app):
                 "notes": "My sample google account info",
                 "folderID": 1,  # Add a value for folderID
             },
-            follow_redirects=True
+            follow_redirects=True,
         )
         print("Post response status code:", response.status_code)
         print("Post response headers:", response.headers)
@@ -40,21 +41,24 @@ def test_new_item(client, auth, app):
 
         # Test redirection to vault
         assert response.request.path == "/vault/"
-        
+
         # Test for successful message
         assert b"Successfully submitted new item" in response.data
 
 
 # As new routes are created they can be added here
-@pytest.mark.parametrize("test_path",[
-    ("/vault/"),
-    ("/vault/profile"),
-    ("/vault/new-item"),
-    ("/vault/new-folder"),
-], ids= ["Check vault", "check profile", "check new-item", "check new-folder"])
-
+@pytest.mark.parametrize(
+    "test_path",
+    [
+        ("/vault/"),
+        ("/vault/profile"),
+        ("/vault/new-item"),
+        ("/vault/new-folder"),
+    ],
+    ids=["Check vault", "check profile", "check new-item", "check new-folder"],
+)
 def test_unauthenticated_route_access(client, test_path):
-    ''' This test should redirect to /auth/login '''
+    """This test should redirect to /auth/login"""
 
     response = client.get(test_path, follow_redirects=True)
     # Print response to help debug
@@ -64,14 +68,14 @@ def test_unauthenticated_route_access(client, test_path):
     # Status code for redirect should be 200 after redirect
     assert response.status_code == 200
     # Flash message of 'You are not logged in.'
-    assert b'You are not logged in.' in response.data
-    assert response.request.path == '/auth/login'
+    assert b"You are not logged in." in response.data
+    assert response.request.path == "/auth/login"
 
 
 def test_authenticated_vault_view_users_items(client, auth):
-    ''' This test should check if the items are shown for the users items'''
+    """This test should check if the items are shown for the users items"""
     pass
-    
+
     """# Simulate a login
     response = auth.login()
     with client:
@@ -107,5 +111,5 @@ def test_authenticated_vault_view_users_items(client, auth):
 
 
 def test_authenticated_vault_view_others_items():
-    ''' This test should attempt to access other users items and fail'''
+    """This test should attempt to access other users items and fail"""
     pass

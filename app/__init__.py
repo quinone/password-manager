@@ -64,7 +64,6 @@ def create_app(test_config=None):
 
     bootstrap.init_app(app)
 
-
     app.secret_key = "super secret key"  # secret key for captcha
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
 
