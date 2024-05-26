@@ -12,3 +12,16 @@ VALUES
         '$argon2id$v=19$m=65536,t=3,p=4$bcra4HaJs0KTWz7VJF+KCg$Misjfg/IRLLKlluRW9WoY4HzoO5z2QsJ5GitIo6wjEs',
         'The password is "other"'
     );
+
+
+INSERT INTO ITEM (USER_ID, FOLDER_ID, NAME, USERNAME, PASSWORD, URI, NOTES)
+VALUES 
+    (
+        '1',
+        '1',
+        'Fake Name',
+        'Fake Username',
+        'asdf1234',
+        'www.google.com',
+        'note'    
+    );
