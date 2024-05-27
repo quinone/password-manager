@@ -23,3 +23,11 @@ def test_decrypt_data(app):
             b"gAAAAABmVOgZwKvhTzxiy7qEI6uD0pZ4lGGZvN3-YtZ4D6kOuQVijXEFBnF-244BgCR9RbDiW3j_grwG28R0UknsDc6PMJ0F-iiZoOMr0p_yY5p95vji6Wg="
         )
         assert decrypted_data == TEST_DATA
+
+
+def test_insert_encrypted_item():
+    pass
+
+
+def test_decrypt_item():
+    pass
