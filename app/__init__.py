@@ -28,6 +28,7 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY="MUSTCHANGE",
+        ENCRYPTION_KEY="3TirqVc7o7Fk7PzoMwUQCVCWS3ad4C2qArDxWV-Sej8=",  ##Must change
         DATABASE=os.path.join(app.instance_path, "data-dev.sqlite"),
     )
 
@@ -48,6 +49,8 @@ def create_app(test_config=None):
     from . import db
 
     db.init_app(app)
+
+    from . import db_cryptography
 
     # Imports auth.py
     from . import auth
