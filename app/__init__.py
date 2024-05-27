@@ -50,8 +50,6 @@ def create_app(test_config=None):
 
     db.init_app(app)
 
-    from . import db_cryptography
-
     # Imports auth.py
     from . import auth
 

@@ -28,7 +28,7 @@ def encrypt_data(data):
 def decrypt_data(encrypted_data):
     cipher = get_cipher()
     decrypted_data = cipher.decrypt(encrypted_data)
-    return decrypted_data
+    return decrypted_data.decode()
 
 
 def insert_encrypted_item(userID, name, username, password, uri, notes, folderID):
