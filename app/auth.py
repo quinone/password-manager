@@ -14,7 +14,7 @@ from argon2 import PasswordHasher
 
 
 from app.db import get_db
-from app.token import generate_token
+from app.token import confirm_token, generate_token
 
 
 bp = Blueprint("auth", __name__, url_prefix="/auth", template_folder="templates")
@@ -214,4 +214,30 @@ def confirm_email(token):
     if g.user.get('EMAIL_CONFIRMED'):
         flash('Account already confirmed.', "success")
         return redirect(url_for('vault.profile'))
+    email = confirm_token(token)
+    # Connect to the database
+    conn = get_db()  # database.connect(db_file)
+    cursor = conn.cursor()
+    try:
+        # Check if user exists in the database
+        cursor.execute("SELECT * FROM USER WHERE EMAIL = ?", (email,))
+        user = cursor.fetchone()
+        cursor.execute("UPDATE user SET email_confirmed = ? WHERE email = ?",(True, email))
+        conn.commit()
+
+        flash("Successfully confirmed email.", "success")
+        
+    
+    except Error as e:
+        flash("Failed to update, please try again.", "danger")
+        print("Database Error:", e)
+        conn.rollback()
+
+    except Exception as e:
+        flash("Invalid or expired token", "danger")
+        print("Exception:", e)
+
+    return redirect(url_for("vault.profile"))
+
+
     
