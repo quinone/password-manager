@@ -12,6 +12,7 @@ from flask import (
 
 from app.auth import login_required
 from app.db import get_db
+from app.db_cryptography import insert_encrypted_item
 from app.forms import NewItemForm
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
@@ -75,6 +76,28 @@ def new_item():
         notes = form.notes.data
         folderID = form.folderID.data
 
+        if insert_encrypted_item(
+            userID, name, username, password, uri, notes, folderID
+        ):
+            flash("Successfully submitted new item")
+            return redirect(url_for("vault.vault"))
+
+    return render_template("new-item.html", form=form)
+
+
+"""@bp.route("/new-item", methods=["GET", "POST"])
+@login_required
+def new_item():
+    form = NewItemForm(request.form)
+    if request.method == "POST" and form.validate():
+        userID = session.get("user_id")
+        name = form.name.data
+        username = form.username.data
+        password = form.password.data
+        uri = form.uri.data
+        notes = form.notes.data
+        folderID = form.folderID.data
+
         try:
             conn = get_db()
             conn.cursor().execute(
@@ -94,7 +117,7 @@ def new_item():
         finally:
             if conn:
                 conn.close()
-    return render_template("new-item.html", form=form)
+    return render_template("new-item.html", form=form)"""
 
 
 """ Commented out to trial using flask-wtf extension

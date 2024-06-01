@@ -20,6 +20,9 @@ def app():
             "DATABASE": db_path,
         }
     )
+    app.config[
+        "ENCRYPTION_KEY"
+    ] = "GIOMjevPEyxq7DfrQnYFDGi0hJ9GurcOAq0c_H09iEE="  # "3TirqVc7o7Fk7PzoMwUQCVCWS3ad4C2qArDxWV-Sej8="
     app.config["WTF_CSRF_ENABLED"] = False  # Disable CSRF for testing,
 
     with app.app_context():
