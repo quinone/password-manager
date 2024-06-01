@@ -66,9 +66,9 @@ def insert_encrypted_item(userID, name, username, password, uri, notes, folderID
         flash("Failed to save, please try again.")
         print("Exception:", e)
 
-    finally:
-        cursor.close()
-        conn.close()
+    # finally:
+    #    cursor.close()
+    #    conn.close()
 
 
 def decrypt_item(item_ID):
@@ -78,10 +78,11 @@ def decrypt_item(item_ID):
     try:
         cursor.execute(
             "SELECT USER_ID, name, username, password, uri, NOTES, FOLDER_ID FROM ITEM WHERE ID = ?",
-            (item_ID),
+            (item_ID,),
         )
         row = cursor.fetchone()
-
+        # Debug print row
+        print(f"Printing selected row: {row}")
         if row:
             (
                 userID,
@@ -113,5 +114,5 @@ def decrypt_item(item_ID):
         print(f"An error occurred: {e}")
         return None
     finally:
-        cursor.close()
-        conn.close()
+       cursor.close()
+       conn.close()
