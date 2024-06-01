@@ -14,6 +14,7 @@ from argon2 import PasswordHasher
 
 
 from app.db import get_db
+from app.token import generate_token
 
 
 bp = Blueprint("auth", __name__, url_prefix="/auth", template_folder="templates")
@@ -135,8 +136,9 @@ def register():
                     "INSERT INTO USER (EMAIL, NAME, PASSWORD, PASSWORD_HINT) VALUES (?, ?, ?, ?)",
                     (email, name, hashed_password, password_hint),
                 )
+                
                 conn.commit()
-                conn.commit()
+                token = generate_token(email)
                 messages.append("Account created successfully.")
                 message_type = "success"
                 return redirect(url_for("auth.login"))
@@ -204,3 +206,12 @@ def logout():
     session.clear()
     flash("You have been logged out.")
     return redirect(url_for("auth.login"))
+
+
+@bp.route("/confirm/<token>")
+@login_required
+def confirm_email(token):
+    if g.user.get('EMAIL_CONFIRMED'):
+        flash('Account already confirmed.', "success")
+        return redirect(url_for('vault.profile'))
+    
