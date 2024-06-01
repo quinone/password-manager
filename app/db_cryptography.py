@@ -114,5 +114,5 @@ def decrypt_item(item_ID):
         print(f"An error occurred: {e}")
         return None
     finally:
-       cursor.close()
-       conn.close()
+        cursor.close()
+        conn.close()

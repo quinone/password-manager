@@ -33,7 +33,31 @@ def load_logged_in_user():
         )
 
 
+def logout_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user:
+            flash("You are already authenticated.")
+            return redirect(url_for("vault.profile"))
+        return view(**kwargs)
+
+    return wrapped_view
+
+
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            flash("You are not logged in.")
+            return redirect(url_for("auth.login"))
+
+        return view(**kwargs)
+
+    return wrapped_view
+
+
 @bp.route("/register", methods=("GET", "POST"))
+@logout_required
 def register():
     if request.method == "POST":
         email = request.form.get("email_address")
@@ -132,6 +156,7 @@ def register():
 
 
 @bp.route("/login", methods=("GET", "POST"))
+@logout_required
 def login():
     if request.method == "POST":
         email = request.form.get("email")
@@ -179,15 +204,3 @@ def logout():
     session.clear()
     flash("You have been logged out.")
     return redirect(url_for("auth.login"))
-
-
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            flash("You are not logged in.")
-            return redirect(url_for("auth.login"))
-
-        return view(**kwargs)
-
-    return wrapped_view

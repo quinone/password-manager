@@ -14,6 +14,8 @@ VALUES
     );
 
 /*
+Changed to encrypted items.
+See below
 INSERT INTO ITEM (USER_ID, FOLDER_ID, NAME, USERNAME, PASSWORD, URI, NOTES)
 VALUES 
     (
