@@ -1,7 +1,40 @@
 {% extends 'base.html' %}
-{% import "bootstrap/wtf.html" as wtf %}
-{% block title %}Add New Item{% endblock %}
+{% block title %}New Item{% endblock %}
+
 {% block content %}
-{{ wtf.quick_form(form) }}
+    <h2>Create New Item</h2>
+    <form method="POST" action="{{ url_for('vault.new_item') }}">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.name.label }}<br>
+            {{ form.name(size=32) }}<br>
+            {{ form.name.errors }}
+        </div>
+        <div>
+            {{ form.username.label }}<br>
+            {{ form.username(size=32) }}<br>
+            {{ form.username.errors }}
+        </div>
+        <div>
+            {{ form.password.label }}<br>
+            {{ form.password(size=32) }}<br>
+            {{ form.password.errors }}
+        </div>
+        <div>
+            {{ form.uri.label }}<br>
+            {{ form.uri(size=32) }}<br>
+            {{ form.uri.errors }}
+        </div>
+        <div>
+            {{ form.notes.label }}<br>
+            {{ form.notes(size=32) }}<br>
+            {{ form.notes.errors }}
+        </div>
+        <div>
+            {{ form.folderID.label }}<br>
+            {{ form.folderID() }}<br>
+            {{ form.folderID.errors }}
+        </div>
+        <input type="submit" value="Submit">
+    </form>
 {% endblock %}
-</html>
