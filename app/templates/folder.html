@@ -1,18 +1,16 @@
 {% extends 'base.html' %}
 {% block title %}Folder{% endblock %}
 
-{% block content %}
 
-    <h2>{{ folder_name }}</h2>
-    <div>
-        <h3>Items</h3>
-        <ul>
-            {% for item in items %}
-            <li>{{ item.NAME }}</li>
-            <!-- Display other item properties as needed -->
-            {% endfor %}
-        </ul>
-    </div>
+{% block content %}
+    <h2>Folder: {{ folder_name }}</h2>
+    <ul>
+        {% for dict_item in items %}
+            <li>Name: {{ dict_item.name }}, Username: {{ dict_item.username }}, Password: {{ dict_item.password }}, URI: {{ dict_item.uri }}, Notes: {{ dict_item.notes }}</li>
+        {% endfor %}
+        
+    </ul>
+    <a href="{{ url_for('vault.vault') }}">Back to Vault</a>
 {% endblock %}
 
 </html>

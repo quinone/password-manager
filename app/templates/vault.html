@@ -7,18 +7,15 @@
     <div class="left-pane">
         <h3>Folders</h3>
         <ul>
-    {% for folder in folders %}
-    <li><a href="{{ url_for('view_folder', folder_name=folder[0]) }}">{{ folder[0] }}</a></li>
-    {% endfor %}
-</ul>
-
-
+            {% for folder in folders %}
+            <li><a href="{{ url_for('vault.view_folder', folder_name=folder[0]) }}">{{ folder[0] }}</a></li>
+            {% endfor %}
+        </ul>
 
     </div>
-<a href="/vault/new-item">Create New Item</a>
-        <a href="/vault/new-folder">Create New folder</a>
-        <a href="/vault/profile">Back</a>
-
+    <a href="{{ url_for('vault.new_item') }}">Create New Item</a>
+    <a href="{{ url_for('vault.new_folder') }}">Create New Folder</a>
+    <a href="{{ url_for('vault.profile') }}">Back</a>
 {% endblock %}
 </html>
 

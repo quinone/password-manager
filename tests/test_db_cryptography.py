@@ -41,7 +41,7 @@ def test_insert_encrypted_item(app):
             password="SuperPassword",
             uri="www.example.com",
             notes="top secret notes",
-            folderID=1,
+            folder_ID=1,
         )
 
         # check if the item is correctly inserted

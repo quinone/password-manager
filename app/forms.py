@@ -9,5 +9,5 @@ class NewItemForm(FlaskForm):
     password = PasswordField("Password")
     uri = StringField("URI", validators=[Length(0, 250)])
     notes = TextAreaField("Notes")
-    folderID = StringField("Folder")
+    folder_name = StringField("Folder")
     submit = SubmitField("Submit")

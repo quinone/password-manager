@@ -31,7 +31,7 @@ def decrypt_data(encrypted_data):
     return decrypted_data.decode()
 
 
-def insert_encrypted_item(userID, name, username, password, uri, notes, folderID):
+def insert_encrypted_item(userID, name, username, password, uri, notes, folder_ID):
     conn = get_db()
     cursor = conn.cursor()
 
@@ -50,7 +50,7 @@ def insert_encrypted_item(userID, name, username, password, uri, notes, folderID
                 encrypted_password,
                 encrypted_uri,
                 encrypted_notes,
-                folderID,
+                folder_ID,
             ),
         )
         conn.commit()
@@ -114,5 +114,5 @@ def decrypt_item(item_ID):
         print(f"An error occurred: {e}")
         return None
     finally:
-       cursor.close()
-       conn.close()
+        cursor.close()
+        conn.close()
