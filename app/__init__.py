@@ -19,8 +19,10 @@ from flask import (
 import random
 import string
 from flask_bootstrap import Bootstrap
+from flask_mail import Mail
 
 bootstrap = Bootstrap()
+mail = Mail()
 
 
 def create_app(test_config=None):
@@ -65,6 +67,7 @@ def create_app(test_config=None):
     app.register_blueprint(vault.bp)
 
     bootstrap.init_app(app)
+    mail.init_app(app)
 
     app.secret_key = "super secret key"  # secret key for captcha
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
