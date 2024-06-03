@@ -94,7 +94,7 @@ def create_app(test_config=None):
                     return redirect(url_for("login"))
             # Update last activity time in session
             session["last_activity_time"] = time.time()
-            
+
             # Loading search form
             g.search_form = SearchForm()
 

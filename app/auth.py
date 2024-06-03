@@ -113,7 +113,7 @@ def register():
                 )
                 conn.commit()
                 conn.commit()
-                messages.append("Account created successfully.")
+                flash("Account created successfully.", "success")
                 message_type = "success"
                 return redirect(url_for("auth.login"))
             except Error as e:
@@ -125,7 +125,7 @@ def register():
             finally:
                 if conn:
                     conn.close()
-        flash(error)
+        flash(error, "danger")
         # Render the template with the messages and message type
         # return redirect(url_for("login"))
     return render_template("register.html")
@@ -159,7 +159,7 @@ def login():
                     session["user_id"] = user[
                         "USER_ID"
                     ]  # Assuming user_id is in the first column
-                    flash("Login successful.")
+                    flash("Login successful.", "success")
                     return redirect(url_for("vault.profile"))
                 else:
                     error_message = "Invalid email or password. Please try again."
@@ -177,7 +177,7 @@ def login():
 @bp.route("/logout")
 def logout():
     session.clear()
-    flash("You have been logged out.")
+    flash("You have been logged out.","warning")
     return redirect(url_for("auth.login"))
 
 
@@ -185,7 +185,7 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
-            flash("You are not logged in.")
+            flash("You are not logged in.", "warning")
             return redirect(url_for("auth.login"))
 
         return view(**kwargs)

@@ -52,7 +52,7 @@ def profile():
     # Connect to the database
     conn = get_db()  # database.connect(db_file)
     if conn is None:
-        flash("Failed to connect to the database.")
+        flash("Failed to connect to the database.", "danger")
         return redirect(url_for("login"))
     cursor = conn.cursor()
     # Fetch user info from the database
@@ -83,7 +83,7 @@ def new_item():
         if insert_encrypted_item(
             userID, name, username, password, uri, notes, folder_ID
         ):
-            flash("Successfully submitted new item")
+            flash("Successfully submitted new item", "success")
             return redirect(url_for("vault.vault"))
 
     return render_template("new-item.html", form=form)
@@ -99,8 +99,6 @@ def view_folder(folder_name):
     decrypted_items = []
     try:
         # Fetch item IDs based on the folder ID
-        #cursor.execute("SELECT ID FROM ITEM WHERE FOLDER_ID = ?", (folder_ID,))
-        #item_IDs = cursor.fetchall()
         item_IDs = query_db("SELECT ID FROM ITEM WHERE FOLDER_ID = ?", (folder_ID,))
         if item_IDs:
             print(f"Item IDs: {item_IDs}")
@@ -128,7 +126,7 @@ def new_folder():
         conn = get_db()
         try:
             if not folder_name:
-                flash("Please provide a folder name.")
+                flash("Please provide a folder name.", "warning")
             else:
                 user_id = session.get("user_id")
                 if user_id:
@@ -154,8 +152,8 @@ def new_folder():
     return render_template("new-folder.html")
 
 
-#Search Function
-@bp.route('/search', methods=['POST'])
+# Search Function
+@bp.route("/search", methods=["POST"])
 @login_required
 def search():
     form = SearchForm()
@@ -167,7 +165,13 @@ def search():
             # Get data from form
             searched = form.searched.data
             # Query database,
-            item_IDs = query_db("SELECT ID FROM ITEM WHERE USER_ID = ? AND LOWER(NAME) LIKE LOWER(?)",(user_ID, f"%{searched}%",))
+            item_IDs = query_db(
+                "SELECT ID FROM ITEM WHERE USER_ID = ? AND LOWER(NAME) LIKE LOWER(?)",
+                (
+                    user_ID,
+                    f"%{searched}%",
+                ),
+            )
             if item_IDs:
                 print(f"Item IDs: {item_IDs}")
                 for item in item_IDs:
@@ -177,12 +181,12 @@ def search():
                         decrypted_items.append(decrypted_item)
                     print(f"Items:", decrypted_items)
             else:
-                flash("No matching results.")
+                flash("No matching results.", "warning")
 
         except Error as e:
             print("Database Error:", e)
 
         return render_template(
-            "search.html", form=form, searched= searched, items=decrypted_items
+            "search.html", form=form, searched=searched, items=decrypted_items
         )
-    return redirect(url_for('vault.vault'))
+    return redirect(url_for("vault.vault"))
