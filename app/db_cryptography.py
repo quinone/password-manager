@@ -113,7 +113,7 @@ def decrypt_item(item_ID):
     except Error as e:
         print(f"An error occurred: {e}")
         return None
-    #finally:
+    # finally:
     #    cursor.close()
     #    conn.close()
 
@@ -137,9 +137,9 @@ def get_folder_ID(folder_name, user_ID):
     except Error as e:
         print(f"An error occurred: {e}")
         return None
-    #finally:
-    #    cursor.close()
-    #    conn.close()
+    # finally:
+    #   cursor.close()
+    #   conn.close()
 
 
 def get_folder_name(folder_ID, user_ID):
@@ -161,6 +161,6 @@ def get_folder_name(folder_ID, user_ID):
     except Error as e:
         print(f"An error occurred: {e}")
         return None
-    #finally:
-    #    cursor.close()
-    #    conn.close()
+    finally:
+        cursor.close()
+        conn.close()

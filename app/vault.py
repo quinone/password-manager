@@ -78,7 +78,7 @@ def new_item():
         folder_name = form.folder_name.data
 
         # Get folder_ID from folder_name
-        folder_ID = get_folder_ID(folder_name=folder_name,user_ID=userID)
+        folder_ID = get_folder_ID(folder_name=folder_name, user_ID=userID)
 
         if insert_encrypted_item(
             userID, name, username, password, uri, notes, folder_ID
@@ -95,7 +95,7 @@ def view_folder(folder_name):
     # Loads "user_id" in session:
     user_id = session["user_id"]
     # Verity folder exists
-    folder_ID = get_folder_ID(folder_name=folder_name,user_ID=user_id)
+    folder_ID = get_folder_ID(folder_name=folder_name, user_ID=user_id)
     conn = get_db()
     decrypted_items = []
     try:
@@ -113,7 +113,7 @@ def view_folder(folder_name):
                     decrypted_items.append(decrypted_item)
                 print(f"Items:", decrypted_items)
             print("success")
-        #return render_template("folder.html", folder_name=folder_name, items=decrypted_items)
+        # return render_template("folder.html", folder_name=folder_name, items=decrypted_items)
 
     except conn.Error as e:
         print("Database Error:", e)
@@ -128,8 +128,6 @@ def view_folder(folder_name):
 def new_folder():
     if request.method == "POST":
         folder_name = request.form.get("folder_name")
-        messages = []
-        message_type = "error"
         conn = get_db()
         try:
             if not folder_name:
@@ -157,19 +155,3 @@ def new_folder():
             if conn:
                 conn.close()
     return render_template("new-folder.html")
-
-
-@bp.route("/get_folders1")
-def get_folders():
-    # Assuming you have a function to retrieve folders from the database
-    folders = (
-        database.get_folders()
-    )  # Implement this function according to your database schema
-
-    # Assuming each folder is represented as a dictionary with 'folder_id' and 'folder_name' keys
-    folders_data = [
-        {"folder_id": folder["folder_id"], "folder_name": folder["folder_name"]}
-        for folder in folders
-    ]
-    # Return the folder data as JSON
-    return jsonify(folders_data)

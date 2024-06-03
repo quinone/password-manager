@@ -227,9 +227,3 @@ def generate_password(
 
     password = "".join(random.sample(password, len(password)))
     return password
-
-
-# if __name__ == "__main__":
-#    app.run(debug=True)
-# no longer required when __init__.py is in a folder called app
-# instead use flask run --debug
