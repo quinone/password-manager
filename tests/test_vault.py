@@ -120,3 +120,24 @@ def test_authenticated_vault_view_users_items(client, auth):
 def test_authenticated_vault_view_others_items():
     """This test should attempt to access other users items and fail"""
     pass
+
+
+def test_search(client, auth):
+    # login
+    auth.login()
+    response = client.get("/vault/")
+    assert b'Search' in response.data
+    # Post with values in each field
+    response = client.post(
+        "/vault/search",
+        data={
+            "searched":'Fake Name'
+        },
+        follow_redirects=True,
+    )
+    print("Post response status code:", response.status_code)
+    print("Post response headers:", response.headers)
+    print("Post response data:", response.data)
+    assert b'asdf1234' in response.data
+    assert b'www.google.com' in response.data
+    assert b'note' in response.data

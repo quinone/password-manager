@@ -7,6 +7,7 @@ from argon2 import PasswordHasher
 from _sqlite3 import Error
 from flask import (
     Flask,
+    g,
     render_template,
     request,
     flash,
@@ -19,6 +20,8 @@ from flask import (
 import random
 import string
 from flask_bootstrap import Bootstrap
+
+from app.forms import SearchForm
 
 bootstrap = Bootstrap()
 
@@ -91,6 +94,15 @@ def create_app(test_config=None):
                     return redirect(url_for("login"))
             # Update last activity time in session
             session["last_activity_time"] = time.time()
+            
+            # Loading search form
+            g.search_form = SearchForm()
+
+    # Pass to base.html
+    @app.context_processor
+    def base():
+        form = SearchForm()
+        return dict(form=form)
 
     # a simple page that says hello
     @app.route("/hello")

@@ -38,3 +38,10 @@ def init_db_command():
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
+
+
+def query_db(query, args=(), one=False):
+    cursor = get_db().execute(query, args)
+    results = cursor.fetchall()
+    cursor.close()
+    return (results[0] if results else None) if one else results

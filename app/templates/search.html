@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<h2>You searched for ...</h2>
+<h3>{{ searched }}</h3>
+<br>
+{% for dict_item in items %}
+            <li>Name: {{ dict_item.name }}, Username: {{ dict_item.username }}, Password: {{ dict_item.password }}, URI: {{ dict_item.uri }}, Notes: {{ dict_item.notes }}</li>
+        {% endfor %}
+{% endblock %}

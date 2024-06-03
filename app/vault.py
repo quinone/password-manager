@@ -11,9 +11,9 @@ from flask import (
 )
 
 from app.auth import login_required
-from app.db import get_db
+from app.db import get_db, query_db
 from app.db_cryptography import decrypt_item, get_folder_ID, insert_encrypted_item
-from app.forms import NewItemForm
+from app.forms import NewItemForm, SearchForm
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
 
@@ -96,13 +96,12 @@ def view_folder(folder_name):
     user_id = session["user_id"]
     # Verity folder exists
     folder_ID = get_folder_ID(folder_name=folder_name, user_ID=user_id)
-    conn = get_db()
     decrypted_items = []
     try:
-        cursor = conn.cursor()
         # Fetch item IDs based on the folder ID
-        cursor.execute("SELECT ID FROM ITEM WHERE FOLDER_ID = ?", (folder_ID,))
-        item_IDs = cursor.fetchall()
+        #cursor.execute("SELECT ID FROM ITEM WHERE FOLDER_ID = ?", (folder_ID,))
+        #item_IDs = cursor.fetchall()
+        item_IDs = query_db("SELECT ID FROM ITEM WHERE FOLDER_ID = ?", (folder_ID,))
         if item_IDs:
             print(f"Item IDs: {item_IDs}")
             for item in item_IDs:
@@ -112,10 +111,8 @@ def view_folder(folder_name):
                 if decrypt_item:
                     decrypted_items.append(decrypted_item)
                 print(f"Items:", decrypted_items)
-            print("success")
-        # return render_template("folder.html", folder_name=folder_name, items=decrypted_items)
 
-    except conn.Error as e:
+    except Error as e:
         print("Database Error:", e)
 
     return render_template(
@@ -155,3 +152,37 @@ def new_folder():
             if conn:
                 conn.close()
     return render_template("new-folder.html")
+
+
+#Search Function
+@bp.route('/search', methods=['POST'])
+@login_required
+def search():
+    form = SearchForm()
+    # Get user_ID from session
+    user_ID = session["user_id"]
+    decrypted_items = []
+    if form.validate_on_submit():
+        try:
+            # Get data from form
+            searched = form.searched.data
+            # Query database,
+            item_IDs = query_db("SELECT ID FROM ITEM WHERE USER_ID = ? AND LOWER(NAME) LIKE LOWER(?)",(user_ID, f"%{searched}%",))
+            if item_IDs:
+                print(f"Item IDs: {item_IDs}")
+                for item in item_IDs:
+                    item_ID = item[0]
+                    decrypted_item = decrypt_item(item_ID)
+                    if decrypt_item:
+                        decrypted_items.append(decrypted_item)
+                    print(f"Items:", decrypted_items)
+            else:
+                flash("No matching results.")
+
+        except Error as e:
+            print("Database Error:", e)
+
+        return render_template(
+            "search.html", form=form, searched= searched, items=decrypted_items
+        )
+    return redirect(url_for('vault.vault'))

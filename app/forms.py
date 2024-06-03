@@ -11,3 +11,9 @@ class NewItemForm(FlaskForm):
     notes = TextAreaField("Notes")
     folder_name = StringField("Folder")
     submit = SubmitField("Submit")
+
+
+# Search form
+class SearchForm(FlaskForm):
+    searched = StringField("Searched",validators=[DataRequired()])
+    submit = SubmitField("Submit")
