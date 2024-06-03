@@ -12,7 +12,7 @@ from flask import (
 
 from app.auth import login_required
 from app.db import get_db
-from app.db_cryptography import decrypt_item, insert_encrypted_item
+from app.db_cryptography import decrypt_item, get_folder_ID, insert_encrypted_item
 from app.forms import NewItemForm
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
@@ -78,9 +78,10 @@ def new_item():
         folder_name = form.folder_name.data
 
         # Get folder_ID from folder_name
+        folder_ID = get_folder_ID(folder_name=folder_name,user_ID=userID)
 
         if insert_encrypted_item(
-            userID, name, username, password, uri, notes, folder_name
+            userID, name, username, password, uri, notes, folder_ID
         ):
             flash("Successfully submitted new item")
             return redirect(url_for("vault.vault"))
@@ -91,57 +92,32 @@ def new_item():
 @bp.route("/<folder_name>")
 @login_required
 def view_folder(folder_name):
+    # Loads "user_id" in session:
+    user_id = session["user_id"]
+    # Verity folder exists
+    folder_ID = get_folder_ID(folder_name=folder_name,user_ID=user_id)
     conn = get_db()
+    decrypted_items = []
     try:
         cursor = conn.cursor()
-        # Verity folder exists
-        cursor.execute(
-            "SELECT ID FROM FOLDER WHERE LOWER(FOLDER_NAME) = LOWER(?)", (folder_name,)
-        )
-        folder_row = cursor.fetchone()
-
-        if not folder_row:
-            print(f"No folder found with name: {folder_name}")
-            return render_template("folder.html", folder_name=folder_name, items=[])
-
-        folder_id = folder_row["ID"]
-        print(f"Folder ID: {folder_id}")
-
         # Fetch item IDs based on the folder ID
-        cursor.execute("SELECT ID FROM ITEM WHERE FOLDER_ID = ?", (folder_id,))
+        cursor.execute("SELECT ID FROM ITEM WHERE FOLDER_ID = ?", (folder_ID,))
         item_IDs = cursor.fetchall()
-        print(f"Item IDs: {item_IDs}")
+        if item_IDs:
+            print(f"Item IDs: {item_IDs}")
+            for item in item_IDs:
+                item_ID = item[0]
 
-        """if id:
-            print(f"Folder exists:", folder_name)
-            print(f"ID exists:", id)
-        cursor.execute(
-            "SELECT ID FROM ITEM WHERE FOLDER_ID = (SELECT ID FROM FOLDER WHERE LOWER(FOLDER_NAME) = LOWER(?))",
-            (folder_name,),
-        )
-        item_IDS = cursor.fetchall()
-        print(f"Items:", item_IDS)"""
-        decrypted_items = []
-        for item in item_IDs:
-            item_ID = item["ID"]
-            decrypted_item = decrypt_item(item_ID)
-            if decrypt_item:
-                decrypted_items.append(decrypted_item)
-        """items = cursor.fetchall()
-        print(f"Items:", items)
-        # for item_ID in item_IDs:
-        #    print(f"Items:", item_ID )
-        #    items.append(decrypt_item(item_ID))
-        decrypted_items=decrypt_item(1)
-        print(f"Items:", decrypted_items)
-        return render_template("folder.html", folder_name=folder_name, items=decrypted_items)"""
+                decrypted_item = decrypt_item(item_ID)
+                if decrypt_item:
+                    decrypted_items.append(decrypted_item)
+                print(f"Items:", decrypted_items)
+            print("success")
+        #return render_template("folder.html", folder_name=folder_name, items=decrypted_items)
 
     except conn.Error as e:
         print("Database Error:", e)
-        # items = []
-    finally:
-        if conn:
-            conn.close()
+
     return render_template(
         "folder.html", folder_name=folder_name, items=decrypted_items
     )

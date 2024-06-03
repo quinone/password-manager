@@ -54,8 +54,9 @@ def test_new_item(client, auth, app):
         ("/vault/profile"),
         ("/vault/new-item"),
         ("/vault/new-folder"),
+        ("/vault/Example Folder"),
     ],
-    ids=["Check vault", "check profile", "check new-item", "check new-folder"],
+    ids=["Check vault", "check profile", "check new-item", "check new-folder","check example folder"],
 )
 def test_unauthenticated_route_access(client, test_path):
     """This test should redirect to /auth/login"""
