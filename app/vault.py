@@ -77,6 +77,8 @@ def new_item():
         notes = form.notes.data
         folder_name = form.folder_name.data
 
+        # Get folder_ID from folder_name
+
         if insert_encrypted_item(
             userID, name, username, password, uri, notes, folder_name
         ):
@@ -89,18 +91,20 @@ def new_item():
 @bp.route("/<folder_name>")
 @login_required
 def view_folder(folder_name):
-    conn = get_db()  
+    conn = get_db()
     try:
         cursor = conn.cursor()
-        #Verity folder exists
-        cursor.execute("SELECT ID FROM FOLDER WHERE LOWER(FOLDER_NAME) = LOWER(?)",(folder_name,))
+        # Verity folder exists
+        cursor.execute(
+            "SELECT ID FROM FOLDER WHERE LOWER(FOLDER_NAME) = LOWER(?)", (folder_name,)
+        )
         folder_row = cursor.fetchone()
 
         if not folder_row:
             print(f"No folder found with name: {folder_name}")
             return render_template("folder.html", folder_name=folder_name, items=[])
 
-        folder_id = folder_row['ID']
+        folder_id = folder_row["ID"]
         print(f"Folder ID: {folder_id}")
 
         # Fetch item IDs based on the folder ID
@@ -119,7 +123,7 @@ def view_folder(folder_name):
         print(f"Items:", item_IDS)"""
         decrypted_items = []
         for item in item_IDs:
-            item_ID = item['ID']
+            item_ID = item["ID"]
             decrypted_item = decrypt_item(item_ID)
             if decrypt_item:
                 decrypted_items.append(decrypted_item)
@@ -134,11 +138,13 @@ def view_folder(folder_name):
 
     except conn.Error as e:
         print("Database Error:", e)
-        #items = []
+        # items = []
     finally:
         if conn:
             conn.close()
-    return render_template("folder.html", folder_name=folder_name, items=decrypted_items)
+    return render_template(
+        "folder.html", folder_name=folder_name, items=decrypted_items
+    )
 
 
 @bp.route("/new-folder", methods=["GET", "POST"])

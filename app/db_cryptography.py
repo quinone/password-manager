@@ -66,9 +66,9 @@ def insert_encrypted_item(userID, name, username, password, uri, notes, folder_I
         flash("Failed to save, please try again.")
         print("Exception:", e)
 
-    # finally:
-    #    cursor.close()
-    #    conn.close()
+    finally:
+        cursor.close()
+        conn.close()
 
 
 def decrypt_item(item_ID):
@@ -110,6 +110,54 @@ def decrypt_item(item_ID):
         else:
             return None
 
+    except Error as e:
+        print(f"An error occurred: {e}")
+        return None
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_folder_ID(folder_name, user_ID):
+    conn = get_db()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT * FROM FOLDER WHERE LOWER(FOLDER_NAME) = LOWER(?) AND USER_ID = (?)",
+            (
+                folder_name,
+                user_ID,
+            ),
+        )
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        print("None found")
+        return None
+    except Error as e:
+        print(f"An error occurred: {e}")
+        return None
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_folder_name(folder_ID, user_ID):
+    conn = get_db()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT FOLDER_NAME FROM FOLDER WHERE USER_ID = (?) AND ID = (?)",
+            (
+                user_ID,
+                folder_ID,
+            ),
+        )
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        print("None found")
+        return None
     except Error as e:
         print(f"An error occurred: {e}")
         return None

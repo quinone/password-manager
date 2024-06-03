@@ -7,6 +7,8 @@ from app.db_cryptography import (
     get_cipher,
     encrypt_data,
     decrypt_data,
+    get_folder_ID,
+    get_folder_name,
     insert_encrypted_item,
 )
 
@@ -43,7 +45,7 @@ def test_insert_encrypted_item(app):
             notes="top secret notes",
             folder_ID=1,
         )
-
+    with app.app_context():
         # check if the item is correctly inserted
         db = get_db()
         cursor = db.cursor()
@@ -84,3 +86,17 @@ def test_decrypt_item(app):
         assert decrypted_item.get("password") == "asdf1234"
         assert decrypted_item.get("uri") == "www.google.com"
         assert decrypted_item.get("notes") == "note"
+
+
+def test_get_folder_ID(app):
+    with app.app_context():
+        assert get_folder_ID("Example Folder", 1) == 1
+    with app.app_context():
+        assert get_folder_ID("Fail", "Fail") == None
+
+
+def test_get_folder_name(app):
+    with app.app_context():
+        assert get_folder_name(1, 1) == "Example Folder"
+    with app.app_context():
+        assert get_folder_ID("Fail", "Fail") == None

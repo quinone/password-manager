@@ -13,19 +13,7 @@ VALUES
         'The password is "other"'
     );
 
-/*
-INSERT INTO ITEM (USER_ID, FOLDER_ID, NAME, USERNAME, PASSWORD, URI, NOTES)
-VALUES 
-    (
-        '1',
-        '2',
-        'Fake Name', 
-        'Fake Username',
-        'asdf1234',
-        'www.google.com',
-        'note'    
-    );
-*/
+
 INSERT INTO ITEM (USER_ID, FOLDER_ID, NAME, USERNAME, PASSWORD, URI, NOTES)
 VALUES 
     (
@@ -36,5 +24,13 @@ VALUES
         'gAAAAABmWxDqNfCLv1twNzBsOW4A3pR-xRkR9rDFkhZFUeDeXAK_A9wOWkXzpubK5Q80hBHiIFcAyciZIivdXGRlOQkizZ6JHA==',--'asdf1234',
         'gAAAAABmWxEmuGdhPyUIBboX1JBviHPrFqHhF84qqhAcEKKS6UbQ0qJUgF5hYgK-t42C4XGRRmSqOh8w6478NHAokSrAClfS8A==',--'www.google.com',
         'gAAAAABmWxFRYsLdWk1MRpIKOtatEeueSJ5THi2xLHvzea6ZLcZk8ii7Br96nEy84vpbhXSy5Uq4ka13R2KLmb3ZnoSxujqCwg=='--'note'    
+    );
+
+
+INSERT INTO FOLDER (USER_ID, FOLDER_NAME)
+VALUES 
+    (
+        '1',
+        'Example Folder'
     );
 
