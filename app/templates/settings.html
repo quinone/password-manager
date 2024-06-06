@@ -5,39 +5,24 @@
 {% block content %}
 
     <h1>User Preferences</h1>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            border: 2px solid white; /* Set the table border color */
-        }
-        th, td {
-            border: 1px solid white; /* Set the cell border color */
-            padding: 8px;
-            text-align: left;
-        }
-         th {
-            background-color: #666; /* Set a background color for the header row */
-            color: white; /* Set text color for the header row */
-        }
-        .button-container button {
-            width: 100%; /* Set equal width for all buttons */
-        }
-    </style>
-    <form id="preferencesForm">
-        <label for="vaultTimeout">Vault Timeout:</label>
-        <input type="time" id="vaultTimeout" name="vaultTimeout">
+<form id="preferencesForm">
+   <li> <label for="vaultTimeout">Vault Timeout:</label>
+    <input type="time" id="vaultTimeout" name="vaultTimeout">
+</li>
 
-        <label for="themeId">Theme:</label>
-        <select id="themeId" name="themeId">
-            <option value="1">Theme 1</option>
-            <option value="2">Theme 2</option>
-            <option value="3">Theme 3</option>
-            <!-- Add more options as needed -->
-        </select>
+    <li>
+    <label for="themeId">Theme:</label>
+    <select id="themeId" name="themeId">
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+    </select>
+</li>
 
-        <button type="submit">Save Preferences</button>
-    </form>
+    <li>
+    <button type="submit">Save Preferences</button>
+    </li>
+</form>
+
 
     <script>
         document.getElementById("preferencesForm").addEventListener("submit", function(event) {
@@ -50,6 +35,10 @@
             // Do something with the values (e.g., save to database, display, etc.)
             console.log("Vault Timeout:", vaultTimeout);
             console.log("Theme ID:", themeId);
+
+            // Change the CSS file based on the selected theme
+            var themeCSS = themeId === "dark" ? "dark-theme.css" : "light-theme.css";
+            document.getElementById("themeCSS").setAttribute("href", themeCSS);
         });
     </script>
 {% endblock %}
