@@ -18,20 +18,7 @@ bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="template
 
 
 
-def get_all_folders():
-    user_id = session.get("user_id")
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute("SELECT FOLDER_NAME, ID FROM FOLDER WHERE USER_ID = ?", (user_id,))
-        folders = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        print("Connection closed in get_all_folders()")
-        return folders
-    except Exception as e:
-        flash("Error fetching folders: {}".format(str(e)), "danger")
-        return []
+
 
 
 def get_items_for_folder(folder_id):
