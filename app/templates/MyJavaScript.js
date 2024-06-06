@@ -76,3 +76,42 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error fetching folders:', error));
 });
+#preferencesForm li {
+    margin-bottom: 20px; /* Adjust the value to increase or decrease the gap */
+}
+
+document.getElementById("preferencesForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent the form from submitting
+
+    // Fetch values from input fields
+    var vaultTimeout = document.getElementById("vaultTimeout").value;
+    var themeId = document.getElementById("themeId").value;
+
+    // Prepare data to send to the server
+    var data = {
+        vaultTimeout: vaultTimeout,
+        themeId: themeId
+    };
+
+    // Make a POST request to save the preferences
+    fetch('/save_preferences', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Preferences saved successfully.');
+            // Optionally, you can update the UI to reflect the changes
+            // For example, change the theme immediately after saving
+            var themeCSS = themeId === "dark" ? "dark-theme.css" : "light-theme.css";
+            document.getElementById("themeCSS").setAttribute("href", themeCSS);
+        } else {
+            console.error('Failed to save preferences.');
+        }
+    })
+    .catch(error => console.error('Error saving preferences:', error));
+});
+
