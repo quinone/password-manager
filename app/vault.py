@@ -16,11 +16,6 @@ from sqlite3 import Error
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
 
-
-
-
-
-
 def get_items_for_folder(folder_id):
     try:
         conn = get_db()
@@ -33,8 +28,6 @@ def get_items_for_folder(folder_id):
     except Exception as e:
         flash("Error fetching items for folder: {}".format(str(e)), "danger")
         return []
-
-
 
 
 # The rest of your routes and functions...
@@ -76,7 +69,7 @@ def vault():
         return render_template("vault.html", folders=folders, items=decrypted_items)
     except Exception as e:
         flash("Error fetching data: {}".format(str(e)), "danger")
-        return render_template("vault.html", folders=[], items=[])
+        return render_template("vault.html", folders=[], items=[], hide_password=True)
 
 
 @bp.route("/profile")
@@ -92,7 +85,6 @@ def profile():
     user_info = cursor.fetchone()
     cursor.close()
     conn.close()
-    print("Connection closed in profile()")
     return render_template("profile.html", user_info=user_info)
 
 @bp.route("/new-item", methods=["GET", "POST"])
@@ -153,8 +145,28 @@ def new_folder():
 @bp.route("/folder/<int:folder_id>/<string:folder_name>")
 @login_required
 def view_folder(folder_id, folder_name):
-    items = get_items_for_folder(folder_id)
-    return render_template('folder.html', items=items, folder_id=folder_id, folder_name=folder_name)
+    try:
+        items = get_items_for_folder(folder_id)
+        decrypted_items = []
+        for item in items:
+            decrypted_item = {
+                "ID": item["ID"],
+                "NAME": item["NAME"],
+                "FOLDER_ID": item["FOLDER_ID"],
+                "USERNAME": decrypt_data(item["USERNAME"]),
+                "PASSWORD": decrypt_data(item["PASSWORD"]),
+                "URI": decrypt_data(item["URI"]),
+                "NOTES": decrypt_data(item["NOTES"])
+            }
+            decrypted_items.append(decrypted_item)
+        return render_template('folder.html', items=decrypted_items, folder_id=folder_id, folder_name=folder_name)
+    except Exception as e:
+        flash("Error fetching folder data: {}".format(str(e)), "danger")
+        return render_template("folder.html", items=[], folder_id=folder_id, folder_name=folder_name, hide_password=True)
+
+
+
+
 
 
 

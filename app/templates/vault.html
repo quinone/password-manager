@@ -38,16 +38,24 @@
             </tr>
         </thead>
         <tbody>
-            {% for item in items if not item.FOLDER_ID %}
+            {% for item in items %}
+            {% if not item.FOLDER_ID %}
             <tr>
                 <td>{{ item.ID }}</td>
                 <td>{{ item.NAME }}</td>
                 <td>{{ item.FOLDER_ID }}</td>
                 <td>{{ item.USERNAME }}</td>
-                <td>{{ item.PASSWORD }}</td>
+                <td>
+                    {% if hide_password %}
+                        ********
+                    {% else %}
+                        {{ item.PASSWORD }}
+                    {% endif %}
+                </td>
                 <td>{{ item.URI }}</td>
                 <td>{{ item.NOTES }}</td>
             </tr>
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>
@@ -55,10 +63,9 @@
     <div class="left-pane">
         <h3>Folders</h3>
         <ul>
-{% for folder in folders %}
-   <li><a href="{{ url_for('vault.view_folder', folder_id=folder[1], folder_name=folder[0]) }}">{{ folder[0] }}</a></li>
-{% endfor %}
-
+            {% for folder in folders %}
+                <li><a href="{{ url_for('vault.view_folder', folder_id=folder[1], folder_name=folder[0]) }}">{{ folder[0] }}</a></li>
+            {% endfor %}
         </ul>
     </div>
 

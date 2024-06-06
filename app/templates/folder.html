@@ -2,7 +2,7 @@
 {% block title %}Folder{% endblock %}
 
 {% block content %}
-<h2>Folder: {{ folder_name }}</h2>
+<h2>Folder Name: {{ folder_name }}</h2>
 
 <style>
     table {
@@ -21,32 +21,36 @@
     }
 </style>
 
-<table>
-    <thead>
-        <tr>
-            <th>ItemID</th>
-            <th>Name</th>
-            <th>Folder</th>
-            <th>Username</th>
-            <th>Password</th>
-            <th>URL</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in items %}
-        <tr>
-            <td>{{ item[0] }}</td>
-            <td>{{ item[1] }}</td>
-            <td>{{ item[2] }}</td>
-            <td>{{ item[3] }}</td>
-            <td>{{ item[4] }}</td>
-            <td>{{ item[5] }}</td>
-            <td>{{ item[6] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+ <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>URI</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>{{ item.ID }}</td>
+                    <td>{{ item.NAME }}</td>
+                    <td>{{ item.USERNAME }}</td>
+                    <td>
+                    {% if hide_password %}
+                        ********
+                    {% else %}
+                        {{ item.PASSWORD }}
+                    {% endif %}
+                </td>
+                    <td>{{ item.URI }}</td>
+                    <td>{{ item.NOTES }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
 <a href="{{ url_for('vault.vault') }}">Back to Vault</a>
 {% endblock %}
