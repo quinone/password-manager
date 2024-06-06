@@ -1,21 +1,80 @@
 {% extends 'base.html' %}
-{% block title %}Vault{% endblock %}
+
+{% block title %}Vault: Items Table{% endblock %}
 
 {% block content %}
+    <h1>Vault: Items Table</h1>
 
-    <h2>Vault</h2>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 2px solid white; /* Set the table border color */
+        }
+        th, td {
+            border: 1px solid white; /* Set the cell border color */
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #666; /* Set a background color for the header row */
+            color: white; /* Set text color for the header row */
+        }
+        .button-container button {
+            width: 100%; /* Set equal width for all buttons */
+        }
+    </style>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ItemID</th>
+                <th>Name</th>
+                <th>Folder</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>URL</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items if not item.FOLDER_ID %}
+            <tr>
+                <td>{{ item.ID }}</td>
+                <td>{{ item.NAME }}</td>
+                <td>{{ item.FOLDER_ID }}</td>
+                <td>{{ item.USERNAME }}</td>
+                <td>{{ item.PASSWORD }}</td>
+                <td>{{ item.URI }}</td>
+                <td>{{ item.NOTES }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
     <div class="left-pane">
         <h3>Folders</h3>
         <ul>
-            {% for folder in folders %}
-            <li><a href="{{ url_for('vault.view_folder', folder_name=folder[0]) }}">{{ folder[0] }}</a></li>
-            {% endfor %}
-        </ul>
+{% for folder in folders %}
+   <li><a href="{{ url_for('vault.view_folder', folder_id=folder[1], folder_name=folder[0]) }}">{{ folder[0] }}</a></li>
+{% endfor %}
 
+        </ul>
     </div>
+
     <a href="{{ url_for('vault.new_item') }}">Create New Item</a>
     <a href="{{ url_for('vault.new_folder') }}">Create New Folder</a>
     <a href="{{ url_for('vault.profile') }}">Back</a>
-{% endblock %}
-</html>
 
+    <div class="button-container">
+        <form action="{{ url_for('vault.new_item') }}" method="get">
+            <button type="submit">Create New Item</button>
+        </form>
+        <form action="{{ url_for('vault.new_folder') }}" method="get">
+            <button type="submit">Create New Folder</button>
+        </form>
+        <form action="{{ url_for('vault.profile') }}" method="get">
+            <button type="submit">Back</button>
+        </form>
+    </div>
+{% endblock %}

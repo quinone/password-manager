@@ -1,84 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration</title>
-     <!-- Include the reCAPTCHA script -->
-    <script src="/MyJavaScript.js" async defer></script>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% extends 'base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+
+    <h1>User Preferences</h1>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        h1 {
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        form {
-            max-width: 400px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        label {
-            font-weight: bold;
-        }
-
-        input[type="email"],
-        input[type="text"],
-        input[type="password"] {
+        table {
+            border-collapse: collapse;
             width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
+            border: 2px solid white; /* Set the table border color */
         }
-
-        button[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0 0;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
+        th, td {
+            border: 1px solid white; /* Set the cell border color */
+            padding: 8px;
+            text-align: left;
         }
-
-        button[type="submit"]:hover {
-            background-color: #0056b3;
+         th {
+            background-color: #666; /* Set a background color for the header row */
+            color: white; /* Set text color for the header row */
         }
-                /* Center the reCAPTCHA widget */
-        .recaptcha-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px; /* Optional margin adjustment */
+        .button-container button {
+            width: 100%; /* Set equal width for all buttons */
         }
     </style>
-</head>
-<body>
-    <h1>Welcome to the settings</h1>
-    <form action="/delete_account" method="post" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
-    <button type="submit">Delete account</button>
-</form>
+    <form id="preferencesForm">
+        <label for="vaultTimeout">Vault Timeout:</label>
+        <input type="time" id="vaultTimeout" name="vaultTimeout">
 
-    <p><td colspan="2"><button type="submit">Change password</button></td></p>
-    <p><td colspan="2"><button type="submit">Back</button></td></p>
+        <label for="themeId">Theme:</label>
+        <select id="themeId" name="themeId">
+            <option value="1">Theme 1</option>
+            <option value="2">Theme 2</option>
+            <option value="3">Theme 3</option>
+            <!-- Add more options as needed -->
+        </select>
 
+        <button type="submit">Save Preferences</button>
+    </form>
 
-</body>
-</html>
+    <script>
+        document.getElementById("preferencesForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent the form from submitting
+
+            // Fetch values from input fields
+            var vaultTimeout = document.getElementById("vaultTimeout").value;
+            var themeId = document.getElementById("themeId").value;
+
+            // Do something with the values (e.g., save to database, display, etc.)
+            console.log("Vault Timeout:", vaultTimeout);
+            console.log("Theme ID:", themeId);
+        });
+    </script>
+{% endblock %}
