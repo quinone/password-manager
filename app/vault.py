@@ -10,7 +10,7 @@ from flask import (
 
 from app.auth import login_required
 from app.db import get_db, query_db
-from app.db_cryptography import get_folder_ID, insert_encrypted_item, decrypt_item
+from app.db_cryptography import get_folder_ID, insert_encrypted_item, decrypt_item, decrypt_data
 from app.forms import NewItemForm, SearchForm
 from sqlite3 import Error
 
@@ -91,18 +91,32 @@ def vault():
         cursor.execute("SELECT FOLDER_NAME, ID FROM FOLDER WHERE USER_ID = ?", (user_id,))
         folders = cursor.fetchall()
 
-        # Retrieve items with no folder
+        # Retrieve items with no folder  along with decrypted data
         cursor.execute(
             "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID IS NULL AND USER_ID = ?",
             (user_id,))
         items = cursor.fetchall()
 
+        #added here decryption
+        decrypted_items = []
+        for item in items:
+            decrypted_item = {
+                "ID": item["ID"],
+                "NAME": item["NAME"],
+                "FOLDER_ID": item["FOLDER_ID"],
+                "USERNAME": decrypt_data(item["USERNAME"]),
+                "PASSWORD": decrypt_data(item["PASSWORD"]),
+                "URI": decrypt_data(item["URI"]),
+                "NOTES": decrypt_data(item["NOTES"])
+            }
+            decrypted_items.append(decrypted_item)
+
         cursor.close()
         conn.close()
 
-        print("Connection closed in vault()")
 
-        return render_template("vault.html", folders=folders, items=items)
+
+        return render_template("vault.html", folders=folders, items=decrypted_items)
     except Exception as e:
         flash("Error fetching data: {}".format(str(e)), "danger")
         return render_template("vault.html", folders=[], items=[])
