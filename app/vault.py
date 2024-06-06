@@ -16,11 +16,13 @@ from sqlite3 import Error
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
 
+
 def get_items_for_folder(folder_id):
     try:
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute("SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?", (folder_id,))
+        cursor.execute("SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
+                       (folder_id,))
         items = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -50,7 +52,7 @@ def vault():
             (user_id,))
         items = cursor.fetchall()
 
-        #added here decryption
+        # added here decryption
         decrypted_items = []
         for item in items:
             decrypted_item = {
@@ -87,6 +89,7 @@ def profile():
     conn.close()
     return render_template("profile.html", user_info=user_info)
 
+
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
@@ -107,6 +110,7 @@ def new_item():
             return redirect(url_for("vault.vault"))
 
     return render_template("new-item.html", form=form)
+
 
 @bp.route("/new-folder", methods=["GET", "POST"])
 @login_required
@@ -142,6 +146,7 @@ def new_folder():
                 print("Connection closed in new_folder()")
     return render_template("new-folder.html")
 
+
 @bp.route("/folder/<int:folder_id>/<string:folder_name>")
 @login_required
 def view_folder(folder_id, folder_name):
@@ -159,16 +164,12 @@ def view_folder(folder_id, folder_name):
                 "NOTES": decrypt_data(item["NOTES"])
             }
             decrypted_items.append(decrypted_item)
-        return render_template('folder.html', items=decrypted_items, folder_id=folder_id, folder_name=folder_name, hide_password=True)
+        return render_template('folder.html', items=decrypted_items, folder_id=folder_id, folder_name=folder_name,
+                               hide_password=True)
     except Exception as e:
         flash("Error fetching folder data: {}".format(str(e)), "danger")
-        return render_template("folder.html", items=[], folder_id=folder_id, folder_name=folder_name, hide_password=True)
-
-
-
-
-
-
+        return render_template("folder.html", items=[], folder_id=folder_id, folder_name=folder_name,
+                               hide_password=True)
 
 
 @bp.route("/search", methods=["POST"])

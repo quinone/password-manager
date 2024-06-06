@@ -1,3 +1,5 @@
+// MyJavaScript.js
+
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('login-form').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent the default form submission
@@ -13,78 +15,53 @@ document.addEventListener('DOMContentLoaded', function() {
             this.submit();
         }
     });
-});
 
-
-document.getElementById('generate_button').addEventListener('click', function() {
-    // Show the copy button when the generate button is clicked
-    document.getElementById('copy_button').style.display = 'inline';
-});
-
-function displayMessages(messages, messageType) {
-    // Clear existing messages
-    const messageContainer = document.getElementById('message-container');
-    messageContainer.innerHTML = '';
-
-    // Create new message elements and append to the container
-    messages.forEach(message => {
-        const messageElement = document.createElement('p');
-        messageElement.textContent = message;
-        messageElement.classList.add(messageType);
-        messageContainer.appendChild(messageElement);
+    document.getElementById('generate_button').addEventListener('click', function() {
+        // Show the copy button when the generate button is clicked
+        document.getElementById('copy_button').style.display = 'inline';
     });
-}
 
-<script>
-      // auto_logout.js
+    // auto_logout.js
 
-var timeout;
+    var timeout;
 
-function startLogoutTimer() {
-    timeout = setTimeout(function() {
-        window.location.href = '/logout'; // Redirect to logout route on timeout
-    }, 60 * 1000); // Timeout after 1 minute (in milliseconds)
-}
+    function startLogoutTimer() {
+        timeout = setTimeout(function() {
+            window.location.href = '/logout'; // Redirect to logout route on timeout
+        }, 60 * 1000); // Timeout after 1 minute (in milliseconds)
+    }
 
-function resetLogoutTimer() {
-    clearTimeout(timeout); // Reset timer
-    startLogoutTimer(); // Start timer again
-}
+    function resetLogoutTimer() {
+        clearTimeout(timeout); // Reset timer
+        startLogoutTimer(); // Start timer again
+    }
 
-document.addEventListener('DOMContentLoaded', function() {
     startLogoutTimer(); // Start timer when the page loads
 
     // Reset timer on user interaction
     document.addEventListener('mousemove', resetLogoutTimer);
     document.addEventListener('keydown', resetLogoutTimer);
     // Add more events as needed (e.g., click, touch)
-});
 
-<script>
-document.getElementById("newItemButton").addEventListener("click", function() {
-    window.location.href = "/new_item";
-});
-</script>
+    document.getElementById("newItemButton").addEventListener("click", function() {
+        window.location.href = "/new_item";
+    });
 
+    // Fetch folders data from the server
+    fetch('/get_folders')
+        .then(response => response.json())
+        .then(data => {
+            const folderList = document.getElementById('folderList');
+            data.forEach(folder => {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.textContent = folder.folder_name;
+                row.appendChild(cell);
+                folderList.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error fetching folders:', error));
 
-<script>
-        // Fetch folders data from the server
-        fetch('/get_folders')
-            .then(response => response.json())
-            .then(data => {
-                const folderList = document.getElementById('folderList');
-                data.forEach(folder => {
-                    const row = document.createElement('tr');
-                    const cell = document.createElement('td');
-                    cell.textContent = folder.folder_name;
-                    row.appendChild(cell);
-                    folderList.appendChild(row);
-                });
-            })
-            .catch(error => console.error('Error fetching folders:', error));
-    </script>
-
-    <script>
     // Fetch folders data from the server
     fetch('/get_folders1')
         .then(response => response.json())
@@ -98,4 +75,4 @@ document.getElementById("newItemButton").addEventListener("click", function() {
             });
         })
         .catch(error => console.error('Error fetching folders:', error));
-</script>
+});

@@ -20,13 +20,12 @@ from flask import (
 import random
 import string
 from flask_bootstrap import Bootstrap
-
 from app.forms import SearchForm
 
 bootstrap = Bootstrap()
 
 
-def create_app(test_config=None):
+def create_app(test_config=None, vault=None):
     # Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
