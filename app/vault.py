@@ -66,7 +66,7 @@ def vault():
 
         cursor.close()
         conn.close()
-        return render_template("vault.html", folders=folders, items=decrypted_items)
+        return render_template("vault.html", folders=folders, items=decrypted_items, hide_password=True)
     except Exception as e:
         flash("Error fetching data: {}".format(str(e)), "danger")
         return render_template("vault.html", folders=[], items=[], hide_password=True)
@@ -159,7 +159,7 @@ def view_folder(folder_id, folder_name):
                 "NOTES": decrypt_data(item["NOTES"])
             }
             decrypted_items.append(decrypted_item)
-        return render_template('folder.html', items=decrypted_items, folder_id=folder_id, folder_name=folder_name)
+        return render_template('folder.html', items=decrypted_items, folder_id=folder_id, folder_name=folder_name, hide_password=True)
     except Exception as e:
         flash("Error fetching folder data: {}".format(str(e)), "danger")
         return render_template("folder.html", items=[], folder_id=folder_id, folder_name=folder_name, hide_password=True)
