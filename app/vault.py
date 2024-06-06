@@ -16,32 +16,6 @@ from sqlite3 import Error
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
 
-def get_items_with_no_folder():
-    user_id = session.get("user_id")
-    print("==================================================.")
-    print("User ID:", user_id)
-    try:
-        conn = get_db()
-        if conn is None:
-            print("Connection is None")
-        print("Connection to the database established.")
-        cursor = conn.cursor()
-        print("Cursor opened ")
-        cursor.execute("SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID IS NULL AND USER_ID = ?", (user_id,))
-        print("executed query  ")
-        items = cursor.fetchall()
-        for item in items:
-            print(item)  # Print each item to the console
-        cursor.close()
-        print("Cursor closed ")
-        conn.close()
-        print("Connection closed get_items_with_no_folder.")
-        print("===========================================================")
-        return items
-    except Exception as e:
-        print("Error:", e)  # Print the exception to see what's going wrong
-        flash("Error fetching items with no folder: {}".format(str(e)), "danger")
-        return []
 
 
 def get_all_folders():
@@ -68,7 +42,6 @@ def get_items_for_folder(folder_id):
         items = cursor.fetchall()
         cursor.close()
         conn.close()
-        print("Connection closed in get_items_for_folder()")
         return items
     except Exception as e:
         flash("Error fetching items for folder: {}".format(str(e)), "danger")
@@ -113,9 +86,6 @@ def vault():
 
         cursor.close()
         conn.close()
-
-
-
         return render_template("vault.html", folders=folders, items=decrypted_items)
     except Exception as e:
         flash("Error fetching data: {}".format(str(e)), "danger")
@@ -198,6 +168,9 @@ def new_folder():
 def view_folder(folder_id, folder_name):
     items = get_items_for_folder(folder_id)
     return render_template('folder.html', items=items, folder_id=folder_id, folder_name=folder_name)
+
+
+
 
 @bp.route("/search", methods=["POST"])
 @login_required
