@@ -20,6 +20,8 @@ from flask import (
 import random
 import string
 from flask_bootstrap import Bootstrap
+
+from app import generate_password
 from app.forms import SearchForm
 
 bootstrap = Bootstrap()
@@ -110,12 +112,23 @@ def create_app(test_config=None, vault=None):
 
     @app.route("/generate_password", methods=["POST"])
     def handle_generate_password():
-        length = int(request.form["total_length"])
-        min_length = int(request.form["min_length"])
-        min_numbers = int(request.form["min_numbers"])
-        min_special_chars = int(request.form["min_special_chars"])
-        special_chars = request.form.getlist("special_chars")
+        length = int(request.form.get("total_length", 15))
+        min_length = int(request.form.get("min_length", 10))
+        min_numbers = int(request.form.get("min_numbers", 0))
+        min_special_chars = int(request.form.get("min_special_chars", 0))
+        special_chars = []
         avoid_ambiguous = "avoid_ambiguous" in request.form
+
+        # Handle options
+        options = request.form.get("options")
+        if options == "Password":
+            if request.form.get("password_type") == "Alphanumeric":
+                special_chars = string.punctuation.replace(" ", "")
+            elif request.form.get("password_type") == "Alphabetic":
+                special_chars = ""
+            elif request.form.get("password_type") == "Numeric":
+                special_chars = ""
+                min_numbers = min_length
 
         password = generate_password(
             length,
@@ -130,31 +143,9 @@ def create_app(test_config=None, vault=None):
     @app.route("/", methods=["GET", "POST"])
     def index():
         if request.method == "POST":
-            options = request.form.get("options")
-            password_type = request.form.get("password_type")
-            total_length = int(request.form.get("total_length"))
-            min_length = int(request.form.get("min_length"))
-            min_numbers = int(request.form.get("min_numbers"))
-            min_special_chars = int(request.form.get("min_special_chars"))
-            special_chars = request.form.getlist("special_chars")
-            avoid_ambiguous = "avoid_ambiguous" in request.form
+            return handle_generate_password()
 
-            if options == "Password":
-                password = generate_password(
-                    total_length,
-                    min_length,
-                    min_numbers,
-                    min_special_chars,
-                    special_chars,
-                    avoid_ambiguous,
-                )
-                return render_template("index.html", password=password)
-            elif options == "Encrypted":
-                # Implement logic for encrypted password generation here
-                encrypted_password = "EncryptedPassword"  # Replace this with your encrypted password generation logic
-                return render_template("index.html", password=encrypted_password)
-
-        return render_template("index.html", password="")
+        return render_template("index.html")
 
     @app.route("/gen_Password")
     def gen_Password():
@@ -199,46 +190,45 @@ def create_app(test_config=None, vault=None):
                 if conn:
                     conn.close()
 
-        else:
-            # Redirect to login page or handle unauthorized access
-            flash("You are not logged in.")
+                else:
+                    # Redirect to login page or handle unauthorized access
+                    flash("You are not logged in.")
             return redirect(url_for("login"))
 
-    # Update your settings HTML template to include a form or button to trigger the account deletion
+            # Update your settings HTML template to include a form or button to trigger the account deletion
 
-    return app
+        return app
 
+        def generate_password(
+                length, min_length, min_numbers, min_special_chars, special_chars, avoid_ambiguous
+        ):
+            password = ""
+            numbers = string.digits
+            special_characters = "".join(special_chars)
+            ambiguous_characters = "0Oo1Il|"
+            if avoid_ambiguous:
+                characters = "".join(
+                    [
+                        c
+                        for c in string.ascii_letters + numbers + special_characters
+                        if c not in ambiguous_characters
+                    ]
+                )
+            else:
+                characters = string.ascii_letters + numbers + special_characters
 
-def generate_password(
-    length, min_length, min_numbers, min_special_chars, special_chars, avoid_ambiguous
-):
-    password = ""
-    numbers = string.digits
-    special_characters = "".join(special_chars)
-    ambiguous_characters = "0Oo1Il|"
-    if avoid_ambiguous:
-        characters = "".join(
-            [
-                c
-                for c in string.ascii_letters + numbers + special_characters
-                if c not in ambiguous_characters
-            ]
-        )
-    else:
-        characters = string.ascii_letters + numbers + special_characters
+            # Add minimum numbers
+            for _ in range(min_numbers):
+                password += random.choice(numbers)
 
-    # Add minimum numbers
-    for _ in range(min_numbers):
-        password += random.choice(numbers)
+            # Add minimum special characters
+            for _ in range(min_special_chars):
+                password += random.choice(special_characters)
 
-    # Add minimum special characters
-    for _ in range(min_special_chars):
-        password += random.choice(special_characters)
+            # Generate the rest of the password
+            remaining_length = length - len(password)
+            for _ in range(remaining_length):
+                password += random.choice(characters)
 
-    # Generate the rest of the password
-    remaining_length = length - min_length
-    for _ in range(remaining_length):
-        password += random.choice(characters)
-
-    password = "".join(random.sample(password, len(password)))
-    return password
+            password = "".join(random.sample(password, len(password)))
+            return password

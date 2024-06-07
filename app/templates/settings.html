@@ -3,31 +3,31 @@
 {% block title %}Settings{% endblock %}
 
 {% block content %}
-<script src="/path/to/MyJavaScript.js" defer></script>
+<script src="/MyJavaScript.js" defer></script>
 <h1>User Preferences</h1>
-<form id="preferencesForm">
-    <p><li>
+<form id="preferencesForm" method="POST"> <!-- Added method="POST" to the form -->
+    <p>
         <label for="vaultTimeout">Vault Timeout:</label>
         <select id="vaultTimeout" name="vaultTimeout">
             <option value="5">5 minutes</option>
             <option value="10">10 minutes</option>
             <option value="15">15 minutes</option>
         </select>
-    </li>
-</p>
+    </p>
     <p>
-    <li>
         <label for="themeId">Theme:</label>
         <select id="themeId" name="themeId">
             <option value="dark">Dark</option>
             <option value="light">Light</option>
         </select>
-    </li>
-</p>
+    </p>
     <p>
-    <li>
+        <textarea id="settingsHtml" name="settingsHtml" rows="10" cols="50">
+            <!-- HTML content goes here -->
+        </textarea>
+    </p>
+    <p>
         <button type="submit">Save Preferences</button>
-    </li>
     </p>
 </form>
 
@@ -38,14 +38,35 @@
         // Fetch values from input fields
         var vaultTimeout = document.getElementById("vaultTimeout").value;
         var themeId = document.getElementById("themeId").value;
+        var settingsHtml = document.getElementById("settingsHtml").value; // Get HTML content
 
-        // Do something with the values (e.g., save to database, display, etc.)
-        console.log("Vault Timeout:", vaultTimeout);
-        console.log("Theme ID:", themeId);
+        // Prepare data to send to the server
+        var data = {
+            vaultTimeout: vaultTimeout,
+            themeId: themeId,
+            settingsHtml: settingsHtml // Include HTML content
+        };
 
-        // Change the CSS file based on the selected theme
-        var themeCSS = themeId === "dark" ? "dark-theme.css" : "light-theme.css";
-        document.getElementById("themeCSS").setAttribute("href", themeCSS);
+        // Send an AJAX request to the server
+        fetch('/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to save preferences');
+            }
+            // Handle success, e.g., show a success message
+            console.log('Preferences saved successfully');
+        })
+        .catch(error => {
+            // Handle error, e.g., show an error message
+            console.error('Error saving preferences:', error);
+        });
     });
 </script>
+
 {% endblock %}
