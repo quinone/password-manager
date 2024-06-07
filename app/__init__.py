@@ -23,6 +23,7 @@ from flask_bootstrap import Bootstrap
 
 from app.forms import SearchForm
 
+
 bootstrap = Bootstrap()
 
 

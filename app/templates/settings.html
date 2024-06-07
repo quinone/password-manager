@@ -4,41 +4,48 @@
 
 {% block content %}
 <script src="/path/to/MyJavaScript.js" defer></script>
-    <h1>User Preferences</h1>
+<h1>User Preferences</h1>
 <form id="preferencesForm">
-   <li> <label for="vaultTimeout">Vault Timeout:</label>
-    <input type="time" id="vaultTimeout" name="vaultTimeout">
-</li>
-
-    <li>
-    <label for="themeId">Theme:</label>
-    <select id="themeId" name="themeId">
-        <option value="dark">Dark</option>
-        <option value="light">Light</option>
-    </select>
-</li>
-
-    <li>
-    <button type="submit">Save Preferences</button>
+    <p><li>
+        <label for="vaultTimeout">Vault Timeout:</label>
+        <select id="vaultTimeout" name="vaultTimeout">
+            <option value="5">5 minutes</option>
+            <option value="10">10 minutes</option>
+            <option value="15">15 minutes</option>
+        </select>
     </li>
+</p>
+    <p>
+    <li>
+        <label for="themeId">Theme:</label>
+        <select id="themeId" name="themeId">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+        </select>
+    </li>
+</p>
+    <p>
+    <li>
+        <button type="submit">Save Preferences</button>
+    </li>
+    </p>
 </form>
 
+<script>
+    document.getElementById("preferencesForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent the form from submitting
 
-    <script>
-        document.getElementById("preferencesForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // Prevent the form from submitting
+        // Fetch values from input fields
+        var vaultTimeout = document.getElementById("vaultTimeout").value;
+        var themeId = document.getElementById("themeId").value;
 
-            // Fetch values from input fields
-            var vaultTimeout = document.getElementById("vaultTimeout").value;
-            var themeId = document.getElementById("themeId").value;
+        // Do something with the values (e.g., save to database, display, etc.)
+        console.log("Vault Timeout:", vaultTimeout);
+        console.log("Theme ID:", themeId);
 
-            // Do something with the values (e.g., save to database, display, etc.)
-            console.log("Vault Timeout:", vaultTimeout);
-            console.log("Theme ID:", themeId);
-
-            // Change the CSS file based on the selected theme
-            var themeCSS = themeId === "dark" ? "dark-theme.css" : "light-theme.css";
-            document.getElementById("themeCSS").setAttribute("href", themeCSS);
-        });
-    </script>
+        // Change the CSS file based on the selected theme
+        var themeCSS = themeId === "dark" ? "dark-theme.css" : "light-theme.css";
+        document.getElementById("themeCSS").setAttribute("href", themeCSS);
+    });
+</script>
 {% endblock %}

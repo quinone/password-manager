@@ -76,9 +76,6 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error fetching folders:', error));
 });
-#preferencesForm li {
-    margin-bottom: 20px; /* Adjust the value to increase or decrease the gap */
-}
 
 document.getElementById("preferencesForm").addEventListener("submit", function(event) {
     event.preventDefault(); // Prevent the form from submitting
