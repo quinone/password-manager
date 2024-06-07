@@ -1,16 +1,15 @@
-from flask import (
-    Blueprint,
-    session,
-    flash,
-    redirect,
-    render_template,
-    url_for,
-    request
-)
+import string
+from flask import Blueprint, session, flash, redirect, render_template, url_for, request
 
+from app.PassGenerator import generate_password
 from app.auth import login_required
 from app.db import get_db, query_db
-from app.db_cryptography import get_folder_ID, insert_encrypted_item, decrypt_item, decrypt_data
+from app.db_cryptography import (
+    get_folder_ID,
+    insert_encrypted_item,
+    decrypt_item,
+    decrypt_data,
+)
 from app.forms import NewItemForm, SearchForm
 from sqlite3 import Error
 
@@ -21,8 +20,10 @@ def get_items_for_folder(folder_id):
     try:
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute("SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
-                       (folder_id,))
+        cursor.execute(
+            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
+            (folder_id,),
+        )
         items = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -34,6 +35,7 @@ def get_items_for_folder(folder_id):
 
 # The rest of your routes and functions...
 
+
 @bp.route("/")
 @login_required
 def vault():
@@ -43,13 +45,16 @@ def vault():
 
         # Retrieve folders
         user_id = session.get("user_id")
-        cursor.execute("SELECT FOLDER_NAME, ID FROM FOLDER WHERE USER_ID = ?", (user_id,))
+        cursor.execute(
+            "SELECT FOLDER_NAME, ID FROM FOLDER WHERE USER_ID = ?", (user_id,)
+        )
         folders = cursor.fetchall()
 
         # Retrieve items with no folder  along with decrypted data
         cursor.execute(
             "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID IS NULL AND USER_ID = ?",
-            (user_id,))
+            (user_id,),
+        )
         items = cursor.fetchall()
 
         # added here decryption
@@ -62,13 +67,15 @@ def vault():
                 "USERNAME": decrypt_data(item["USERNAME"]),
                 "PASSWORD": decrypt_data(item["PASSWORD"]),
                 "URI": decrypt_data(item["URI"]),
-                "NOTES": decrypt_data(item["NOTES"])
+                "NOTES": decrypt_data(item["NOTES"]),
             }
             decrypted_items.append(decrypted_item)
 
         cursor.close()
         conn.close()
-        return render_template("vault.html", folders=folders, items=decrypted_items, hide_password=True)
+        return render_template(
+            "vault.html", folders=folders, items=decrypted_items, hide_password=True
+        )
     except Exception as e:
         flash("Error fetching data: {}".format(str(e)), "danger")
         return render_template("vault.html", folders=[], items=[], hide_password=True)
@@ -105,7 +112,9 @@ def new_item():
 
         folder_ID = get_folder_ID(folder_name=folder_name, user_ID=userID)
 
-        if insert_encrypted_item(userID, name, username, password, uri, notes, folder_ID):
+        if insert_encrypted_item(
+            userID, name, username, password, uri, notes, folder_ID
+        ):
             flash("Successfully submitted new item", "success")
             return redirect(url_for("vault.vault"))
 
@@ -147,11 +156,15 @@ def new_folder():
     return render_template("new-folder.html")
 
 
-@bp.route("/folder/<int:folder_id>/<string:folder_name>")
+@bp.route("/folder/<string:folder_name>")
 @login_required
-def view_folder(folder_id, folder_name):
+def view_folder(folder_name):
+    # Loads "user_id" in session:
+    user_id = session["user_id"]
+    # Verity folder exists
+    folder_ID = get_folder_ID(folder_name=folder_name, user_ID=user_id)
     try:
-        items = get_items_for_folder(folder_id)
+        items = get_items_for_folder(folder_ID)
         decrypted_items = []
         for item in items:
             decrypted_item = {
@@ -161,15 +174,20 @@ def view_folder(folder_id, folder_name):
                 "USERNAME": decrypt_data(item["USERNAME"]),
                 "PASSWORD": decrypt_data(item["PASSWORD"]),
                 "URI": decrypt_data(item["URI"]),
-                "NOTES": decrypt_data(item["NOTES"])
+                "NOTES": decrypt_data(item["NOTES"]),
             }
             decrypted_items.append(decrypted_item)
-        return render_template('folder.html', items=decrypted_items, folder_id=folder_id, folder_name=folder_name,
-                               hide_password=True)
+        return render_template(
+            "folder.html",
+            items=decrypted_items,
+            folder_name=folder_name,
+            hide_password=True,
+        )
     except Exception as e:
         flash("Error fetching folder data: {}".format(str(e)), "danger")
-        return render_template("folder.html", items=[], folder_id=folder_id, folder_name=folder_name,
-                               hide_password=True)
+        return render_template(
+            "folder.html", items=[], folder_name=folder_name, hide_password=True
+        )
 
 
 @bp.route("/search", methods=["POST"])
@@ -200,5 +218,40 @@ def search():
         except Error as e:
             flash("Database Error: {}".format(str(e)), "danger")
 
-        return render_template("search.html", form=form, searched=searched, items=decrypted_items)
+        return render_template(
+            "search.html", form=form, searched=searched, items=decrypted_items
+        )
     return redirect(url_for("vault.vault"))
+
+
+@bp.route("/generate-password", methods=["GET", "POST"])
+@login_required
+def password_generator():
+    # def handle_generate_password():
+    if request.method == "POST":
+        length = int(request.form.get("total_length", 15))
+        min_capitals = int(request.form.get("min_capitals"))
+        # Only one length required
+        # min_length = int(request.form.get("min_length", 10))
+        min_numbers = int(request.form.get("min_numbers", 0))
+        min_special_chars = int(request.form.get("min_special_chars", 0))
+        special_chars = []
+        # Not sure if this is required
+        # avoid_ambiguous = "avoid_ambiguous" in request.form
+        # Handle options
+        options = request.form.get("options")
+        if options == "Password":
+            # min_length = int(request.form.get("min_length", 10))  # Default minimum length to 10
+            special_chars = request.form.getlist("special_chars")
+            # Generate password with alphabetic characters, numbers, and selected special characters
+            special_chars = "".join(special_chars)
+            # characters = string.ascii_letters + string.digits + special_chars
+            password = generate_password(
+                length=length,
+                number_digits=min_numbers,
+                number_upper=min_capitals,
+                number_special=min_special_chars,
+                special=special_chars,
+            )
+        return render_template("password-generator.html", generated_password=password)
+    return render_template("password-generator.html")

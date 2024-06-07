@@ -110,25 +110,6 @@ def create_app(test_config=None):
     def hello():
         return "Hello, World!"
 
-    @app.route("/generate_password", methods=["POST"])
-    def handle_generate_password():
-        length = int(request.form["total_length"])
-        min_length = int(request.form["min_length"])
-        min_numbers = int(request.form["min_numbers"])
-        min_special_chars = int(request.form["min_special_chars"])
-        special_chars = request.form.getlist("special_chars")
-        avoid_ambiguous = "avoid_ambiguous" in request.form
-
-        password = generate_password(
-            length,
-            min_length,
-            min_numbers,
-            min_special_chars,
-            special_chars,
-            avoid_ambiguous,
-        )
-        return jsonify(password=password)
-
     @app.route("/", methods=["GET", "POST"])
     def index():
         if request.method == "POST":
@@ -157,18 +138,6 @@ def create_app(test_config=None):
                 return render_template("index.html", password=encrypted_password)
 
         return render_template("index.html", password="")
-
-    @app.route("/gen_Password")
-    def gen_Password():
-        return render_template("gen_Password.html")
-
-    @app.route("/password_generator")
-    def password_generator():
-        return render_template("Password_generator.html")
-
-    @app.route("/settings")
-    def settings():
-        return render_template("settings.html")
 
     # Add this route to handle account deletion// not deleting data related to user just user profile
     @app.route("/delete_account", methods=["POST"])

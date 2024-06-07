@@ -3,7 +3,6 @@ from wtforms import StringField, PasswordField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, Length
 
 
-
 class NewItemForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired(), Length(1, 50)])
     username = StringField("Username", validators=[Length(0, 250)])
@@ -20,4 +19,6 @@ class SearchForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
-
+# Password Generate form
+class PasswordForm(FlaskForm):
+    pass
