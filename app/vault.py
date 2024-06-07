@@ -96,6 +96,9 @@ def view_folder(folder_name):
     user_id = session["user_id"]
     # Verity folder exists
     folder_ID = get_folder_ID(folder_name=folder_name, user_ID=user_id)
+    if folder_ID == None:
+        flash("You don't have a folder with that name.", "danger")
+        return redirect(url_for('vault.vault'))
     decrypted_items = []
     try:
         # Fetch item IDs based on the folder ID

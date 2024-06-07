@@ -65,8 +65,7 @@ def test_new_item(client, auth, app):
     ],
 )
 def test_unauthenticated_route_access(client, test_path):
-    """This test should redirect to /auth/login"""
-
+    """This test should redirect to /auth/login""" 
     response = client.get(test_path, follow_redirects=True)
     # Print response to help debug
     print("Post response status code:", response.status_code)
