@@ -17,8 +17,3 @@ class NewItemForm(FlaskForm):
 class SearchForm(FlaskForm):
     searched = StringField("Searched", validators=[DataRequired()])
     submit = SubmitField("Submit")
-
-
-# Password Generate form
-class PasswordForm(FlaskForm):
-    pass
