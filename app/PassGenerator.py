@@ -1,31 +1,23 @@
-import time
-from datetime import datetime, timedelta
 import os
-import re
-import bcrypt
-from argon2 import PasswordHasher
-from _sqlite3 import Error
+import string
+import random
 from flask import (
-    Flask,
+    Blueprint,
     g,
-    render_template,
     request,
     flash,
-    url_for,
     session,
     redirect,
-    logging,
+    render_template,
+    url_for,
     jsonify,
 )
-import random
-import string
-from flask_bootstrap import Bootstrap
-
-from app import generate_password
-from app.auth import login_required
 from app.forms import SearchForm
+from app.auth import login_required
+from app.db import get_db
 
-bootstrap = Bootstrap()
+bp = Blueprint("password_generator", __name__, url_prefix="/password_generator", template_folder="templates")
+
 
 def generate_password(
         length, min_length, min_numbers, min_special_chars, special_chars, avoid_ambiguous
@@ -61,203 +53,118 @@ def generate_password(
     password = "".join(random.sample(password, len(password)))
     return password
 
-def create_app(test_config=None, vault=None):
-    # Create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(
-        SECRET_KEY="MUSTCHANGE",
-        ENCRYPTION_KEY="3TirqVc7o7Fk7PzoMwUQCVCWS3ad4C2qArDxWV-Sej8=",  # Must change
-        DATABASE=os.path.join(app.instance_path, "data-dev.sqlite"),
-    )
 
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile("config.py", silent=True)
-    else:
-        # load the test config if passed in
-        app.config.from_mapping(test_config)
+@bp.route("/generate_password", methods=["POST"])
+@login_required
+def handle_generate_password():
+    length = int(request.form.get("total_length", 15))
+    min_length = int(request.form.get("min_length", 10))
+    min_numbers = int(request.form.get("min_numbers", 0))
+    min_special_chars = int(request.form.get("min_special_chars", 0))
+    special_chars = []
+    avoid_ambiguous = "avoid_ambiguous" in request.form
 
-    # ensure the instance folder exists
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
+    # Handle options
+    options = request.form.get("options")
+    if options == "Password":
+        total_length = int(request.form.get("total_length", 15))  # Default total length to 15
+        min_length = int(request.form.get("min_length", 10))  # Default minimum length to 10
 
-    # Imports db.py which includes get_db()
-    from . import db
+        # Check if total length is less than 15
+        if total_length < 15:
+            flash("Total length should be 15 or more.")
+        # Check if minimum length is less than 10
+        elif min_length < 10:
+            flash("Minimum length should be 10 or more.")
+        else:
+            password_type = request.form.get("password_type")
+            special_chars = request.form.getlist("special_chars")
 
-    db.init_app(app)
-
-    # Imports auth.py
-    from . import auth
-
-    # Blueprint allows prefix in url of '/auth/' and points to the templates folder
-    # and access the actions/methods in the auth.py by using auth.methods
-    app.register_blueprint(auth.bp)
-
-    from . import vault
-
-    # Blueprint allows prefix in url of '/vault/' and points to the templates folder
-    # and access the actions/methods in the auth.py by using vault.methods
-    app.register_blueprint(vault.bp)
-
-    bootstrap.init_app(app)
-
-    app.secret_key = "super secret key"  # secret key for captcha
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
-
-    # Define session timeout duration in seconds
-    SESSION_TIMEOUT = 60
-
-    # Set the session lifetime
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
-
-    @app.before_request
-    @login_required
-    def before_request():
-        # Check if user is logged in and session is active
-        if "user_id" in session:
-            # Check if the last activity time is stored in session
-            last_activity_time = session.get("last_activity_time")
-            if last_activity_time is not None:
-                # Calculate time elapsed since last activity
-                time_elapsed = time.time() - last_activity_time
-                # If time elapsed exceeds session timeout, log the user out
-                if time_elapsed > SESSION_TIMEOUT:
-                    # Clear session and log out user
-                    session.clear()
-                    flash("Session timed out due to inactivity.")
-                    return redirect(url_for("login"))
-            # Update last activity time in session
-            session["last_activity_time"] = time.time()
-
-            # Loading search form
-            g.search_form = SearchForm()
-
-    # Pass to base.html
-    @app.context_processor
-    def base():
-        form = SearchForm()
-        return dict(form=form)
-
-    # a simple page that says hello
-    @app.route("/hello")
-    @login_required
-    def hello():
-        return "Hello, World!"
-
-    @app.route("/generate_password", methods=["POST"])
-    @login_required
-    def handle_generate_password():
-        length = int(request.form.get("total_length", 15))
-        min_length = int(request.form.get("min_length", 10))
-        min_numbers = int(request.form.get("min_numbers", 0))
-        min_special_chars = int(request.form.get("min_special_chars", 0))
-        special_chars = []
-        avoid_ambiguous = "avoid_ambiguous" in request.form
-
-        # Handle options
-        options = request.form.get("options")
-        if options == "Password":
-            total_length = int(request.form.get("total_length", 15))  # Default total length to 15
-            min_length = int(request.form.get("min_length", 10))  # Default minimum length to 10
-
-            # Check if total length is less than 15
-            if total_length < 15:
-                flash("Total length should be 15 or more.")
-            # Check if minimum length is less than 10
-            elif min_length < 10:
-                flash("Minimum length should be 10 or more.")
-            else:
-                password_type = request.form.get("password_type")
-                special_chars = request.form.getlist("special_chars")
-
-                if password_type == "Alphanumeric":
-                    # If no special characters
-                    # If no special characters are selected, show a Flask message
-                    if not special_chars:
-                        flash("Please select some special characters.")
-                    else:
-                        # Generate password with alphabetic characters, numbers, and selected special characters
-                        special_chars = "".join(special_chars)
-                        characters = string.ascii_letters + string.digits + special_chars
-                        password = generate_password(total_length, min_length, min_length, min_length, characters,
-                                                     False)
-                elif password_type == "Alphabetic":
-                    # Generate password with only alphabetic characters
-                    characters = string.ascii_letters
-                    password = generate_password(total_length, min_length, min_length, min_length, characters, False)
-                elif password_type == "Numeric":
-                    # Generate password with only numeric characters
-                    characters = string.digits
-                    password = generate_password(total_length, min_length, min_length, min_length, characters, False)
-
-                password = generate_password(
-                    length,
-                    min_length,
-                    min_numbers,
-                    min_special_chars,
-                    special_chars,
-                    avoid_ambiguous,
-                )
-                return jsonify(password=password)
-
-            @app.route("/", methods=["GET", "POST"])
-            @login_required
-            def index():
-                if request.method == "POST":
-                    return handle_generate_password()
-
-                return render_template("index.html")
-
-            @app.route("/gen_Password")
-            @login_required
-            def gen_Password():
-                return render_template("gen_Password.html")
-
-            @app.route("/password_generator")
-            @login_required
-            def password_generator():
-                return render_template("Password_generator.html")
-
-            @app.route("/settings")
-            def settings():
-                return render_template("settings.html")
-
-            # Add this route to handle account deletion// not deleting data related to user just user profile
-            @app.route("/delete_account", methods=["POST"])
-            @login_required
-            def delete_account():
-                # Check if the user is authenticated
-                if "user_id" in session:
-                    user_id = session["user_id"]
-                    conn = db.get_db()
-                    try:
-                        # Connect to the database
-                        # conn = database.connect(db_file)
-                        # cursor = conn.cursor()
-                        # TODO User should have to reauthenticate before deletion
-                        # Delete user's data from related tables
-                        conn.execute("DELETE FROM REGISTRATION WHERE USER_ID = ?", (user_id,))
-                        # You may need additional delete operations for related tables, such as items, folders, etc.
-
-                        conn.commit()
-                        flash("Your account has been successfully deleted.")
-                        # Clear the session
-                        session.clear()
-                        return redirect(url_for("index"))
-
-                    except Exception as e:
-                        # Handle any errors appropriately
-                        print("Error deleting account:", e)
-                        flash("Failed to delete your account. Please try again later.")
-
-                    finally:
-                        if conn:
-                            conn.close()
+            if password_type == "Alphanumeric":
+                # If no special characters
+                # If no special characters are selected, show a Flask message
+                if not special_chars:
+                    flash("Please select some special characters.")
                 else:
-                    # Redirect to login page or handle unauthorized access
-                    flash("You are not logged in.")
-                return redirect(url_for("login"))
+                    # Generate password with alphabetic characters, numbers, and selected special characters
+                    special_chars = "".join(special_chars)
+                    characters = string.ascii_letters + string.digits + special_chars
+                    password = generate_password(total_length, min_length, min_length, min_length, characters,
+                                                 False)
+            elif password_type == "Alphabetic":
+                # Generate password with only alphabetic characters
+                characters = string.ascii_letters
+                password = generate_password(total_length, min_length, min_length, min_length, characters, False)
+            elif password_type == "Numeric":
+                # Generate password with only numeric characters
+                characters = string.digits
+                password = generate_password(total_length, min_length, min_length, min_length, characters, False)
 
-            return app
+            password = generate_password(
+                length,
+                min_length,
+                min_numbers,
+                min_special_chars,
+                special_chars,
+                avoid_ambiguous,
+            )
+            return jsonify(password=password)
+
+
+@bp.route("/", methods=["GET", "POST"])
+@login_required
+def index():
+    if request.method == "POST":
+        return handle_generate_password()
+
+    return render_template("index.html")
+
+
+@bp.route("/gen_Password")
+@login_required
+def gen_Password():
+    return render_template("gen_Password.html")
+
+
+@bp.route("/password_generator")
+@login_required
+def password_generator():
+    return render_template("Password_generator.html")
+
+
+# to handle account deletion// not deleting data related to user just user profile
+@bp.route("/delete_account", methods=["POST"])
+@login_required
+def delete_account():
+    # Check if the user is authenticated
+    if "user_id" in session:
+        user_id = session["user_id"]
+        conn = get_db()
+        try:
+            # Connect to the database
+            # conn = database.connect(db_file)
+            # cursor = conn.cursor()
+            # TODO User should have to reauthenticate before deletion
+            # Delete user's data from related tables
+            conn.execute("DELETE FROM REGISTRATION WHERE USER_ID = ?", (user_id,))
+            # You may need additional delete operations for related tables, such as items, folders, etc.
+
+            conn.commit()
+            flash("Your account has been successfully deleted.")
+            # Clear the session
+            session.clear()
+            return redirect(url_for("index"))
+
+        except Exception as e:
+            # Handle any errors appropriately
+            print("Error deleting account:", e)
+            flash("Failed to delete your account. Please try again later.")
+
+        finally:
+            if conn:
+                conn.close()
+    else:
+        # Redirect to login page or handle unauthorized access
+        flash("You are not logged in.")
+    return redirect(url_for("login"))
+
