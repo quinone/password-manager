@@ -2,7 +2,7 @@ import time
 from datetime import datetime, timedelta
 import os
 import re
-import bcrypt
+#import bcrypt
 from argon2 import PasswordHasher
 from _sqlite3 import Error
 from flask import (
@@ -23,6 +23,7 @@ from flask_bootstrap import Bootstrap
 
 from app.forms import SearchForm
 
+
 bootstrap = Bootstrap()
 
 
@@ -31,7 +32,7 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY="MUSTCHANGE",
-        ENCRYPTION_KEY="3TirqVc7o7Fk7PzoMwUQCVCWS3ad4C2qArDxWV-Sej8=",  ##Must change
+        ENCRYPTION_KEY="3TirqVc7o7Fk7PzoMwUQCVCWS3ad4C2qArDxWV-Sej8=",  # Must change
         DATABASE=os.path.join(app.instance_path, "data-dev.sqlite"),
     )
 
@@ -126,7 +127,7 @@ def create_app(test_config=None):
             special_chars,
             avoid_ambiguous,
         )
-        return password  # Return the generated password as plain text
+        return jsonify(password=password)
 
     @app.route("/", methods=["GET", "POST"])
     def index():
@@ -160,6 +161,10 @@ def create_app(test_config=None):
     @app.route("/gen_Password")
     def gen_Password():
         return render_template("gen_Password.html")
+
+    @app.route("/password_generator")
+    def password_generator():
+        return render_template("Password_generator.html")
 
     @app.route("/settings")
     def settings():
