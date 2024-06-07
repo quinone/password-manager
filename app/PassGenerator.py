@@ -22,6 +22,7 @@ import string
 from flask_bootstrap import Bootstrap
 
 from app import generate_password
+from app.auth import login_required
 from app.forms import SearchForm
 
 bootstrap = Bootstrap()
@@ -78,7 +79,10 @@ def create_app(test_config=None, vault=None):
     # Set the session lifetime
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
 
+
+
     @app.before_request
+    @login_required
     def before_request():
         # Check if user is logged in and session is active
         if "user_id" in session:
@@ -107,10 +111,12 @@ def create_app(test_config=None, vault=None):
 
     # a simple page that says hello
     @app.route("/hello")
+    @login_required
     def hello():
         return "Hello, World!"
 
     @app.route("/generate_password", methods=["POST"])
+    @login_required
     def handle_generate_password():
         length = int(request.form.get("total_length", 15))
         min_length = int(request.form.get("min_length", 10))
@@ -122,13 +128,37 @@ def create_app(test_config=None, vault=None):
         # Handle options
         options = request.form.get("options")
         if options == "Password":
-            if request.form.get("password_type") == "Alphanumeric":
-                special_chars = string.punctuation.replace(" ", "")
-            elif request.form.get("password_type") == "Alphabetic":
-                special_chars = ""
-            elif request.form.get("password_type") == "Numeric":
-                special_chars = ""
-                min_numbers = min_length
+            total_length = int(request.form.get("total_length", 15))  # Default total length to 15
+            min_length = int(request.form.get("min_length", 10))  # Default minimum length to 10
+
+            # Check if total length is less than 15
+            if total_length < 15:
+                flash("Total length should be 15 or more.")
+            # Check if minimum length is less than 10
+            elif min_length < 10:
+                flash("Minimum length should be 10 or more.")
+            else:
+                password_type = request.form.get("password_type")
+                special_chars = request.form.getlist("special_chars")
+
+                if password_type == "Alphanumeric":
+                    # If no special characters are selected, show a Flask message
+                    if not special_chars:
+                        flash("Please select some special characters.")
+                    else:
+                        # Generate password with alphabetic characters, numbers, and selected special characters
+                        special_chars = "".join(special_chars)
+                        characters = string.ascii_letters + string.digits + special_chars
+                        password = generate_password(total_length, min_length, min_length, min_length, characters,
+                                                     False)
+                elif password_type == "Alphabetic":
+                    # Generate password with only alphabetic characters
+                    characters = string.ascii_letters
+                    password = generate_password(total_length, min_length, min_length, min_length, characters, False)
+                elif password_type == "Numeric":
+                    # Generate password with only numeric characters
+                    characters = string.digits
+                    password = generate_password(total_length, min_length, min_length, min_length, characters, False)
 
         password = generate_password(
             length,
@@ -141,6 +171,7 @@ def create_app(test_config=None, vault=None):
         return jsonify(password=password)
 
     @app.route("/", methods=["GET", "POST"])
+    @login_required
     def index():
         if request.method == "POST":
             return handle_generate_password()
@@ -148,10 +179,15 @@ def create_app(test_config=None, vault=None):
         return render_template("index.html")
 
     @app.route("/gen_Password")
+    @login_required
     def gen_Password():
         return render_template("gen_Password.html")
 
+
+
+
     @app.route("/password_generator")
+    @login_required
     def password_generator():
         return render_template("Password_generator.html")
 
@@ -161,6 +197,7 @@ def create_app(test_config=None, vault=None):
 
     # Add this route to handle account deletion// not deleting data related to user just user profile
     @app.route("/delete_account", methods=["POST"])
+    @login_required
     def delete_account():
         # Check if the user is authenticated
         if "user_id" in session:
@@ -189,11 +226,10 @@ def create_app(test_config=None, vault=None):
             finally:
                 if conn:
                     conn.close()
-
-                else:
-                    # Redirect to login page or handle unauthorized access
-                    flash("You are not logged in.")
-            return redirect(url_for("login"))
+        else:
+            # Redirect to login page or handle unauthorized access
+            flash("You are not logged in.")
+        return redirect(url_for("login"))
 
             # Update your settings HTML template to include a form or button to trigger the account deletion
 
