@@ -1,7 +1,7 @@
 import string
 from flask import Blueprint, session, flash, redirect, render_template, url_for, request
 
-from app.PassGenerator import generate_number, generate_passphrase, generate_password
+from app.PassGenerator import generate_number, generate_passphrase, generate_password, generate_username
 from app.auth import login_required
 from app.db import get_db, query_db
 from app.db_cryptography import (
@@ -235,24 +235,26 @@ def password_generator():
         password_type = request.form.get("password_type")
         # Handle options
         options = request.form.get("options")
-        if password_type == "password":
-            special_chars = request.form.getlist("special_chars")
-            # Generate password with alphabetic characters, numbers, and selected special characters
-            special_chars = "".join(special_chars)
-            # characters = string.ascii_letters + string.digits + special_chars
-            password = generate_password(
-                length=length,
-                number_digits=min_numbers,
-                number_upper=min_capitals,
-                number_special=min_special_chars,
-                special=special_chars,
-            )
-            # return render_template("password-generator.html", generated_password=password)
-        if password_type == "pin":
-            password = generate_number(length)
-
-        if password_type == "passphrase":
-            password = generate_passphrase(length=length)
-
-        return render_template("password-generator.html", generated_password=password)
+        if options == 'username':
+            username = generate_username()
+            return render_template("password-generator.html", generated_password=username)
+        if options == 'password':
+            if password_type == "password":
+                special_chars = request.form.getlist("special_chars")
+                # Generate password with alphabetic characters, numbers, and selected special characters
+                special_chars = "".join(special_chars)
+                # characters = string.ascii_letters + string.digits + special_chars
+                password = generate_password(
+                    length=length,
+                    number_digits=min_numbers,
+                    number_upper=min_capitals,
+                    number_special=min_special_chars,
+                    special=special_chars,
+                )
+                # return render_template("password-generator.html", generated_password=password)
+            if password_type == "pin":
+                password = generate_number(length)
+            if password_type == "passphrase":
+                password = generate_passphrase(length=length)
+            return render_template("password-generator.html", generated_password=password)
     return render_template("password-generator.html")
