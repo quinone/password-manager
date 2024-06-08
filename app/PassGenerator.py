@@ -62,9 +62,10 @@ def generate_passphrase(
     filepath = Path(__file__).parent / "AgileWords.txt"
     with open(filepath) as wordlist:
         words = [word.strip() for word in wordlist]
-        if capitalize:
-            words = [word.title() for word in words]
         password = delimiter.join(secrets.choice(words) for i in range(length))
+
+    if capitalize:
+        password = password.title()
 
     if include_number:
         index = password.index(delimiter)
