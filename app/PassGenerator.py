@@ -50,52 +50,23 @@ def generate_number(length):
     return "".join(secrets.choice(digits) for i in range(length))
 
 
-def generate_passphrase(length=4, delimiter="-", capitalize=False):
+def generate_passphrase(
+    length=4, delimiter="-", capitalize=False, include_number=False
+):
+    # Delimiter can be a single character
     if len(delimiter) > 1:
         return None
+    # Max length
     if length > 20:
         return None
     filepath = Path(__file__).parent / "AgileWords.txt"
     with open(filepath) as wordlist:
         words = [word.strip() for word in wordlist]
         if capitalize:
-            for word in words:
-                word[0].upper()
+            words = [word.title() for word in words]
         password = delimiter.join(secrets.choice(words) for i in range(length))
 
+    if include_number:
+        index = password.index(delimiter)
+        password = password[:index] + generate_number(1) + password[index:]
     return password
-
-
-"""def generate_password(
-        length, min_length, min_numbers, min_special_chars, special_chars, avoid_ambiguous
-):
-    password = ""
-    numbers = string.digits
-    special_characters = "".join(special_chars)
-    ambiguous_characters = "0Oo1Il|"
-    if avoid_ambiguous:
-        characters = "".join(
-            [
-                c
-                for c in string.ascii_letters + numbers + special_characters
-                if c not in ambiguous_characters
-            ]
-        )
-    else:
-        characters = string.ascii_letters + numbers + special_characters
-
-    # Add minimum numbers
-    for _ in range(min_numbers):
-        password += random.choice(numbers)
-
-    # Add minimum special characters
-    for _ in range(min_special_chars):
-        password += random.choice(special_characters)
-
-    # Generate the rest of the password
-    remaining_length = length - len(password)
-    for _ in range(remaining_length):
-        password += random.choice(characters)
-
-    password = "".join(random.sample(password, len(password)))
-    return password"""
