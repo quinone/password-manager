@@ -1,7 +1,7 @@
 import string
 from flask import Blueprint, session, flash, redirect, render_template, url_for, request
 
-from app.PassGenerator import generate_password
+from app.PassGenerator import generate_number, generate_passphrase, generate_password
 from app.auth import login_required
 from app.db import get_db, query_db
 from app.db_cryptography import (
@@ -223,23 +223,19 @@ def search():
 
 
 @bp.route("/generate-password", methods=["GET", "POST"])
-@login_required
+# @login_required
 def password_generator():
     # def handle_generate_password():
     if request.method == "POST":
         length = int(request.form.get("total_length", 15))
         min_capitals = int(request.form.get("min_capitals"))
-        # Only one length required
-        # min_length = int(request.form.get("min_length", 10))
         min_numbers = int(request.form.get("min_numbers", 0))
         min_special_chars = int(request.form.get("min_special_chars", 0))
         special_chars = []
-        # Not sure if this is required
-        # avoid_ambiguous = "avoid_ambiguous" in request.form
+        password_type = request.form.get("password_type")
         # Handle options
         options = request.form.get("options")
-        if options == "Password":
-            # min_length = int(request.form.get("min_length", 10))  # Default minimum length to 10
+        if password_type == "password":
             special_chars = request.form.getlist("special_chars")
             # Generate password with alphabetic characters, numbers, and selected special characters
             special_chars = "".join(special_chars)
@@ -251,5 +247,12 @@ def password_generator():
                 number_special=min_special_chars,
                 special=special_chars,
             )
+            # return render_template("password-generator.html", generated_password=password)
+        if password_type == "pin":
+            password = generate_number(length)
+
+        if password_type == "passphrase":
+            password = generate_passphrase(length=length)
+
         return render_template("password-generator.html", generated_password=password)
     return render_template("password-generator.html")

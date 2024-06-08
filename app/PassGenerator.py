@@ -71,3 +71,7 @@ def generate_passphrase(
         index = password.index(delimiter)
         password = password[:index] + generate_number(1) + password[index:]
     return password
+
+
+def generate_username():
+    pass
