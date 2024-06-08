@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import secrets
 import string
 import random
@@ -16,9 +17,6 @@ from flask import (
 from app.forms import SearchForm
 from app.auth import login_required
 from app.db import get_db
-
-# bp = Blueprint("password_generator", __name__, url_prefix="/password_generator", template_folder="templates")
-bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
 
 
 def generate_password(
@@ -51,6 +49,14 @@ def generate_number(length):
     digits = string.digits
     return "".join(secrets.choice(digits) for i in range(length))
 
+
+
+def generate_passphrase(length=4, delimiter='-'):
+    filepath = Path(__file__).parent/'AgileWords.txt'
+    with open(filepath) as wordlist:
+        words = [word.strip() for word in wordlist]
+        password = delimiter.join(secrets.choice(words) for i in range(length))
+    return password
 
 """def generate_password(
         length, min_length, min_numbers, min_special_chars, special_chars, avoid_ambiguous
