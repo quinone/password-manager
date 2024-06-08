@@ -73,5 +73,13 @@ def generate_passphrase(
     return password
 
 
-def generate_username():
-    pass
+def generate_username(capitalize=False, include_number=True):
+    filepath = Path(__file__).parent / "AgileWords.txt"
+    with open(filepath) as wordlist:
+        words = [word.strip() for word in wordlist]
+    password = secrets.choice(words)
+    if capitalize:
+        password = password.title()
+    if include_number:
+        password += generate_number(4)
+    return password
