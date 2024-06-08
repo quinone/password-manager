@@ -50,13 +50,21 @@ def generate_number(length):
     return "".join(secrets.choice(digits) for i in range(length))
 
 
-
-def generate_passphrase(length=4, delimiter='-'):
-    filepath = Path(__file__).parent/'AgileWords.txt'
+def generate_passphrase(length=4, delimiter="-", capitalize=False):
+    if len(delimiter) > 1:
+        return None
+    if length > 20:
+        return None
+    filepath = Path(__file__).parent / "AgileWords.txt"
     with open(filepath) as wordlist:
         words = [word.strip() for word in wordlist]
+        if capitalize:
+            for word in words:
+                word[0].upper()
         password = delimiter.join(secrets.choice(words) for i in range(length))
+
     return password
+
 
 """def generate_password(
         length, min_length, min_numbers, min_special_chars, special_chars, avoid_ambiguous
