@@ -2,7 +2,8 @@ import time
 from datetime import datetime, timedelta
 import os
 import re
-import bcrypt
+
+# import bcrypt
 from argon2 import PasswordHasher
 from _sqlite3 import Error
 from flask import (

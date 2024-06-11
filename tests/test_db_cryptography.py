@@ -58,12 +58,12 @@ def test_insert_encrypted_item(app):
         print(f"Decrypted item: {decrypted_item}")
         assert decrypted_item is not None
 
-        assert decrypted_item.get("userID") == 2
-        assert decrypted_item.get("name") == "New item"
-        assert decrypted_item.get("username") == "New user"
-        assert decrypted_item.get("password") == "SuperPassword"
-        assert decrypted_item.get("uri") == "www.example.com"
-        assert decrypted_item.get("notes") == "top secret notes"
+        assert decrypted_item.get("USER_ID") == 2
+        assert decrypted_item.get("NAME") == "New item"
+        assert decrypted_item.get("USERNAME") == "New user"
+        assert decrypted_item.get("PASSWORD") == "SuperPassword"
+        assert decrypted_item.get("URI") == "www.example.com"
+        assert decrypted_item.get("NOTES") == "top secret notes"
 
 
 def test_decrypt_item(app):
@@ -80,12 +80,12 @@ def test_decrypt_item(app):
         print(f"Decrypted item: {decrypted_item}")
         assert decrypted_item is not None
 
-        assert decrypted_item.get("userID") == 1
-        assert decrypted_item.get("name") == "Fake Name"
-        assert decrypted_item.get("username") == "Fake Username"
-        assert decrypted_item.get("password") == "asdf1234"
-        assert decrypted_item.get("uri") == "www.google.com"
-        assert decrypted_item.get("notes") == "note"
+        assert decrypted_item.get("USER_ID") == 1
+        assert decrypted_item.get("NAME") == "Fake Name"
+        assert decrypted_item.get("USERNAME") == "Fake Username"
+        assert decrypted_item.get("PASSWORD") == "asdf1234"
+        assert decrypted_item.get("URI") == "www.google.com"
+        assert decrypted_item.get("NOTES") == "note"
 
 
 def test_get_folder_ID(app):

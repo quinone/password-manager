@@ -99,13 +99,13 @@ def decrypt_item(item_ID):
             notes = decrypt_data(encrypted_notes)
 
             return {
-                "userID": userID,
-                "name": name,
-                "username": username,
-                "password": password,
-                "uri": uri,
-                "notes": notes,
-                "folderID": folderID,
+                "USER_ID": userID,
+                "NAME": name,
+                "USERNAME": username,
+                "PASSWORD": password,
+                "URI": uri,
+                "NOTES": notes,
+                "FOLDER_ID": folderID,
             }
         else:
             return None

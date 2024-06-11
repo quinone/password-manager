@@ -64,10 +64,11 @@
         <h3>Folders</h3>
         <ul>
             {% for folder in folders %}
-                <li><a href="{{ url_for('vault.view_folder', folder_name=folder[0]) }}">{{ folder[0] }}</a></li>
+                    <li><a href="{{ url_for('vault.view_folder', folder_id=folder[1], folder_name=folder[0]) }}">{{ folder[0] }}</a></li>
             {% endfor %}
         </ul>
     </div>
+
 
     <a href="{{ url_for('vault.new_item') }}">Create New Item</a>
     <a href="{{ url_for('vault.new_folder') }}">Create New Folder</a>

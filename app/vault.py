@@ -7,6 +7,12 @@ from app.PassGenerator import (
     generate_password,
     generate_username,
 )
+from app.PassGenerator import (
+    generate_number,
+    generate_passphrase,
+    generate_password,
+    generate_username,
+)
 from app.auth import login_required
 from app.db import get_db, query_db
 from app.db_cryptography import (
@@ -17,8 +23,49 @@ from app.db_cryptography import (
 )
 from app.forms import NewItemForm, SearchForm
 from sqlite3 import Error
+from sqlite3 import Error
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
+
+
+def get_items_for_folder(folder_id):
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
+            (folder_id,),
+        )
+        items = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return items
+    except Exception as e:
+        flash("Error fetching items for folder: {}".format(str(e)), "danger")
+        return []
+
+
+# The rest of your routes and functions...
+
+
+def get_items_for_folder(folder_id):
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
+            (folder_id,),
+        )
+        items = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return items
+    except Exception as e:
+        flash("Error fetching items for folder: {}".format(str(e)), "danger")
+        return []
+
+
+# The rest of your routes and functions...
 
 
 def get_items_for_folder(folder_id):
@@ -91,6 +138,7 @@ def vault():
 def profile():
     user_id = session["user_id"]
     conn = get_db()
+    conn = get_db()
     if conn is None:
         flash("Failed to connect to the database.", "danger")
         return redirect(url_for("login"))
@@ -105,20 +153,44 @@ def profile():
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
-    form = NewItemForm(request.form)
+    form = NewItemForm()
+    user_id = session.get("user_id")
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT ID, FOLDER_NAME FROM FOLDER WHERE USER_ID = ?", (user_id,))
+    folders = cursor.fetchall()
+    cursor.close()
+
+    form.folder_select.choices = [(folder[0], folder[1]) for folder in folders]
+    form.folder_select.choices.append((0, "Add New Folder"))
+
     if request.method == "POST" and form.validate():
-        userID = session.get("user_id")
         name = form.name.data
         username = form.username.data
         password = form.password.data
         uri = form.uri.data
         notes = form.notes.data
-        folder_name = form.folder_name.data
+        # folder_name = form.folder_name.data Not required
+        folder_id = form.folder_select.data
+        new_folder_name = form.new_folder_name.data
 
-        folder_ID = get_folder_ID(folder_name=folder_name, user_ID=userID)
+        if folder_id == 0 and new_folder_name:
+            conn = get_db()  # Ensure a new connection is obtained
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO FOLDER (USER_ID, FOLDER_NAME) VALUES (?, ?)",
+                (user_id, new_folder_name),
+            )
+            conn.commit()
+            folder_id = cursor.lastrowid
+            cursor.close()
+
+        # Get folder_ID from folder_name [OBSOLETE]
+        # folder_ID = get_folder_ID(folder_name=folder_name, user_ID=user_id)
 
         if insert_encrypted_item(
-            userID, name, username, password, uri, notes, folder_ID
+            user_id, name, username, password, uri, notes, folder_id
         ):
             flash("Successfully submitted new item", "success")
             return redirect(url_for("vault.vault"))
@@ -193,6 +265,41 @@ def view_folder(folder_name):
     )
 
 
+"""
+
+@bp.route("/folder/<folder_name>")
+@login_required
+def view_folder(folder_name):
+    # Loads "user_id" in session:
+    user_id = session["user_id"]
+    # Verity folder exists
+    folder_ID = get_folder_ID(folder_name=folder_name, user_ID=user_id)
+    if folder_ID == None:
+        flash("You don't have a folder with that name.", "danger")
+        return redirect(url_for("vault.vault"))
+    decrypted_items = []
+    try:
+        # Fetch item IDs based on the folder ID
+        item_IDs = query_db("SELECT ID FROM ITEM WHERE FOLDER_ID = ?", (folder_ID,))
+        if item_IDs:
+            print(f"Item IDs: {item_IDs}")
+            for item in item_IDs:
+                item_ID = item[0]
+
+                decrypted_item = decrypt_item(item_ID)
+                if decrypt_item:
+                    decrypted_items.append(decrypted_item)
+                print(f"Items:", decrypted_items)
+
+    except Error as e:
+        print("Database Error:", e)
+
+    return render_template(
+        "folder.html", folder_name=folder_name, items=decrypted_items
+    )
+"""
+
+
 @bp.route("/search", methods=["POST"])
 @login_required
 def search():
@@ -219,6 +326,7 @@ def search():
                 flash("No matching results.", "warning")
 
         except Error as e:
+            flash("Database Error: {}".format(str(e)), "danger")
             flash("Database Error: {}".format(str(e)), "danger")
 
         return render_template(
