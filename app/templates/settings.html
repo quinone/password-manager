@@ -1,84 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration</title>
-     <!-- Include the reCAPTCHA script -->
-    <script src="/MyJavaScript.js" async defer></script>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends 'base.html' %}
 
-        h1 {
-            text-align: center;
-            margin-top: 50px;
-        }
+{% block title %}Settings{% endblock %}
 
-        form {
-            max-width: 400px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
+{% block content %}
+<script src="/MyJavaScript.js" defer></script>
+<h1>User Preferences</h1>
+<form id="preferencesForm" method="POST"> <!-- Added method="POST" to the form -->
+    <p>
+        <label for="vaultTimeout">Vault Timeout:</label>
+        <select id="vaultTimeout" name="vaultTimeout">
+            <option value="5">5 minutes</option>
+            <option value="10">10 minutes</option>
+            <option value="15">15 minutes</option>
+        </select>
+    </p>
+    <p>
+        <label for="themeId">Theme:</label>
+        <select id="themeId" name="themeId">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+        </select>
+    </p>
 
-        label {
-            font-weight: bold;
-        }
-
-        input[type="email"],
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        button[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0 0;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        button[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-                /* Center the reCAPTCHA widget */
-        .recaptcha-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px; /* Optional margin adjustment */
-        }
-    </style>
-</head>
-<body>
-    <h1>Welcome to the settings</h1>
-    <form action="/delete_account" method="post" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
-    <button type="submit">Delete account</button>
+    <p>
+        <button type="submit">Save Preferences</button>
+    </p>
 </form>
 
-    <p><td colspan="2"><button type="submit">Change password</button></td></p>
-    <p><td colspan="2"><button type="submit">Back</button></td></p>
+<script>
+    document.getElementById("preferencesForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent the form from submitting
 
+        // Fetch values from input fields
+        var vaultTimeout = document.getElementById("vaultTimeout").value;
+        var themeId = document.getElementById("themeId").value;
+        var settingsHtml = document.getElementById("settingsHtml").value; // Get HTML content
 
-</body>
-</html>
+        // Prepare data to send to the server
+        var data = {
+            vaultTimeout: vaultTimeout,
+            themeId: themeId,
+            settingsHtml: settingsHtml // Include HTML content
+        };
+
+        // Send an AJAX request to the server
+        fetch('/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to save preferences');
+            }
+            // Handle success, e.g., show a success message
+            console.log('Preferences saved successfully');
+        })
+        .catch(error => {
+            // Handle error, e.g., show an error message
+            console.error('Error saving preferences:', error);
+        });
+    });
+</script>
+
+{% endblock %}

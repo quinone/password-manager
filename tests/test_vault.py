@@ -54,7 +54,7 @@ def test_new_item(client, auth, app):
         ("/vault/profile"),
         ("/vault/new-item"),
         ("/vault/new-folder"),
-        ("/vault/Example Folder"),
+        ("/vault/folder/Example Folder"),
     ],
     ids=[
         "Check vault",

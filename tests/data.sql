@@ -51,4 +51,3 @@ VALUES
         '2',
         'Other users Folder'
     );
-

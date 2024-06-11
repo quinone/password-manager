@@ -1,16 +1,54 @@
 {% extends 'base.html' %}
 {% block title %}Folder{% endblock %}
 
-
 {% block content %}
-    <h2>Folder: {{ folder_name }}</h2>
-    <ul>
-        {% for dict_item in items %}
-            <li>Name: {{ dict_item.name }}, Username: {{ dict_item.username }}, Password: {{ dict_item.password }}, URI: {{ dict_item.uri }}, Notes: {{ dict_item.notes }}</li>
-        {% endfor %}
-        
-    </ul>
-    <a href="{{ url_for('vault.vault') }}">Back to Vault</a>
-{% endblock %}
+<h2>Folder Name: {{ folder_name }}</h2>
 
-</html>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        border: 2px solid white; /* Set the table border color */
+    }
+    th, td {
+        border: 1px solid white; /* Set the cell border color */
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #666; /* Set a background color for the header row */
+        color: white; /* Set text color for the header row */
+    }
+</style>
+
+ <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>URI</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.username }}</td>
+                    <td>
+                    {% if hide_password %}
+                        ********
+                    {% else %}
+                        {{ item.password }}
+                    {% endif %}
+                </td>
+                    <td>{{ item.uri }}</td>
+                    <td>{{ item.notes }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+<a href="{{ url_for('vault.vault') }}">Back to Vault</a>
+{% endblock %}
