@@ -64,14 +64,14 @@
         <h3>Folders</h3>
         <ul>
             {% for folder in folders %}
-                <li><a href="{{ url_for('vault.view_folder', folder_id=folder[1], folder_name=folder[0]) }}">{{ folder[0] }}</a></li>
+                <li><a href="{{ url_for('vault.view_folder', folder_name=folder[0]) }}">{{ folder[0] }}</a></li>
             {% endfor %}
         </ul>
     </div>
 
     <a href="{{ url_for('vault.new_item') }}">Create New Item</a>
     <a href="{{ url_for('vault.new_folder') }}">Create New Folder</a>
-    <a href="{{ url_for('password_generator') }}">Password Generator</a>
+    <a href="{{ url_for('vault.password_generator') }}">Password Generator</a>
     <a href="{{ url_for('vault.profile') }}">Back</a>
 
     <div class="button-container">
@@ -81,7 +81,7 @@
         <form action="{{ url_for('vault.new_folder') }}" method="get">
             <button type="submit">Create New Folder</button>
         </form>
-            <form action="{{ url_for('password_generator') }}" method="get">
+            <form action="{{ url_for('vault.password_generator') }}" method="get">
             <button type="submit"> Password Generator </button>
         </form>
         <form action="{{ url_for('vault.profile') }}" method="get">

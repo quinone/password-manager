@@ -46,15 +46,19 @@ def query_db(query, args=(), one=False):
     cursor.close()
     return (results[0] if results else None) if one else results
 
+
 # In app/db.py
 from flask import current_app
+
 
 def get_folder_id_from_database(folder_name):
     try:
         with current_app.app_context():
             conn = get_db()
             cursor = conn.cursor()
-            cursor.execute("SELECT ID FROM FOLDER WHERE FOLDER_NAME = ?", (folder_name,))
+            cursor.execute(
+                "SELECT ID FROM FOLDER WHERE FOLDER_NAME = ?", (folder_name,)
+            )
             folder_id = cursor.fetchone()
             cursor.close()
             conn.close()

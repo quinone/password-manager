@@ -49,12 +49,12 @@ def test_insert_encrypted_item(app):
         # check if the item is correctly inserted
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM ITEM WHERE ID = 2")
+        cursor.execute("SELECT * FROM ITEM WHERE NAME = 'New item'")
         item = cursor.fetchone()
         print(f"Item from database: {item}")
         assert item is not None
 
-        decrypted_item = decrypt_item(2)
+        decrypted_item = decrypt_item(item[0])
         print(f"Decrypted item: {decrypted_item}")
         assert decrypted_item is not None
 

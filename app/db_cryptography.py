@@ -68,7 +68,7 @@ def insert_encrypted_item(userID, name, username, password, uri, notes, folder_I
 
     finally:
         cursor.close()
-        #conn.close()
+        # conn.close()
 
 
 def decrypt_item(item_ID):
@@ -163,4 +163,4 @@ def get_folder_name(folder_ID, user_ID):
         return None
     finally:
         cursor.close()
-        #conn.close()
+        # conn.close()

@@ -177,7 +177,7 @@ def login():
 @bp.route("/logout")
 def logout():
     session.clear()
-    flash("You have been logged out.","warning")
+    flash("You have been logged out.", "warning")
     return redirect(url_for("auth.login"))
 
 
@@ -191,3 +191,40 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
+
+
+# to handle account deletion// not deleting data related to user just user profile
+@bp.route("/delete_account", methods=["POST"])
+@login_required
+def delete_account():
+    # Check if the user is authenticated
+    if "user_id" in session:
+        user_id = session["user_id"]
+        conn = get_db()
+        try:
+            # Connect to the database
+            # conn = database.connect(db_file)
+            # cursor = conn.cursor()
+            # TODO User should have to reauthenticate before deletion
+            # Delete user's data from related tables
+            conn.execute("DELETE FROM REGISTRATION WHERE USER_ID = ?", (user_id,))
+            # You may need additional delete operations for related tables, such as items, folders, etc.
+
+            conn.commit()
+            flash("Your account has been successfully deleted.")
+            # Clear the session
+            session.clear()
+            return redirect(url_for("index"))
+
+        except Exception as e:
+            # Handle any errors appropriately
+            print("Error deleting account:", e)
+            flash("Failed to delete your account. Please try again later.")
+
+        finally:
+            if conn:
+                conn.close()
+    else:
+        # Redirect to login page or handle unauthorized access
+        flash("You are not logged in.")
+    return redirect(url_for("login"))

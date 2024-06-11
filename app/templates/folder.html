@@ -24,7 +24,6 @@
  <table>
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Name</th>
                 <th>Username</th>
                 <th>Password</th>
@@ -35,18 +34,17 @@
         <tbody>
             {% for item in items %}
                 <tr>
-                    <td>{{ item.ID }}</td>
-                    <td>{{ item.NAME }}</td>
-                    <td>{{ item.USERNAME }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.username }}</td>
                     <td>
                     {% if hide_password %}
                         ********
                     {% else %}
-                        {{ item.PASSWORD }}
+                        {{ item.password }}
                     {% endif %}
                 </td>
-                    <td>{{ item.URI }}</td>
-                    <td>{{ item.NOTES }}</td>
+                    <td>{{ item.uri }}</td>
+                    <td>{{ item.notes }}</td>
                 </tr>
             {% endfor %}
         </tbody>

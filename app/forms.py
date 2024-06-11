@@ -3,7 +3,6 @@ from wtforms import StringField, PasswordField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, Length
 
 
-
 class NewItemForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired(), Length(1, 50)])
     username = StringField("Username", validators=[Length(0, 250)])
@@ -18,6 +17,3 @@ class NewItemForm(FlaskForm):
 class SearchForm(FlaskForm):
     searched = StringField("Searched", validators=[DataRequired()])
     submit = SubmitField("Submit")
-
-
-
