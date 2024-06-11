@@ -1,7 +1,12 @@
 import string
 from flask import Blueprint, session, flash, redirect, render_template, url_for, request
 
-from app.PassGenerator import generate_number, generate_passphrase, generate_password, generate_username
+from app.PassGenerator import (
+    generate_number,
+    generate_passphrase,
+    generate_password,
+    generate_username,
+)
 from app.auth import login_required
 from app.db import get_db, query_db
 from app.db_cryptography import (
@@ -121,38 +126,6 @@ def new_item():
     return render_template("new-item.html", form=form)
 
 
-@bp.route("/<folder_name>")
-@login_required
-def view_folder(folder_name):
-    # Loads "user_id" in session:
-    user_id = session["user_id"]
-    # Verity folder exists
-    folder_ID = get_folder_ID(folder_name=folder_name, user_ID=user_id)
-    if folder_ID == None:
-        flash("You don't have a folder with that name.", "danger")
-        return redirect(url_for('vault.vault'))
-    decrypted_items = []
-    try:
-        # Fetch item IDs based on the folder ID
-        item_IDs = query_db("SELECT ID FROM ITEM WHERE FOLDER_ID = ?", (folder_ID,))
-        if item_IDs:
-            print(f"Item IDs: {item_IDs}")
-            for item in item_IDs:
-                item_ID = item[0]
-
-                decrypted_item = decrypt_item(item_ID)
-                if decrypt_item:
-                    decrypted_items.append(decrypted_item)
-                print(f"Items:", decrypted_items)
-
-    except Error as e:
-        print("Database Error:", e)
-
-    return render_template(
-        "folder.html", folder_name=folder_name, items=decrypted_items
-    )
-
-
 @bp.route("/new-folder", methods=["GET", "POST"])
 @login_required
 def new_folder():
@@ -267,10 +240,12 @@ def password_generator():
         password_type = request.form.get("password_type")
         # Handle options
         options = request.form.get("options")
-        if options == 'username':
+        if options == "username":
             username = generate_username()
-            return render_template("password-generator.html", generated_password=username)
-        if options == 'password':
+            return render_template(
+                "password-generator.html", generated_password=username
+            )
+        if options == "password":
             if password_type == "password":
                 special_chars = request.form.getlist("special_chars")
                 # Generate password with alphabetic characters, numbers, and selected special characters
@@ -288,5 +263,7 @@ def password_generator():
                 password = generate_number(length)
             if password_type == "passphrase":
                 password = generate_passphrase(length=length)
-            return render_template("password-generator.html", generated_password=password)
+            return render_template(
+                "password-generator.html", generated_password=password
+            )
     return render_template("password-generator.html")
