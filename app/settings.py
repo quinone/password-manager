@@ -8,20 +8,24 @@ from flask import (
     url_for,
     render_template,
 )
-from flask_login import login_required, current_user, LoginManager
+
+# from flask_login import login_required, current_user, LoginManager
+from app.auth import login_required
 from app.db import get_db
-from tests.conftest import app
 
-login_manager = LoginManager()
-login_manager.init_app(app)
+# login_manager = LoginManager()
+# login_manager.init_app(app)
 
-bp = Blueprint("settings", __name__, url_prefix="/setting", template_folder="templates")
+bp = Blueprint(
+    "settings", __name__, url_prefix="/settings", template_folder="templates"
+)
 
 
 @bp.route("/", methods=["GET", "POST"])
 @login_required
 def settings():
     if request.method == "POST":
+        user_id = session.get("user_id")
         vault_timeout = request.form.get("vaultTimeout", default="00:05:00")
         theme_id = request.form.get("themeId", default="light")
         settings_html = request.form.get(
@@ -34,7 +38,7 @@ def settings():
             cursor.execute(
                 "REPLACE INTO preferences (user_id, vault_timeout, theme_id, settings_html) VALUES (?, ?, ?, ?)",
                 (
-                    current_user.id,
+                    user_id,
                     vault_timeout,
                     theme_id,
                     settings_html,
@@ -55,6 +59,7 @@ def settings():
 @bp.route("/get_user_preferences", methods=["GET"])
 @login_required
 def get_user_preferences():
+    current_user = session.get("user_id")
     try:
         preferences = (
             current_user.preferences

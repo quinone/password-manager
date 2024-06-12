@@ -20,10 +20,12 @@ from flask import (
 )
 import random
 import string
+from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
 
 from app.forms import SearchForm
 
+login_manager = LoginManager()
 
 bootstrap = Bootstrap()
 
@@ -68,7 +70,13 @@ def create_app(test_config=None):
     # and access the actions/methods in the auth.py by using vault.methods
     app.register_blueprint(vault.bp)
 
+    # login_manager.init_app(app)
     bootstrap.init_app(app)
+
+    # Import for settings route
+    from . import settings
+
+    app.register_blueprint(settings.bp)
 
     app.secret_key = "super secret key"  # secret key for captcha
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
@@ -113,32 +121,7 @@ def create_app(test_config=None):
 
     @app.route("/", methods=["GET", "POST"])
     def index():
-        if request.method == "POST":
-            options = request.form.get("options")
-            password_type = request.form.get("password_type")
-            total_length = int(request.form.get("total_length"))
-            min_length = int(request.form.get("min_length"))
-            min_numbers = int(request.form.get("min_numbers"))
-            min_special_chars = int(request.form.get("min_special_chars"))
-            special_chars = request.form.getlist("special_chars")
-            avoid_ambiguous = "avoid_ambiguous" in request.form
-
-            if options == "Password":
-                password = generate_password(
-                    total_length,
-                    min_length,
-                    min_numbers,
-                    min_special_chars,
-                    special_chars,
-                    avoid_ambiguous,
-                )
-                return render_template("index.html", password=password)
-            elif options == "Encrypted":
-                # Implement logic for encrypted password generation here
-                encrypted_password = "EncryptedPassword"  # Replace this with your encrypted password generation logic
-                return render_template("index.html", password=encrypted_password)
-
-        return render_template("index.html", password="")
+        return render_template("index.html")
 
     # Add this route to handle account deletion// not deleting data related to user just user profile
     @app.route("/delete_account", methods=["POST"])

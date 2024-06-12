@@ -1,12 +1,16 @@
 from pathlib import Path
 import pytest
-from app.PassGenerator import generate_passphrase, generate_username
+from app.PassGenerator import generate_passphrase, generate_password, generate_username
 
 
 def test_generate_passphrase_default():
     passphrase = generate_passphrase()
     wordlist = passphrase.split("-")
     assert len(wordlist) == 4
+
+
+def test_generate_passphrase_random():
+    assert generate_passphrase() != generate_passphrase()
 
 
 @pytest.mark.parametrize(
@@ -85,3 +89,16 @@ def test_generate_username_capitalize_false():
 def test_generate_username_number_false():
     username = generate_username(include_number=False)
     assert username[-4:].isalpha()
+
+
+def test_generate_username_random():
+    assert generate_username() != generate_username()
+
+
+def test_generate_password_randoom():
+    assert generate_password() != generate_password()
+
+
+def test_generate_password_default():
+    password = generate_password()
+    assert len(password) == 15
