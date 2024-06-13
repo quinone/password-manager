@@ -40,7 +40,7 @@ def test_new_item(client, auth, app):
         print("Post response data:", response.data)
 
         # Test redirection to vault
-        # assert response.request.path == "/vault/"
+        assert response.request.path == "/vault/"
 
         # Test for successful message
         assert b"Successfully submitted new item" in response.data
@@ -55,6 +55,7 @@ def test_new_item(client, auth, app):
         ("/vault/new-item"),
         ("/vault/new-folder"),
         ("/vault/folder/Example Folder"),
+        ("/vault/generate-password"),
     ],
     ids=[
         "Check vault",
@@ -62,6 +63,7 @@ def test_new_item(client, auth, app):
         "check new-item",
         "check new-folder",
         "check example folder",
+        "Check generate-password",
     ],
 )
 def test_unauthenticated_route_access(client, test_path):
@@ -76,6 +78,35 @@ def test_unauthenticated_route_access(client, test_path):
     # Flash message of 'You are not logged in.'
     assert b"You are not logged in." in response.data
     assert response.request.path == "/auth/login"
+
+
+# As new routes are created they can be added here
+@pytest.mark.parametrize(
+    "test_path",
+    [
+        ("/vault/"),
+        ("/vault/profile"),
+        ("/vault/new-item"),
+        ("/vault/new-folder"),
+        ("/vault/folder/Example Folder"),
+        ("/vault/generate-password"),
+    ],
+    ids=[
+        "Check vault",
+        "check profile",
+        "check new-item",
+        "check new-folder",
+        "check example folder",
+        "Check generate-password",
+    ],
+)
+def test_authenticated_route_access(client, auth, test_path):
+    """Test should load path."""
+    with client:
+        auth.login()
+        response = client.get(test_path)
+        print("Response status_code: ", response.status_code)
+        assert response.status_code == 200
 
 
 def test_authenticated_vault_view_users_items(client, auth):

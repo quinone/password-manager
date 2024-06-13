@@ -268,7 +268,7 @@ def search():
 
 
 @bp.route("/generate-password", methods=["GET", "POST"])
-# @login_required
+@login_required
 def password_generator():
     # def handle_generate_password():
     if request.method == "POST":
