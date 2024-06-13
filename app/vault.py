@@ -1,12 +1,5 @@
-import string
 from flask import Blueprint, session, flash, redirect, render_template, url_for, request
 
-from app.PassGenerator import (
-    generate_number,
-    generate_passphrase,
-    generate_password,
-    generate_username,
-)
 from app.PassGenerator import (
     generate_number,
     generate_passphrase,
@@ -23,29 +16,8 @@ from app.db_cryptography import (
 )
 from app.forms import NewItemForm, SearchForm
 from sqlite3 import Error
-from sqlite3 import Error
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
-
-
-def get_items_for_folder(folder_id):
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute(
-            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
-            (folder_id,),
-        )
-        items = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return items
-    except Exception as e:
-        flash("Error fetching items for folder: {}".format(str(e)), "danger")
-        return []
-
-
-# The rest of your routes and functions...
 
 
 def get_items_for_folder(folder_id):
@@ -171,7 +143,6 @@ def new_item():
         password = form.password.data
         uri = form.uri.data
         notes = form.notes.data
-        # folder_name = form.folder_name.data Not required
         folder_id = form.folder_select.data
         new_folder_name = form.new_folder_name.data
 
@@ -185,9 +156,6 @@ def new_item():
             conn.commit()
             folder_id = cursor.lastrowid
             cursor.close()
-
-        # Get folder_ID from folder_name [OBSOLETE]
-        # folder_ID = get_folder_ID(folder_name=folder_name, user_ID=user_id)
 
         if insert_encrypted_item(
             user_id, name, username, password, uri, notes, folder_id
@@ -291,7 +259,6 @@ def search():
                 flash("No matching results.", "warning")
 
         except Error as e:
-            flash("Database Error: {}".format(str(e)), "danger")
             flash("Database Error: {}".format(str(e)), "danger")
 
         return render_template(
