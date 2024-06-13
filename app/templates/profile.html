@@ -8,7 +8,7 @@
 
     <h1>Welcome {{ user_info[2] }}</h1>
     <ul>
-           <li><a href="{{ url_for('vault.vault') }}">Vault</a></li>
+           <li><a href="/vault">Vault</a></li>
            <li><a href="{{ url_for('settings.settings') }}">Settings</a></li>
         </ul>
 
@@ -17,7 +17,7 @@
     <p>Email: {{ user_info[1] }}</p>
     <p>Name: {{ user_info[2] }}</p>
     <p>Hint: {{ user_info[4] }}</p>
-    <!-- Add more user info fields as needed -->
+
     {% else %}
     <p>No user information available.</p>
     {% endif %}
