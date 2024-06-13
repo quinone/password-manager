@@ -29,7 +29,6 @@
 <table>
     <thead>
         <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Username</th>
             <th>Password</th>
@@ -40,7 +39,6 @@
     <tbody>
         {% for item in items %}
         <tr>
-            <td>{{ item.ID }}</td>
             <td>{{ item.NAME }}</td>
             <td>{{ item.USERNAME }}</td>
             <td>
@@ -61,37 +59,5 @@
 </table>
 
 <a href="{{ url_for('vault.vault') }}">Back to Vault</a>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var passwordToggles = document.querySelectorAll('.password-toggle');
-        var revealIcons = document.querySelectorAll('.reveal-password');
-        var copyIcons = document.querySelectorAll('.copy-password');
-
-        revealIcons.forEach((icon, index) => {
-            icon.addEventListener('click', function() {
-                var passwordToggle = passwordToggles[index];
-                var password = passwordToggle.getAttribute('data-password');
-                if (passwordToggle.textContent === password) {
-                    passwordToggle.textContent = '********';
-                } else {
-                    passwordToggle.textContent = password;
-                }
-            });
-        });
-
-        copyIcons.forEach((icon, index) => {
-            icon.addEventListener('click', function() {
-                var passwordToggle = passwordToggles[index];
-                var password = passwordToggle.getAttribute('data-password');
-                navigator.clipboard.writeText(password).then(function() {
-                    console.log('Password copied to clipboard');
-                }, function() {
-                    console.error('Failed to copy password to clipboard');
-                });
-            });
-        });
-    });
-</script>
 
 {% endblock %}

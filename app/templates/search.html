@@ -2,61 +2,9 @@
 {% block title %}Search{% endblock %}
 
 {% block content %}
-<style>
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        border: 2px solid white; /* Set the table border color */
-    }
-    th, td {
-        border: 1px solid white; /* Set the cell border color */
-        padding: 8px;
-        text-align: left;
-    }
-    th {
-        background-color: #666; /* Set a background color for the header row */
-        color: white; /* Set text color for the header row */
-    }
-    .button-container button {
-        width: 100%; /* Set equal width for all buttons */
-    }
-</style>
 <h2>You searched for ...</h2>
 <h3>{{ searched }}</h3>
 <br>
-<table>
-    <thead>
-        <tr>
-            <th>ItemID</th>
-            <th>Name</th>
-            <th>Folder</th>
-            <th>Username</th>
-            <th>Password</th>
-            <th>URL</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in items %}
-        <tr>
-            <td>{{ item.ID }}</td>
-            <td>{{ item.NAME }}</td>
-            <td>{{ item.FOLDER_ID }}</td>
-            <td>{{ item.USERNAME }}</td>
-            <td>
-                {% if hide_password %}
-                    ********
-                {% else %}
-                    {{ item.PASSWORD }}
-                {% endif %}
-            </td>
-            <td>{{ item.URI }}</td>
-            <td>{{ item.NOTES }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
 {% for dict_item in items %}
             <li>Name: {{ dict_item.NAME }}, Username: {{ dict_item.USERNAME }}, Password: {{ dict_item.PASSWORD }}, URI: {{ dict_item.URI }}, Notes: {{ dict_item.NOTES }}</li>
         {% endfor %}
