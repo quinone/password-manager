@@ -44,10 +44,6 @@ def get_items_for_folder(folder_id):
         flash("Error fetching items for folder: {}".format(str(e)), "danger")
         return []
 
-
-# The rest of your routes and functions...
-
-
 def get_items_for_folder(folder_id):
     try:
         conn = get_db()
@@ -65,8 +61,6 @@ def get_items_for_folder(folder_id):
         return []
 
 
-# The rest of your routes and functions...
-
 
 def get_items_for_folder(folder_id):
     try:
@@ -83,9 +77,6 @@ def get_items_for_folder(folder_id):
     except Exception as e:
         flash("Error fetching items for folder: {}".format(str(e)), "danger")
         return []
-
-
-# The rest of your routes and functions...
 
 
 @bp.route("/")
