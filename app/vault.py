@@ -188,7 +188,7 @@ def new_item():
             flash("Please enter a new folder name", "error")
             return render_template("new-item.html", form=form)
 
-        folder_id = int(folder_id) if folder_id.isdigit() else None
+        folder_id = int(folder_id) if isinstance(folder_id, str) and folder_id.isdigit() else folder_id
 
         if insert_encrypted_item(
             user_id, name, username, password, uri, notes, folder_id
@@ -197,6 +197,7 @@ def new_item():
             return redirect(url_for("vault.vault"))
 
     return render_template("new-item.html", form=form)
+
 
 @bp.route("/new-folder", methods=["GET", "POST"])
 @login_required
