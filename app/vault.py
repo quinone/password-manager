@@ -14,6 +14,7 @@ from app.db_cryptography import (
     insert_encrypted_item,
     decrypt_item,
     decrypt_data,
+    update_encrypted_item,
 )
 from app.forms import NewItemForm, SearchForm
 from sqlite3 import Error
@@ -182,15 +183,18 @@ def edit_item(item_ID):
         notes = form.notes.data
         folder_id = form.folder_select.data
         new_folder_name = form.new_folder_name.data
+        if folder_id == "0" and new_folder_name:
+            folder_id = query_db(
+                "INSERT INTO FOLDER (USER_ID, FOLDER_NAME) VALUES (?, ?)",
+                (user_ID, new_folder_name),
+                last=True,
+            )
 
-        query_db(
-            "INSERT INTO FOLDER (USER_ID, FOLDER_NAME) VALUES (?, ?)",
-            (user_ID, new_folder_name),
-        )
-
-    if update_encrypted_item(user_ID, name, username, password, uri, notes, folder_id):
-        flash("Successfully updated the item", "success")
-        return redirect(url_for("vault.vault"))
+        if update_encrypted_item(
+            item_ID, user_ID, name, username, password, uri, notes, folder_id
+        ):
+            flash("Successfully updated the item", "success")
+            return redirect(url_for("vault.vault"))
 
     form.name.data = item["name"]
     form.username.data = decrypt_data(item["username"])
@@ -199,7 +203,7 @@ def edit_item(item_ID):
     form.notes.data = decrypt_data(item["notes"])
     form.folder_select.data = item["folder_id"]
 
-    return render_template("update-item.html", form=form)
+    return render_template("edit-item.html", form=form)
 
 
 @bp.route("/new-folder", methods=["GET", "POST"])
