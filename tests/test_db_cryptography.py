@@ -4,7 +4,6 @@ import pytest
 from app.db import get_db
 from app.db_cryptography import (
     decrypt_item,
-    get_cipher,
     encrypt_data,
     decrypt_data,
     get_folder_ID,

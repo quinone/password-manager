@@ -44,40 +44,6 @@ def get_items_for_folder(folder_id):
         flash("Error fetching items for folder: {}".format(str(e)), "danger")
         return []
 
-def get_items_for_folder(folder_id):
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute(
-            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
-            (folder_id,),
-        )
-        items = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return items
-    except Exception as e:
-        flash("Error fetching items for folder: {}".format(str(e)), "danger")
-        return []
-
-
-
-def get_items_for_folder(folder_id):
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute(
-            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
-            (folder_id,),
-        )
-        items = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return items
-    except Exception as e:
-        flash("Error fetching items for folder: {}".format(str(e)), "danger")
-        return []
-
 
 @bp.route("/")
 @login_required
