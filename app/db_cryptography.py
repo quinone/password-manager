@@ -118,6 +118,52 @@ def decrypt_item(item_ID):
     #    conn.close()
 
 
+def update_encrypted_item(
+    item_ID, user_ID, name, username, password, uri, notes, folder_ID
+):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    try:
+        encrypted_username = encrypt_data(username)
+        encrypted_password = encrypt_data(password)
+        encrypted_uri = encrypt_data(uri)
+        encrypted_notes = encrypt_data(notes)
+
+        cursor.execute(
+            """
+                UPDATE ITEM 
+                SET USER_ID = ?, name = ?, username = ?, password = ?, uri = ?, NOTES = ?, FOLDER_ID = ?
+                WHERE ID = ? AND USER_ID = ?
+            """,
+            (
+                user_ID,
+                name,
+                encrypted_username,
+                encrypted_password,
+                encrypted_uri,
+                encrypted_notes,
+                folder_ID,
+                item_ID,
+                user_ID,
+            ),
+        )
+        conn.commit()
+        return item_ID
+    except Error as e:
+        flash("Failed to save, please try again.")
+        print("Database Error:", e)
+        conn.rollback()
+
+    except Exception as e:
+        flash("Failed to save, please try again.")
+        print("Exception:", e)
+
+    # finally:
+    # cursor.close()
+    # conn.close()
+
+
 def get_folder_ID(folder_name, user_ID):
     conn = get_db()
     try:

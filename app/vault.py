@@ -7,12 +7,6 @@ from app.PassGenerator import (
     generate_password,
     generate_username,
 )
-from app.PassGenerator import (
-    generate_number,
-    generate_passphrase,
-    generate_password,
-    generate_username,
-)
 from app.auth import login_required
 from app.db import get_db, query_db
 from app.db_cryptography import (
@@ -106,6 +100,7 @@ def profile():
     conn.close()
     return render_template("profile.html", user_info=user_info)
 
+
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
@@ -145,7 +140,11 @@ def new_item():
             flash("Please enter a new folder name", "error")
             return render_template("new-item.html", form=form)
 
-        folder_id = int(folder_id) if isinstance(folder_id, str) and folder_id.isdigit() else folder_id
+        folder_id = (
+            int(folder_id)
+            if isinstance(folder_id, str) and folder_id.isdigit()
+            else folder_id
+        )
 
         if insert_encrypted_item(
             user_id, name, username, password, uri, notes, folder_id
@@ -154,6 +153,53 @@ def new_item():
             return redirect(url_for("vault.vault"))
 
     return render_template("new-item.html", form=form)
+
+
+@bp.route("/edit-item/<item_ID>", methods=["GET", "POST"])
+@login_required
+def edit_item(item_ID):
+    form = NewItemForm()
+    user_ID = session.get("user_id")
+    item = query_db(
+        "SELECT * FROM ITEM WHERE USER_ID = ? AND ID = ?",
+        (
+            user_ID,
+            item_ID,
+        ),
+        one=True,
+    )
+    folders = query_db(
+        "SELECT ID, FOLDER_NAME FROM FOLDER WHERE USER_ID = ?", (user_ID,), one=False
+    )
+    form.folder_select.choices = [(str(folder[0]), folder[1]) for folder in folders]
+    form.folder_select.choices.append(("0", "Add New Folder"))
+    form.folder_select.choices.append(("None", "No Folder"))
+    if request.method == "POST" and form.validate():
+        name = form.name.data
+        username = form.username.data
+        password = form.password.data
+        uri = form.uri.data
+        notes = form.notes.data
+        folder_id = form.folder_select.data
+        new_folder_name = form.new_folder_name.data
+
+        query_db(
+            "INSERT INTO FOLDER (USER_ID, FOLDER_NAME) VALUES (?, ?)",
+            (user_ID, new_folder_name),
+        )
+
+    if update_encrypted_item(user_ID, name, username, password, uri, notes, folder_id):
+        flash("Successfully updated the item", "success")
+        return redirect(url_for("vault.vault"))
+
+    form.name.data = item["name"]
+    form.username.data = decrypt_data(item["username"])
+    form.password.data = decrypt_data(item["password"])
+    form.uri.data = decrypt_data(item["uri"])
+    form.notes.data = decrypt_data(item["notes"])
+    form.folder_select.data = item["folder_id"]
+
+    return render_template("update-item.html", form=form)
 
 
 @bp.route("/new-folder", methods=["GET", "POST"])
