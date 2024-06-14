@@ -4,62 +4,7 @@
 {% block content %}
 <script src="/MyJavaScript.js" defer></script>
 <h2>Folder Name: {{ folder_name }}</h2>
-
-<style>
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        border: 2px solid white; /* Set the table border color */
-    }
-    th, td {
-        border: 1px solid white; /* Set the cell border color */
-        padding: 8px;
-        text-align: left;
-    }
-    th {
-        background-color: #666; /* Set a background color for the header row */
-        color: white; /* Set text color for the header row */
-    }
-    .reveal-password, .copy-password {
-        cursor: pointer;
-        margin-left: 10px; /* Add some space between icons */
-    }
-</style>
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Username</th>
-            <th>Password</th>
-            <th>URI</th>
-            <th>Notes</th>
-            <th>Edit</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in items %}
-        <tr>
-            <td>{{ item.NAME }}</td>
-            <td>{{ item.USERNAME }}</td>
-            <td>
-                <span class="password-toggle" data-password="{{ item.PASSWORD }}">********</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye reveal-password" viewBox="0 0 16 16">
-                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
-                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-copy copy-password" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
-                </svg>
-            </td>
-            <td>{{ item.URI }}</td>
-            <td>{{ item.NOTES }}</td>
-            <td><a href="{{ url_for('vault.edit_item', item_ID=item.ITEM_ID)}}">Edit</a></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
+{% include 'item-table.html' %}
 <a href="{{ url_for('vault.vault') }}">Back to Vault</a>
 
 {% endblock %}
