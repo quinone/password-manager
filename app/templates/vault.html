@@ -71,11 +71,6 @@
     </ul>
 </div>
 
-<a href="{{ url_for('vault.new_item') }}">Create New Item</a>
-<a href="{{ url_for('vault.new_folder') }}">Create New Folder</a>
-<a href="{{ url_for('vault.password_generator') }}">Password Generator</a>
-<a href="{{ url_for('vault.profile') }}">Back</a>
-
 <div class="button-container">
     <form action="{{ url_for('vault.new_item') }}" method="get">
         <button type="submit">Create New Item</button>
