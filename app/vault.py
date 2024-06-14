@@ -1,5 +1,12 @@
+import string
 from flask import Blueprint, session, flash, redirect, render_template, url_for, request
 
+from app.PassGenerator import (
+    generate_number,
+    generate_passphrase,
+    generate_password,
+    generate_username,
+)
 from app.PassGenerator import (
     generate_number,
     generate_passphrase,
@@ -15,6 +22,7 @@ from app.db_cryptography import (
     decrypt_data,
 )
 from app.forms import NewItemForm, SearchForm
+from sqlite3 import Error
 from sqlite3 import Error
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
@@ -36,10 +44,6 @@ def get_items_for_folder(folder_id):
         flash("Error fetching items for folder: {}".format(str(e)), "danger")
         return []
 
-
-# The rest of your routes and functions...
-
-
 def get_items_for_folder(folder_id):
     try:
         conn = get_db()
@@ -57,7 +61,22 @@ def get_items_for_folder(folder_id):
         return []
 
 
-# The rest of your routes and functions...
+
+def get_items_for_folder(folder_id):
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
+            (folder_id,),
+        )
+        items = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return items
+    except Exception as e:
+        flash("Error fetching items for folder: {}".format(str(e)), "danger")
+        return []
 
 
 @bp.route("/")
@@ -121,7 +140,6 @@ def profile():
     conn.close()
     return render_template("profile.html", user_info=user_info)
 
-
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
@@ -134,8 +152,9 @@ def new_item():
     folders = cursor.fetchall()
     cursor.close()
 
-    form.folder_select.choices = [(folder[0], folder[1]) for folder in folders]
-    form.folder_select.choices.append((0, "Add New Folder"))
+    form.folder_select.choices = [(str(folder[0]), folder[1]) for folder in folders]
+    form.folder_select.choices.append(("0", "Add New Folder"))
+    form.folder_select.choices.append(("None", "No Folder"))
 
     if request.method == "POST" and form.validate():
         name = form.name.data
@@ -146,7 +165,7 @@ def new_item():
         folder_id = form.folder_select.data
         new_folder_name = form.new_folder_name.data
 
-        if folder_id == 0 and new_folder_name:
+        if folder_id == "0" and new_folder_name:
             conn = get_db()  # Ensure a new connection is obtained
             cursor = conn.cursor()
             cursor.execute(
@@ -156,6 +175,11 @@ def new_item():
             conn.commit()
             folder_id = cursor.lastrowid
             cursor.close()
+        elif folder_id == "0" and not new_folder_name:
+            flash("Please enter a new folder name", "error")
+            return render_template("new-item.html", form=form)
+
+        folder_id = int(folder_id) if isinstance(folder_id, str) and folder_id.isdigit() else folder_id
 
         if insert_encrypted_item(
             user_id, name, username, password, uri, notes, folder_id
@@ -259,6 +283,7 @@ def search():
                 flash("No matching results.", "warning")
 
         except Error as e:
+            flash("Database Error: {}".format(str(e)), "danger")
             flash("Database Error: {}".format(str(e)), "danger")
 
         return render_template(
