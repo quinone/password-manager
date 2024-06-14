@@ -203,7 +203,7 @@ def edit_item(item_ID):
     form.notes.data = decrypt_data(item["notes"])
     form.folder_select.data = item["folder_id"]
 
-    return render_template("edit-item.html", form=form)
+    return render_template("edit-item.html", form=form, item_ID=item_ID)
 
 
 @bp.route("/new-folder", methods=["GET", "POST"])

@@ -34,6 +34,7 @@
             <th>Password</th>
             <th>URI</th>
             <th>Notes</th>
+            <th>Edit</th>
         </tr>
     </thead>
     <tbody>
@@ -53,6 +54,7 @@
             </td>
             <td>{{ item.URI }}</td>
             <td>{{ item.NOTES }}</td>
+            <td><a href="{{ url_for('vault.edit_item', item_ID=item.ITEM_ID)}}">Edit</a></td>
         </tr>
         {% endfor %}
     </tbody>

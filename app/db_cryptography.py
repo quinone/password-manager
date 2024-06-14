@@ -99,6 +99,7 @@ def decrypt_item(item_ID):
             notes = decrypt_data(encrypted_notes)
 
             return {
+                "ITEM_ID": item_ID,
                 "USER_ID": userID,
                 "NAME": name,
                 "USERNAME": username,
