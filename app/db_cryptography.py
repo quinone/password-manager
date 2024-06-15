@@ -5,7 +5,7 @@ from sqlite3 import Error
 
 from flask import current_app, flash
 
-from app.db import get_db
+from app.db import get_db, query_db
 
 
 # Using get method to retrieve encryption key after app instance is created
@@ -208,6 +208,28 @@ def get_folder_name(folder_ID, user_ID):
     except Error as e:
         print(f"An error occurred: {e}")
         return None
+    finally:
+        cursor.close()
+        # conn.close()
+
+
+def delete_encrypted_item(item_ID):
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM ITEM WHERE ID = ?", (item_ID,))
+        conn.commit()
+        return True
+
+    except Error as e:
+        flash("Failed to delete, please try again.")
+        print("Database Error:", e)
+        conn.rollback()
+
+    except Exception as e:
+        flash("Failed to delete, please try again.")
+        print("Exception:", e)
+
     finally:
         cursor.close()
         # conn.close()

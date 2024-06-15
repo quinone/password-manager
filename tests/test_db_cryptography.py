@@ -4,6 +4,7 @@ import pytest
 from app.db import get_db, query_db
 from app.db_cryptography import (
     decrypt_item,
+    delete_encrypted_item,
     encrypt_data,
     decrypt_data,
     get_folder_ID,
@@ -118,6 +119,21 @@ def test_update_encrypted_item(app):
         assert decrypted_item.get("PASSWORD") == "New-SuperPassword"
         assert decrypted_item.get("URI") == "www.new-example.com"
         assert decrypted_item.get("NOTES") == "New secret notes"
+
+
+def test_delete_encrypted_item(app):
+    with app.app_context():
+        user_row = query_db(
+            "SELECT ID FROM ITEM WHERE NAME = ?", ("Delete item",), one=True
+        )
+        print("ID of 'Delete item': ", user_row["ID"])
+    with app.app_context():
+        delete_encrypted_item(item_ID=user_row["ID"])
+        user_row_deleted = query_db(
+            "SELECT ID FROM ITEM WHERE NAME = ?", ("Delete item",), one=True
+        )
+        print("ID of 'Delete item': ", user_row_deleted)
+        assert user_row_deleted is None
 
 
 def test_get_folder_ID(app):
