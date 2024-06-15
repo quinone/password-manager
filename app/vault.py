@@ -204,7 +204,7 @@ def edit_item(item_ID):
     form.notes.data = decrypt_data(item["notes"])
     form.folder_select.data = item["folder_id"]
 
-    return render_template("edit-item.html", form=form, item_ID=item_ID, user_ID=user_ID)
+    return render_template("edit-item.html", form=form, item_ID=item_ID)
 
 
 @bp.route("/new-folder", methods=["GET", "POST"])
@@ -350,12 +350,14 @@ def password_generator():
             )
     return render_template("password-generator.html")
 
-@bp.route("/delete/<int:item_ID>", methods=['POST'])
+
+@bp.route("/delete", methods=["POST"])
 @login_required
-def delete_item(item_ID):
-    if request.method == "POST":
-        user_ID = session.get('user_id')
-        if delete_encrypted_item(item_ID, user_ID):
-            flash("Item successfully deleted.")
-            return redirect(url_for('vault.vault'))
-        
+def delete_item():
+    item_ID = request.form.get("item_ID")
+    user_ID = session.get("user_id")
+    if delete_encrypted_item(item_ID, user_ID):
+        flash("Item successfully deleted.", "success")
+        return redirect(url_for("vault.vault"))
+    flash("Item does not exist or is not yours.")
+    return redirect(url_for("vault.vault"))

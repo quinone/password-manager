@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="position-relative">
+    <div>
         <div class="container-fluid full-height d-flex justify-content-center align-items-center">
-            <h1>{% block title %} 500 Internal Server Error {% endblock %}</h1>
-            <p>Sorry! Something went wrong on the server.</p>
-            <p>We are working on it. Please try again later.</p>
+            <div>
+                <h1>{% block title %} 500 Internal Server Error {% endblock %}</h1>
+                <p>Sorry! Something went wrong on the server.</p>
+                <p>We are working on it. Please try again later.</p>
+            <p><a href="{{ url_for('vault.vault') }}">Vault</a></p>
+            </div>
+            
         </div>
     </div>
-    
-    <p><a href="{{ url_for('vault.vault') }}">Back</a></p>
 {% endblock %}

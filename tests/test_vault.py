@@ -184,3 +184,23 @@ def test_search(client, auth):
     assert b"asdf1234" in response.data
     assert b"www.google.com" in response.data
     assert b"note" in response.data
+
+
+def test_delete_item(auth, client):
+    auth.login()
+    with client:
+        response = client.post(
+            "/vault/delete", data={"item_ID": 3}, follow_redirects=True
+        )
+        assert response.status_code == 200
+        assert b"Item successfully deleted." in response.data
+
+
+def test_delete_item_other_user(auth, client):
+    auth.login()
+    with client:
+        response = client.post(
+            "/vault/delete", data={"item_ID": 2}, follow_redirects=True
+        )
+        assert response.status_code == 200
+        assert b"Item does not exist or is not yours." in response.data
