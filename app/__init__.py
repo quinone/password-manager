@@ -67,7 +67,7 @@ def create_app(test_config=None):
     SESSION_TIMEOUT = 300
 
     # Set the session lifetime
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=5)
 
     @app.before_request
     def before_request():

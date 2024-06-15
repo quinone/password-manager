@@ -36,7 +36,7 @@ VALUES
 
     ),
     (
-        '1', -- user 2
+        '1', -- user 1
         '2', -- folder 3
         'Delete item',
         'gAAAAABmX1ETqp-DM_aRaREkjivpP4uOpcCsn4CN27AB0tT9UR1t3bApgEEYUyNeEud4Np4t0nl5rBO6Nahmc1qWBlmmHzJJq9cqtPzgj1dO6vHN9GMkDjo=', --otheruser username

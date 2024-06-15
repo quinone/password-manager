@@ -124,11 +124,12 @@ def test_update_encrypted_item(app):
 def test_delete_encrypted_item(app):
     with app.app_context():
         user_row = query_db(
-            "SELECT ID FROM ITEM WHERE NAME = ?", ("Delete item",), one=True
+            "SELECT ID, USER_ID FROM ITEM WHERE NAME = ?", ("Delete item",), one=True
         )
         print("ID of 'Delete item': ", user_row["ID"])
+        print("User_ID of 'Delete item': ", user_row["USER_ID"])
     with app.app_context():
-        delete_encrypted_item(item_ID=user_row["ID"])
+        delete_encrypted_item(user_row["ID"], user_row["USER_ID"])
         user_row_deleted = query_db(
             "SELECT ID FROM ITEM WHERE NAME = ?", ("Delete item",), one=True
         )

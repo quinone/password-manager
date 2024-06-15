@@ -213,11 +213,11 @@ def get_folder_name(folder_ID, user_ID):
         # conn.close()
 
 
-def delete_encrypted_item(item_ID):
+def delete_encrypted_item(item_ID, user_ID):
     conn = get_db()
     cursor = conn.cursor()
     try:
-        cursor.execute("DELETE FROM ITEM WHERE ID = ?", (item_ID,))
+        cursor.execute("DELETE FROM ITEM WHERE ID = ? AND USER_ID = ?", (item_ID,user_ID,))
         conn.commit()
         return True
 
