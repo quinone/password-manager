@@ -1,9 +1,8 @@
 import time
 from datetime import datetime, timedelta
 import os
-import re
 
-# import bcrypt
+
 from argon2 import PasswordHasher
 from _sqlite3 import Error
 from flask import (
@@ -18,15 +17,14 @@ from flask import (
     logging,
     jsonify,
 )
-import random
-import string
 from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
+
+from app.errors import page_not_found, internal_server_error
 
 from app.forms import SearchForm
 
 login_manager = LoginManager()
-
 bootstrap = Bootstrap()
 
 
@@ -77,6 +75,8 @@ def create_app(test_config=None):
     from . import settings
 
     app.register_blueprint(settings.bp)
+    app.register_error_handler(404, page_not_found)
+    app.register_error_handler(500, internal_server_error)
 
     app.secret_key = "super secret key"  # secret key for captcha
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
@@ -162,38 +162,3 @@ def create_app(test_config=None):
     # Update your settings HTML template to include a form or button to trigger the account deletion
 
     return app
-
-
-def generate_password(
-    length, min_length, min_numbers, min_special_chars, special_chars, avoid_ambiguous
-):
-    password = ""
-    numbers = string.digits
-    special_characters = "".join(special_chars)
-    ambiguous_characters = "0Oo1Il|"
-    if avoid_ambiguous:
-        characters = "".join(
-            [
-                c
-                for c in string.ascii_letters + numbers + special_characters
-                if c not in ambiguous_characters
-            ]
-        )
-    else:
-        characters = string.ascii_letters + numbers + special_characters
-
-    # Add minimum numbers
-    for _ in range(min_numbers):
-        password += random.choice(numbers)
-
-    # Add minimum special characters
-    for _ in range(min_special_chars):
-        password += random.choice(special_characters)
-
-    # Generate the rest of the password
-    remaining_length = length - min_length
-    for _ in range(remaining_length):
-        password += random.choice(characters)
-
-    password = "".join(random.sample(password, len(password)))
-    return password
