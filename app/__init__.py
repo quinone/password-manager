@@ -2,8 +2,6 @@ import time
 from datetime import datetime, timedelta
 import os
 
-
-from argon2 import PasswordHasher
 from _sqlite3 import Error
 from flask import (
     Flask,
@@ -17,14 +15,12 @@ from flask import (
     logging,
     jsonify,
 )
-from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
 
 from app.errors import page_not_found, internal_server_error
 
 from app.forms import SearchForm
 
-login_manager = LoginManager()
 bootstrap = Bootstrap()
 
 
@@ -51,38 +47,24 @@ def create_app(test_config=None):
         pass
 
     # Imports db.py which includes get_db()
-    from . import db
+    from . import db, auth, vault, settings
 
     db.init_app(app)
-
-    # Imports auth.py
-    from . import auth
-
-    # Blueprint allows prefix in url of '/auth/' and points to the templates folder
+    # Blueprint allows prefix in url like '/auth/' and points to the templates folder
     # and access the actions/methods in the auth.py by using auth.methods
     app.register_blueprint(auth.bp)
-
-    from . import vault
-
-    # Blueprint allows prefix in url of '/vault/' and points to the templates folder
-    # and access the actions/methods in the auth.py by using vault.methods
     app.register_blueprint(vault.bp)
-
-    # login_manager.init_app(app)
+    app.register_blueprint(settings.bp)
     bootstrap.init_app(app)
 
-    # Import for settings route
-    from . import settings
-
-    app.register_blueprint(settings.bp)
+    # Error handling
     app.register_error_handler(404, page_not_found)
     app.register_error_handler(500, internal_server_error)
 
     app.secret_key = "super secret key"  # secret key for captcha
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
 
     # Define session timeout duration in seconds
-    SESSION_TIMEOUT = 60
+    SESSION_TIMEOUT = 300
 
     # Set the session lifetime
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
