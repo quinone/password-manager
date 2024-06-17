@@ -159,6 +159,8 @@ def login():
                     session["user_id"] = user[
                         "USER_ID"
                     ]  # Assuming user_id is in the first column
+
+                    log_action(action_type="LOGIN")
                     flash("Login successful.", "success")
                     return redirect(url_for("vault.profile"))
                 else:
@@ -176,10 +178,38 @@ def login():
 
 @bp.route("/logout")
 def logout():
-    session.clear()
-    flash("You have been logged out.", "warning")
+    if "user_id" in session:
+        user_id = session["user_id"]
+
+        # Log logout action to AUDIT table
+        log_action(action_type="LOGOUT")
+
+        session.clear()
+        flash("You have been logged out.", "warning")
+
     return redirect(url_for("auth.login"))
 
+
+from datetime import datetime
+from flask import session
+from app.db import get_db
+
+def log_action(entity_type_id=None, entity_id=None, action_type=None):
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cursor.execute(
+            "INSERT INTO AUDIT (ENTITY_TYPE_ID, ENTITY_ID, ACTION_TYPE, USER_ID, TIMESTAMP) VALUES (?, ?, ?, ?, ?)",
+            (entity_type_id, entity_id, action_type, session.get("user_id"), timestamp)
+        )
+        conn.commit()
+        print("Audit log successfully recorded.")
+    except Exception as e:
+        print(f"Failed to log action: {e}")
+    finally:
+        if conn:
+            conn.close()
 
 def login_required(view):
     @functools.wraps(view)
@@ -191,6 +221,9 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
+
+
+
 
 
 # to handle account deletion// not deleting data related to user just user profile

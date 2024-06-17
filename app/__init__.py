@@ -38,6 +38,9 @@ def create_app(test_config=None):
         ENCRYPTION_KEY="3TirqVc7o7Fk7PzoMwUQCVCWS3ad4C2qArDxWV-Sej8=",  # Must change
         DATABASE=os.path.join(app.instance_path, "data-dev.sqlite"),
     )
+    if __name__ == "__main__":
+        app.run(host='0.0.0.0')
+
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -79,13 +82,13 @@ def create_app(test_config=None):
     app.register_blueprint(settings.bp)
 
     app.secret_key = "super secret key"  # secret key for captcha
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=5)
 
     # Define session timeout duration in seconds
-    SESSION_TIMEOUT = 60
+    SESSION_TIMEOUT = 300
 
     # Set the session lifetime
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=5)
 
     @app.before_request
     def before_request():

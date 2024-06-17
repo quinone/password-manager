@@ -379,3 +379,24 @@ button[type="submit"]:hover {
     align-items: center;
     margin-bottom: 20px; /* Optional margin adjustment */
 }
+/* Default (Light Theme) */
+body {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* Dark Theme */
+body.dark-theme {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+/* Additional Styles for Dark Theme */
+body.dark-theme .navbar {
+    background-color: #333333;
+}
+
+/* Example for other elements */
+body.dark-theme .nav-link {
+    color: #ffffff;
+}

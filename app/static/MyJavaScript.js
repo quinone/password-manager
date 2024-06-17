@@ -1,4 +1,20 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Existing JavaScript code...
+
+    // Dark/Light Mode Toggle
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const htmlElement = document.documentElement;
+
+    htmlElement.setAttribute('data-bs-theme', currentTheme);
+
+    themeToggleBtn.addEventListener('click', function() {
+        const newTheme = htmlElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+        htmlElement.setAttribute('data-bs-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
+
+    // Existing script
     var passwordToggles = document.querySelectorAll('.password-toggle');
     var revealIcons = document.querySelectorAll('.reveal-password');
     var copyIcons = document.querySelectorAll('.copy-password');
@@ -137,4 +153,3 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error saving preferences:', error));
     });
 });
-

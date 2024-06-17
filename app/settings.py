@@ -1,81 +1,52 @@
-from flask import (
-    Blueprint,
-    jsonify,
-    request,
-    session,
-    flash,
-    redirect,
-    url_for,
-    render_template,
-)
-
-# from flask_login import login_required, current_user, LoginManager
+from flask import Blueprint, jsonify, request, session, flash, redirect, url_for, render_template
 from app.auth import login_required
 from app.db import get_db
 
-# login_manager = LoginManager()
-# login_manager.init_app(app)
-
-bp = Blueprint(
-    "settings", __name__, url_prefix="/settings", template_folder="templates"
-)
-
+bp = Blueprint("settings", __name__, url_prefix="/settings", template_folder="templates")
 
 @bp.route("/", methods=["GET", "POST"])
 @login_required
 def settings():
     if request.method == "POST":
         user_id = session.get("user_id")
-        vault_timeout = request.form.get("vaultTimeout", default="00:05:00")
-        theme_id = request.form.get("themeId", default="light")
-        settings_html = request.form.get(
-            "settingsHtml", default=""
-        )  # Get HTML content from the form
+        vault_timeout = request.json.get("vaultTimeout", "00:05:00")
+        theme_id = request.json.get("themeId", "light")
 
         try:
             conn = get_db()
             cursor = conn.cursor()
             cursor.execute(
-                "REPLACE INTO preferences (user_id, vault_timeout, theme_id, settings_html) VALUES (?, ?, ?, ?)",
-                (
-                    user_id,
-                    vault_timeout,
-                    theme_id,
-                    settings_html,
-                ),  # Use current_user.id to get user_id
+                "REPLACE INTO preferences (user_id, vault_timeout, theme_id) VALUES (?, ?, ?)",
+                (user_id, vault_timeout, theme_id),
             )
             conn.commit()
             cursor.close()
             conn.close()
-            flash("Preferences saved successfully", "success")
+            return jsonify({"message": "Preferences saved successfully"}), 200
         except Exception as e:
-            flash(f"Failed to save preferences: {str(e)}", "danger")
-
-        return redirect(url_for("settings.settings"))
+            return jsonify({"error": f"Failed to save preferences: {str(e)}"}), 500
 
     return render_template("settings.html")
-
 
 @bp.route("/get_user_preferences", methods=["GET"])
 @login_required
 def get_user_preferences():
-    current_user = session.get("user_id")
+    user_id = session.get("user_id")
     try:
-        preferences = (
-            current_user.preferences
-        )  # Assuming you have a preferences relationship in your User model
-        if preferences:
-            return jsonify(
-                {
-                    "vault_timeout": preferences.vault_timeout,
-                    "theme_id": preferences.theme_id,
-                    "settings_html": preferences.settings_html,
-                }
-            )
-    except Exception as e:
-        flash(f"Failed to fetch preferences: {str(e)}", "danger")
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT vault_timeout, theme_id FROM preferences WHERE user_id = ?",
+            (user_id,),
+        )
+        preferences = cursor.fetchone()
+        cursor.close()
+        conn.close()
 
-    # Return default preferences if no preferences found or an error occurred
-    return jsonify(
-        {"vault_timeout": "00:05:00", "theme_id": "light", "settings_html": ""}
-    )
+        if preferences:
+            vault_timeout, theme_id = preferences
+            return jsonify({"vault_timeout": vault_timeout, "theme_id": theme_id})
+        else:
+            return jsonify({"vault_timeout": "00:05:00", "theme_id": "light"})
+    except Exception as e:
+        return jsonify({"error": f"Failed to fetch preferences: {str(e)}"}), 500
