@@ -2,6 +2,15 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% block title %}Add New Item{% endblock %}
 {% block content %}
-{{ wtf.quick_form(form) }}
+<div class="d-flex">
+<div class="d-flex flex-grow-1">
+    {{ wtf.quick_form(form) }}
+</div>
+<div class="d-flex"></div>
+<div class="d-flex justify-content-end">
+    {% include 'password-widget.html' %}
+</div>
+</div>
 {% endblock %}
+
 

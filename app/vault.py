@@ -7,22 +7,18 @@ from app.PassGenerator import (
     generate_password,
     generate_username,
 )
-from app.PassGenerator import (
-    generate_number,
-    generate_passphrase,
-    generate_password,
-    generate_username,
-)
+
 from app.auth import login_required
 from app.db import get_db, query_db
 from app.db_cryptography import (
+    delete_encrypted_item,
     get_folder_ID,
     insert_encrypted_item,
     decrypt_item,
     decrypt_data,
+    update_encrypted_item,
 )
 from app.forms import NewItemForm, SearchForm
-from sqlite3 import Error
 from sqlite3 import Error
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
@@ -43,49 +39,6 @@ def get_items_for_folder(folder_id):
     except Exception as e:
         flash("Error fetching items for folder: {}".format(str(e)), "danger")
         return []
-
-
-# The rest of your routes and functions...
-
-
-def get_items_for_folder(folder_id):
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute(
-            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
-            (folder_id,),
-        )
-        items = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return items
-    except Exception as e:
-        flash("Error fetching items for folder: {}".format(str(e)), "danger")
-        return []
-
-
-# The rest of your routes and functions...
-
-
-def get_items_for_folder(folder_id):
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute(
-            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
-            (folder_id,),
-        )
-        items = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return items
-    except Exception as e:
-        flash("Error fetching items for folder: {}".format(str(e)), "danger")
-        return []
-
-
-# The rest of your routes and functions...
 
 
 @bp.route("/")
@@ -189,7 +142,11 @@ def new_item():
             flash("Please enter a new folder name", "error")
             return render_template("new-item.html", form=form)
 
-        folder_id = int(folder_id) if folder_id.isdigit() else None
+        folder_id = (
+            int(folder_id)
+            if isinstance(folder_id, str) and folder_id.isdigit()
+            else folder_id
+        )
 
         if insert_encrypted_item(
             user_id, name, username, password, uri, notes, folder_id
@@ -198,6 +155,56 @@ def new_item():
             return redirect(url_for("vault.vault"))
 
     return render_template("new-item.html", form=form)
+
+
+@bp.route("/edit-item/<item_ID>", methods=["GET", "POST"])
+@login_required
+def edit_item(item_ID):
+    form = NewItemForm()
+    user_ID = session.get("user_id")
+    item = query_db(
+        "SELECT * FROM ITEM WHERE USER_ID = ? AND ID = ?",
+        (
+            user_ID,
+            item_ID,
+        ),
+        one=True,
+    )
+    folders = query_db(
+        "SELECT ID, FOLDER_NAME FROM FOLDER WHERE USER_ID = ?", (user_ID,), one=False
+    )
+    form.folder_select.choices = [(str(folder[0]), folder[1]) for folder in folders]
+    form.folder_select.choices.append(("0", "Add New Folder"))
+    form.folder_select.choices.append(("None", "No Folder"))
+    if request.method == "POST" and form.validate():
+        name = form.name.data
+        username = form.username.data
+        password = form.password.data
+        uri = form.uri.data
+        notes = form.notes.data
+        folder_id = form.folder_select.data
+        new_folder_name = form.new_folder_name.data
+        if folder_id == "0" and new_folder_name:
+            folder_id = query_db(
+                "INSERT INTO FOLDER (USER_ID, FOLDER_NAME) VALUES (?, ?)",
+                (user_ID, new_folder_name),
+                last=True,
+            )
+
+        if update_encrypted_item(
+            item_ID, user_ID, name, username, password, uri, notes, folder_id
+        ):
+            flash("Successfully updated the item", "success")
+            return redirect(url_for("vault.vault"))
+
+    form.name.data = item["name"]
+    form.username.data = decrypt_data(item["username"])
+    form.password.data = decrypt_data(item["password"])
+    form.uri.data = decrypt_data(item["uri"])
+    form.notes.data = decrypt_data(item["notes"])
+    form.folder_select.data = item["folder_id"]
+
+    return render_template("edit-item.html", form=form, item_ID=item_ID)
 
 
 @bp.route("/new-folder", methods=["GET", "POST"])
@@ -294,7 +301,6 @@ def search():
 
         except Error as e:
             flash("Database Error: {}".format(str(e)), "danger")
-            flash("Database Error: {}".format(str(e)), "danger")
 
         return render_template(
             "search.html", form=form, searched=searched, items=decrypted_items
@@ -303,7 +309,7 @@ def search():
 
 
 @bp.route("/generate-password", methods=["GET", "POST"])
-# @login_required
+@login_required
 def password_generator():
     # def handle_generate_password():
     if request.method == "POST":
@@ -342,3 +348,15 @@ def password_generator():
                 "password-generator.html", generated_password=password
             )
     return render_template("password-generator.html")
+
+
+@bp.route("/delete", methods=["POST"])
+@login_required
+def delete_item():
+    item_ID = request.form.get("item_ID")
+    user_ID = session.get("user_id")
+    if delete_encrypted_item(item_ID, user_ID):
+        flash("Item successfully deleted.", "success")
+        return redirect(url_for("vault.vault"))
+    flash("Item does not exist or is not yours.")
+    return redirect(url_for("vault.vault"))

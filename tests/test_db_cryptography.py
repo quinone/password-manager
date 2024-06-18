@@ -1,15 +1,16 @@
 from cryptography.fernet import Fernet
 import pytest
 
-from app.db import get_db
+from app.db import get_db, query_db
 from app.db_cryptography import (
     decrypt_item,
-    get_cipher,
+    delete_encrypted_item,
     encrypt_data,
     decrypt_data,
     get_folder_ID,
     get_folder_name,
     insert_encrypted_item,
+    update_encrypted_item,
 )
 
 
@@ -86,6 +87,54 @@ def test_decrypt_item(app):
         assert decrypted_item.get("PASSWORD") == "asdf1234"
         assert decrypted_item.get("URI") == "www.google.com"
         assert decrypted_item.get("NOTES") == "note"
+
+
+def test_update_encrypted_item(app):
+    with app.app_context():
+        assert (
+            update_encrypted_item(
+                user_ID="2",
+                name="Updated item",
+                username="Updated user",
+                password="New-SuperPassword",
+                uri="www.new-example.com",
+                notes="New secret notes",
+                folder_ID=3,
+                item_ID=2,
+            )
+            == 2
+        )
+    with app.app_context():
+        # check if the item is correctly inserted
+        item = query_db("SELECT * FROM ITEM WHERE NAME = 'Updated item'", one=True)
+        print(f"Item from database: {item}")
+        assert item is not None
+
+        decrypted_item = decrypt_item(item[0])
+        print(f"Decrypted item: {decrypted_item}")
+        assert decrypted_item is not None
+        assert decrypted_item.get("USER_ID") == 2
+        assert decrypted_item.get("NAME") == "Updated item"
+        assert decrypted_item.get("USERNAME") == "Updated user"
+        assert decrypted_item.get("PASSWORD") == "New-SuperPassword"
+        assert decrypted_item.get("URI") == "www.new-example.com"
+        assert decrypted_item.get("NOTES") == "New secret notes"
+
+
+def test_delete_encrypted_item(app):
+    with app.app_context():
+        user_row = query_db(
+            "SELECT ID, USER_ID FROM ITEM WHERE NAME = ?", ("Delete item",), one=True
+        )
+        print("ID of 'Delete item': ", user_row["ID"])
+        print("User_ID of 'Delete item': ", user_row["USER_ID"])
+    with app.app_context():
+        delete_encrypted_item(user_row["ID"], user_row["USER_ID"])
+        user_row_deleted = query_db(
+            "SELECT ID FROM ITEM WHERE NAME = ?", ("Delete item",), one=True
+        )
+        print("ID of 'Delete item': ", user_row_deleted)
+        assert user_row_deleted is None
 
 
 def test_get_folder_ID(app):

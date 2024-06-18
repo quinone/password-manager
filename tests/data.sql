@@ -34,6 +34,16 @@ VALUES
         'gAAAAABmX1FTrrviVO7X-9oZHufGGmBeNijnX-k98aOOUff8VuASIocfkOcYYPeb6mSKuOTxbJ0qWCtgodiw1ih7U8pWQneOcXxm01tRKaSgAroTubXuVR4=', --www.otherusersite.com
         'gAAAAABmX1FzkDPPErYQlmIzPp9bW-PDZU0yqfyUOHr5b2l2eoTGJtaD5A81YQ70Mz8NUGuMYFLy1-Jdj0ZJRawz7WkAhcOEGw==' -- otherusers note
 
+    ),
+    (
+        '1', -- user 1
+        '2', -- folder 3
+        'Delete item',
+        'gAAAAABmX1ETqp-DM_aRaREkjivpP4uOpcCsn4CN27AB0tT9UR1t3bApgEEYUyNeEud4Np4t0nl5rBO6Nahmc1qWBlmmHzJJq9cqtPzgj1dO6vHN9GMkDjo=', --otheruser username
+        'gAAAAABmX1E5IkTiOOi6CSBHqSAFcYQ61pFvoEo3z-kMlN2VFV_TeArjat2wsS_1kvwYM0WV7o6IRICAO82jRJcHfvp8r9W4pkiSe1E3INkaFpquwumMUac=', --otheruser password
+        'gAAAAABmX1FTrrviVO7X-9oZHufGGmBeNijnX-k98aOOUff8VuASIocfkOcYYPeb6mSKuOTxbJ0qWCtgodiw1ih7U8pWQneOcXxm01tRKaSgAroTubXuVR4=', --www.otherusersite.com
+        'gAAAAABmX1FzkDPPErYQlmIzPp9bW-PDZU0yqfyUOHr5b2l2eoTGJtaD5A81YQ70Mz8NUGuMYFLy1-Jdj0ZJRawz7WkAhcOEGw==' -- otherusers note
+
     );
 
 

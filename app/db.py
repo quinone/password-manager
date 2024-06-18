@@ -40,10 +40,12 @@ def init_app(app):
     app.cli.add_command(init_db_command)
 
 
-def query_db(query, args=(), one=False):
+def query_db(query, args=(), one=False, last=False):
     cursor = get_db().execute(query, args)
     results = cursor.fetchall()
     cursor.close()
+    if last:
+        return results[-1] if results else None
     return (results[0] if results else None) if one else results
 
 

@@ -1,10 +1,7 @@
 import time
 from datetime import datetime, timedelta
 import os
-import re
 
-# import bcrypt
-from argon2 import PasswordHasher
 from _sqlite3 import Error
 from flask import (
     Flask,
@@ -18,14 +15,11 @@ from flask import (
     logging,
     jsonify,
 )
-import random
-import string
-from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
 
-from app.forms import SearchForm
+from app.errors import page_not_found, internal_server_error
 
-login_manager = LoginManager()
+from app.forms import SearchForm
 
 bootstrap = Bootstrap()
 
@@ -55,33 +49,21 @@ def create_app(test_config=None):
         pass
 
     # Imports db.py which includes get_db()
-    from . import db
+    from . import db, auth, vault, settings
 
     db.init_app(app)
-
-    # Imports auth.py
-    from . import auth
-
-    # Blueprint allows prefix in url of '/auth/' and points to the templates folder
+    # Blueprint allows prefix in url like '/auth/' and points to the templates folder
     # and access the actions/methods in the auth.py by using auth.methods
     app.register_blueprint(auth.bp)
-
-    from . import vault
-
-    # Blueprint allows prefix in url of '/vault/' and points to the templates folder
-    # and access the actions/methods in the auth.py by using vault.methods
     app.register_blueprint(vault.bp)
-
-    # login_manager.init_app(app)
+    app.register_blueprint(settings.bp)
     bootstrap.init_app(app)
 
-    # Import for settings route
-    from . import settings
-
-    app.register_blueprint(settings.bp)
+    # Error handling
+    app.register_error_handler(404, page_not_found)
+    app.register_error_handler(500, internal_server_error)
 
     app.secret_key = "super secret key"  # secret key for captcha
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=5)
 
     # Define session timeout duration in seconds
     SESSION_TIMEOUT = 300
@@ -164,38 +146,3 @@ def create_app(test_config=None):
     # Update your settings HTML template to include a form or button to trigger the account deletion
 
     return app
-
-
-def generate_password(
-    length, min_length, min_numbers, min_special_chars, special_chars, avoid_ambiguous
-):
-    password = ""
-    numbers = string.digits
-    special_characters = "".join(special_chars)
-    ambiguous_characters = "0Oo1Il|"
-    if avoid_ambiguous:
-        characters = "".join(
-            [
-                c
-                for c in string.ascii_letters + numbers + special_characters
-                if c not in ambiguous_characters
-            ]
-        )
-    else:
-        characters = string.ascii_letters + numbers + special_characters
-
-    # Add minimum numbers
-    for _ in range(min_numbers):
-        password += random.choice(numbers)
-
-    # Add minimum special characters
-    for _ in range(min_special_chars):
-        password += random.choice(special_characters)
-
-    # Generate the rest of the password
-    remaining_length = length - min_length
-    for _ in range(remaining_length):
-        password += random.choice(characters)
-
-    password = "".join(random.sample(password, len(password)))
-    return password

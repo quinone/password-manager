@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div >
+        <div class="container-fluid full-height d-flex justify-content-center align-items-center">
+            <div>
+                <h1>{% block title %} 404 Page Not Found {% endblock %}</h1>
+                <p>The page you are looking for doesn't seem to exist.</p>
+                <p>Please try something else.</p>
+            <p><a href="{{ url_for('vault.vault') }}">Vault</a></p>
+            </div>
+            
+        </div>
+    </div>
+{% endblock %}

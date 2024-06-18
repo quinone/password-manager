@@ -1,4 +1,32 @@
 document.addEventListener('DOMContentLoaded', function() {
+    var passwordToggles = document.querySelectorAll('.password-toggle');
+    var revealIcons = document.querySelectorAll('.reveal-password');
+    var copyIcons = document.querySelectorAll('.copy-password');
+
+    revealIcons.forEach((icon, index) => {
+        icon.addEventListener('click', function() {
+            var passwordToggle = passwordToggles[index];
+            var password = passwordToggle.getAttribute('data-password');
+            if (passwordToggle.textContent === password) {
+                passwordToggle.textContent = '********';
+            } else {
+                passwordToggle.textContent = password;
+            }
+        });
+    });
+
+    copyIcons.forEach((icon, index) => {
+        icon.addEventListener('click', function() {
+            var passwordToggle = passwordToggles[index];
+            var password = passwordToggle.getAttribute('data-password');
+            navigator.clipboard.writeText(password).then(function() {
+                console.log('Password copied to clipboard');
+            }, function() {
+                console.error('Failed to copy password to clipboard');
+            });
+        });
+    });
+
     // Existing JavaScript code...
 
     // Dark/Light Mode Toggle
@@ -118,38 +146,38 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error fetching folders:', error));
 
-    document.getElementById("preferencesForm").addEventListener("submit", function(event) {
-        event.preventDefault(); // Prevent the form from submitting
+        document.getElementById("preferencesForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent the form from submitting
 
-        // Fetch values from input fields
-        var vaultTimeout = document.getElementById("vaultTimeout").value;
-        var themeId = document.getElementById("themeId").value;
+            // Fetch values from input fields
+            var vaultTimeout = document.getElementById("vaultTimeout").value;
+            var themeId = document.getElementById("themeId").value;
 
-        // Prepare data to send to the server
-        var data = {
-            vaultTimeout: vaultTimeout,
-            themeId: themeId
-        };
+            // Prepare data to send to the server
+            var data = {
+                vaultTimeout: vaultTimeout,
+                themeId: themeId
+            };
 
-        // Make a POST request to save the preferences
-        fetch('/save_preferences', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log('Preferences saved successfully.');
-                // Optionally, you can update the UI to reflect the changes
-                // For example, change the theme immediately after saving
-                var themeCSS = themeId === "dark" ? "dark-theme.css" : "light-theme.css";
-                document.getElementById("themeCSS").setAttribute("href", themeCSS);
-            } else {
-                console.error('Failed to save preferences.');
-            }
-        })
-        .catch(error => console.error('Error saving preferences:', error));
-    });
+    // Make a POST request to save the preferences
+    fetch('/save_preferences', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Preferences saved successfully.');
+            // Optionally, you can update the UI to reflect the changes
+            // For example, change the theme immediately after saving
+            var themeCSS = themeId === "dark" ? "dark-theme.css" : "light-theme.css";
+            document.getElementById("themeCSS").setAttribute("href", themeCSS);
+        } else {
+            console.error('Failed to save preferences.');
+        }
+    })
+    .catch(error => console.error('Error saving preferences:', error));
 });
+
