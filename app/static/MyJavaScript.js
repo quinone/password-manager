@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
 
     copyIcons.forEach((icon, index) => {
         icon.addEventListener('click', function() {
@@ -179,5 +180,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     })
     .catch(error => console.error('Error saving preferences:', error));
+    });
 });
-
