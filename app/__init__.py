@@ -39,8 +39,7 @@ def create_app(test_config=None):
         DATABASE=os.path.join(app.instance_path, "data-dev.sqlite"),
     )
     if __name__ == "__main__":
-        app.run(host='0.0.0.0')
-
+        app.run(host="0.0.0.0")
 
     if test_config is None:
         # load the instance config, if it exists, when not testing

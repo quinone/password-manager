@@ -16,7 +16,6 @@ class NewItemForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
-
 # Search form
 class SearchForm(FlaskForm):
     searched = StringField("Searched", validators=[DataRequired()])

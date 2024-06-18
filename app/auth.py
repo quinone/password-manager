@@ -194,6 +194,7 @@ from datetime import datetime
 from flask import session
 from app.db import get_db
 
+
 def log_action(entity_type_id=None, entity_id=None, action_type=None):
     try:
         conn = get_db()
@@ -201,7 +202,7 @@ def log_action(entity_type_id=None, entity_id=None, action_type=None):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor.execute(
             "INSERT INTO AUDIT (ENTITY_TYPE_ID, ENTITY_ID, ACTION_TYPE, USER_ID, TIMESTAMP) VALUES (?, ?, ?, ?, ?)",
-            (entity_type_id, entity_id, action_type, session.get("user_id"), timestamp)
+            (entity_type_id, entity_id, action_type, session.get("user_id"), timestamp),
         )
         conn.commit()
         print("Audit log successfully recorded.")
@@ -210,6 +211,7 @@ def log_action(entity_type_id=None, entity_id=None, action_type=None):
     finally:
         if conn:
             conn.close()
+
 
 def login_required(view):
     @functools.wraps(view)
@@ -221,9 +223,6 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
-
-
-
 
 
 # to handle account deletion// not deleting data related to user just user profile

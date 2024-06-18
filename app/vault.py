@@ -149,6 +149,7 @@ def profile():
     conn.close()
     return render_template("profile.html", user_info=user_info)
 
+
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
@@ -197,6 +198,7 @@ def new_item():
             return redirect(url_for("vault.vault"))
 
     return render_template("new-item.html", form=form)
+
 
 @bp.route("/new-folder", methods=["GET", "POST"])
 @login_required

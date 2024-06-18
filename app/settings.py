@@ -1,8 +1,20 @@
-from flask import Blueprint, jsonify, request, session, flash, redirect, url_for, render_template
+from flask import (
+    Blueprint,
+    jsonify,
+    request,
+    session,
+    flash,
+    redirect,
+    url_for,
+    render_template,
+)
 from app.auth import login_required
 from app.db import get_db
 
-bp = Blueprint("settings", __name__, url_prefix="/settings", template_folder="templates")
+bp = Blueprint(
+    "settings", __name__, url_prefix="/settings", template_folder="templates"
+)
+
 
 @bp.route("/", methods=["GET", "POST"])
 @login_required
@@ -27,6 +39,7 @@ def settings():
             return jsonify({"error": f"Failed to save preferences: {str(e)}"}), 500
 
     return render_template("settings.html")
+
 
 @bp.route("/get_user_preferences", methods=["GET"])
 @login_required
