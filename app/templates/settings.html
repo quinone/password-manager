@@ -13,18 +13,48 @@
             <option value="00:15:00">15 minutes</option>
         </select>
     </p>
-    <p>
-        <label for="themeId">Theme:</label>
-        <select id="themeId" name="themeId">
-            <option value="dark">Dark</option>
-            <option value="light">Light</option>
-        </select>
-    </p>
+
 
     <p>
         <button type="submit">Save Preferences</button>
     </p>
 </form>
+
+<h2>Audit for current user:</h2>
+
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        border: 2px solid white; /* Set the table border color */
+    }
+    th, td {
+        border: 1px solid white; /* Set the cell border color */
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #666; /* Set a background color for the header row */
+        color: white; /* Set text color for the header row */
+    }
+</style>
+
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Action Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in audit_data %}
+        <tr>
+            <td>{{ record[3] }}</td>
+            <td>{{ record[2] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

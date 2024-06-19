@@ -24,6 +24,7 @@ from app.db_cryptography import (
 from app.forms import NewItemForm, SearchForm
 from sqlite3 import Error
 from sqlite3 import Error
+from app.auth import login_required, log_action  # Import the log_action function
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
 
@@ -148,7 +149,6 @@ def profile():
     cursor.close()
     conn.close()
     return render_template("profile.html", user_info=user_info)
-
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
@@ -197,6 +197,7 @@ def new_item():
             return redirect(url_for("vault.vault"))
 
     return render_template("new-item.html", form=form)
+
 
 @bp.route("/new-folder", methods=["GET", "POST"])
 @login_required

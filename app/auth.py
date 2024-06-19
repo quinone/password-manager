@@ -136,44 +136,42 @@ def login():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
-        # Connect to the database
-        conn = get_db()  # database.connect(db_file)
+        conn = get_db()
+
         if conn is None:
             flash("Failed to connect to the database.")
             return redirect(url_for("auth.login"))
+
         cursor = conn.cursor()
-        # Check if user exists in the database
         cursor.execute("SELECT * FROM USER WHERE EMAIL = ?", (email,))
         user = cursor.fetchone()
-        if user:
-            # Debug: Print user data retrieved from the database
-            print("User Data:", user)
-            try:
-                # Check if passwords match
-                password_hasher = PasswordHasher()  # Using Argon2
-                # if bcrypt.checkpw(password.encode('utf-8'), user[4]):  # Compare hashed password
-                if password_hasher.verify(user["PASSWORD"], password):
-                    # Passwords match, set session variables or redirect to dashboard
-                    session.clear()
-                    print(user["USER_ID"])
-                    session["user_id"] = user[
-                        "USER_ID"
-                    ]  # Assuming user_id is in the first column
 
-                    log_action(action_type="LOGIN")
+        if user:
+            try:
+                password_hasher = PasswordHasher()
+                if password_hasher.verify(user["PASSWORD"], password):
+                    session.clear()
+                    session["user_id"] = user["USER_ID"]
+                    log_action(action_type="SUCCESSFUL LOGIN")
                     flash("Login successful.", "success")
                     return redirect(url_for("vault.profile"))
                 else:
                     error_message = "Invalid email or password. Please try again."
+                    log_action(action_type="UNSUCCESSFUL LOGIN")
             except Exception as e:
                 error_message = "Invalid email or password. Please try again."
+                log_action(action_type="UNSUCCESSFUL LOGIN")
+                print(f"Login failed: {e}")
         else:
             error_message = "Invalid email or password. Please try again."
-        # Debug: Print error message
+            log_action(action_type="UNSUCCESSFUL LOGIN")
+
         print("Error Message:", error_message)
-        # Render login page with error message
+        flash(error_message, "danger")
         return render_template("index.html", error_message=error_message)
+
     return render_template("index.html")
+
 
 
 @bp.route("/logout")
@@ -245,6 +243,8 @@ def delete_account():
 
             conn.commit()
             flash("Your account has been successfully deleted.")
+            # Audit
+            log_action(action_type="DELETE ACCOUNT")
             # Clear the session
             session.clear()
             return redirect(url_for("index"))

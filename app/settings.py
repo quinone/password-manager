@@ -4,6 +4,28 @@ from app.db import get_db
 
 bp = Blueprint("settings", __name__, url_prefix="/settings", template_folder="templates")
 
+def get_audit_data(user_id):
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT ENTITY_TYPE_ID, ENTITY_ID, ACTION_TYPE, TIMESTAMP
+            FROM AUDIT
+            WHERE USER_ID = ?
+            ORDER BY TIMESTAMP DESC
+            LIMIT 25
+            """,
+            (user_id,)
+        )
+        audit_data = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return audit_data
+    except Exception as e:
+        print(f"Failed to fetch audit data: {e}")
+        return []
+
 @bp.route("/", methods=["GET", "POST"])
 @login_required
 def settings():
@@ -26,7 +48,11 @@ def settings():
         except Exception as e:
             return jsonify({"error": f"Failed to save preferences: {str(e)}"}), 500
 
-    return render_template("settings.html")
+    user_id = session.get("user_id")
+    user_name = session.get("user_name")  # Get the user's name from session
+    audit_data = get_audit_data(user_id)
+    return render_template("settings.html", audit_data=audit_data, user_name=user_name)
+
 
 @bp.route("/get_user_preferences", methods=["GET"])
 @login_required
