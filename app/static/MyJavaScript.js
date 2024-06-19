@@ -73,35 +73,6 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = "/new_item";
     });
 
-    // Fetch folders data from the server
-    fetch('/get_folders')
-        .then(response => response.json())
-        .then(data => {
-            const folderList = document.getElementById('folderList');
-            data.forEach(folder => {
-                const row = document.createElement('tr');
-                const cell = document.createElement('td');
-                cell.textContent = folder.folder_name;
-                row.appendChild(cell);
-                folderList.appendChild(row);
-            });
-        })
-        .catch(error => console.error('Error fetching folders:', error));
-
-    // Fetch folders data from the server
-    fetch('/get_folders1')
-        .then(response => response.json())
-        .then(data => {
-            const folderSelect = document.getElementById('folder_id');
-            data.forEach(folder => {
-                const option = document.createElement('option');
-                option.value = folder.folder_id; // Assuming folder_id is the correct property name in your data
-                option.textContent = folder.folder_name;
-                folderSelect.appendChild(option);
-            });
-        })
-        .catch(error => console.error('Error fetching folders:', error));
-
     document.getElementById("preferencesForm").addEventListener("submit", function(event) {
         event.preventDefault(); // Prevent the form from submitting
 
@@ -136,5 +107,10 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error saving preferences:', error));
     });
-});
 
+    // Function to handle "Change Password" button click
+    document.getElementById("changePasswordBtn").addEventListener("click", function() {
+        // Redirect to change_password.html
+        window.location.href = "/change_password.html";
+    });
+});

@@ -7,10 +7,7 @@ from flask import current_app, flash
 
 from app.db import get_db, query_db
 
-
-# Using get method to retrieve encryption key after app instance is created
 def get_cipher():
-    # Retrieve key from envirnment variable
     key = current_app.config[
         "ENCRYPTION_KEY"
     ].encode()  # or os.getenv('ENCRYPTION_KEY').encode()

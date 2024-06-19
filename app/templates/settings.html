@@ -5,7 +5,7 @@
 {% block content %}
 <script src="/MyJavaScript.js" defer></script>
 <h1>User Preferences</h1>
-<form id="preferencesForm" method="POST"> <!-- Added method="POST" to the form -->
+<form id="preferencesForm" method="POST">
     <p>
         <label for="vaultTimeout">Vault Timeout:</label>
         <select id="vaultTimeout" name="vaultTimeout">
@@ -25,44 +25,16 @@
     <p>
         <button type="submit">Save Preferences</button>
     </p>
+    <p>
+        <button type="button" id="changePasswordBtn">Change Password</button>
+    </p>
+    <p>
+        <button type="button" id="deleteAccountBtn">Delete Account</button>
+    </p>
 </form>
 
-<script>
-    document.getElementById("preferencesForm").addEventListener("submit", function(event) {
-        event.preventDefault(); // Prevent the form from submitting
+<p><a href="{{ url_for('settings.change_password') }}">Change Password</a></p>
+<p><a href="{{ url_for('settings.delete_account') }}">Delete Account</a></p>
 
-        // Fetch values from input fields
-        var vaultTimeout = document.getElementById("vaultTimeout").value;
-        var themeId = document.getElementById("themeId").value;
-        var settingsHtml = document.getElementById("settingsHtml").value; // Get HTML content
-
-        // Prepare data to send to the server
-        var data = {
-            vaultTimeout: vaultTimeout,
-            themeId: themeId,
-            settingsHtml: settingsHtml // Include HTML content
-        };
-
-        // Send an AJAX request to the server
-        fetch('/settings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to save preferences');
-            }
-            // Handle success, e.g., show a success message
-            console.log('Preferences saved successfully');
-        })
-        .catch(error => {
-            // Handle error, e.g., show an error message
-            console.error('Error saving preferences:', error);
-        });
-    });
-</script>
 
 {% endblock %}
