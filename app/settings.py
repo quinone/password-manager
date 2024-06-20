@@ -1,6 +1,14 @@
+import logging
 from flask import Blueprint, jsonify, request, session, flash, redirect, url_for, render_template
 from app.auth import login_required
 from app.db import get_db
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Function to log actions
+
 
 bp = Blueprint("settings", __name__, url_prefix="/settings", template_folder="templates")
 
@@ -12,9 +20,9 @@ def get_audit_data(user_id):
             """
             SELECT ENTITY_TYPE_ID, ENTITY_ID, ACTION_TYPE, TIMESTAMP
             FROM AUDIT
-            WHERE USER_ID = ?
+            WHERE USER_ID = ? OR USER_ID IS NULL
             ORDER BY TIMESTAMP DESC
-            LIMIT 25
+            LIMIT 30
             """,
             (user_id,)
         )
@@ -23,7 +31,7 @@ def get_audit_data(user_id):
         conn.close()
         return audit_data
     except Exception as e:
-        print(f"Failed to fetch audit data: {e}")
+        logger.error(f"Failed to fetch audit data: {e}")
         return []
 
 @bp.route("/", methods=["GET", "POST"])
@@ -44,15 +52,16 @@ def settings():
             conn.commit()
             cursor.close()
             conn.close()
+            log_action(user_id, f"Updated preferences: vault_timeout={vault_timeout}, theme_id={theme_id}")
             return jsonify({"message": "Preferences saved successfully"}), 200
         except Exception as e:
+            logger.error(f"Failed to save preferences: {e}")
             return jsonify({"error": f"Failed to save preferences: {str(e)}"}), 500
 
     user_id = session.get("user_id")
     user_name = session.get("user_name")  # Get the user's name from session
     audit_data = get_audit_data(user_id)
     return render_template("settings.html", audit_data=audit_data, user_name=user_name)
-
 
 @bp.route("/get_user_preferences", methods=["GET"])
 @login_required
@@ -75,4 +84,5 @@ def get_user_preferences():
         else:
             return jsonify({"vault_timeout": "00:05:00", "theme_id": "light"})
     except Exception as e:
+        logger.error(f"Failed to fetch preferences: {e}")
         return jsonify({"error": f"Failed to fetch preferences: {str(e)}"}), 500

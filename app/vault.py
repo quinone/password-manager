@@ -1,19 +1,12 @@
 import string
 from flask import Blueprint, session, flash, redirect, render_template, url_for, request
-
 from app.PassGenerator import (
     generate_number,
     generate_passphrase,
     generate_password,
     generate_username,
 )
-from app.PassGenerator import (
-    generate_number,
-    generate_passphrase,
-    generate_password,
-    generate_username,
-)
-from app.auth import login_required
+from app.auth import login_required, log_action  # Import the log_action function
 from app.db import get_db, query_db
 from app.db_cryptography import (
     get_folder_ID,
@@ -23,12 +16,9 @@ from app.db_cryptography import (
 )
 from app.forms import NewItemForm, SearchForm
 from sqlite3 import Error
-from sqlite3 import Error
-from app.auth import login_required, log_action  # Import the log_action function
 
 bp = Blueprint("vault", __name__, url_prefix="/vault", template_folder="templates")
 
-
 def get_items_for_folder(folder_id):
     try:
         conn = get_db()
@@ -44,50 +34,6 @@ def get_items_for_folder(folder_id):
     except Exception as e:
         flash("Error fetching items for folder: {}".format(str(e)), "danger")
         return []
-
-
-# The rest of your routes and functions...
-
-
-def get_items_for_folder(folder_id):
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute(
-            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
-            (folder_id,),
-        )
-        items = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return items
-    except Exception as e:
-        flash("Error fetching items for folder: {}".format(str(e)), "danger")
-        return []
-
-
-# The rest of your routes and functions...
-
-
-def get_items_for_folder(folder_id):
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute(
-            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
-            (folder_id,),
-        )
-        items = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return items
-    except Exception as e:
-        flash("Error fetching items for folder: {}".format(str(e)), "danger")
-        return []
-
-
-# The rest of your routes and functions...
-
 
 @bp.route("/")
 @login_required
@@ -103,7 +49,7 @@ def vault():
         )
         folders = cursor.fetchall()
 
-        # Retrieve items with no folder  along with decrypted data
+        # Retrieve items with no folder along with decrypted data
         cursor.execute(
             "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID IS NULL AND USER_ID = ?",
             (user_id,),
@@ -133,12 +79,10 @@ def vault():
         flash("Error fetching data: {}".format(str(e)), "danger")
         return render_template("vault.html", folders=[], items=[], hide_password=True)
 
-
 @bp.route("/profile")
 @login_required
 def profile():
     user_id = session["user_id"]
-    conn = get_db()
     conn = get_db()
     if conn is None:
         flash("Failed to connect to the database.", "danger")
@@ -149,6 +93,7 @@ def profile():
     cursor.close()
     conn.close()
     return render_template("profile.html", user_info=user_info)
+
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
@@ -184,6 +129,9 @@ def new_item():
             conn.commit()
             folder_id = cursor.lastrowid
             cursor.close()
+
+            log_action(user_id, "Create a New Folder")
+
         elif folder_id == "0" and not new_folder_name:
             flash("Please enter a new folder name", "error")
             return render_template("new-item.html", form=form)
@@ -193,6 +141,8 @@ def new_item():
         if insert_encrypted_item(
             user_id, name, username, password, uri, notes, folder_id
         ):
+            log_action(user_id, f"Created new item: {name}")
+
             flash("Successfully submitted new item", "success")
             return redirect(url_for("vault.vault"))
 
@@ -214,12 +164,12 @@ def new_folder():
                     cursor = conn.cursor()
                     cursor.execute(
                         "INSERT INTO FOLDER (USER_ID, FOLDER_NAME) VALUES (?, ?)",
-                        (
-                            user_id,
-                            folder_name,
-                        ),
+                        (user_id, folder_name),
                     )
                     conn.commit()
+
+                    log_action(user_id, f"Created new folder: {folder_name}")
+
                     flash("Folder added successfully.", "success")
                     return redirect(url_for("vault.vault"))
                 else:
@@ -237,34 +187,23 @@ def new_folder():
 @bp.route("/folder/<folder_name>")
 @login_required
 def view_folder(folder_name):
-    # Loads "user_id" in session:
     user_id = session["user_id"]
-    # Verity folder exists
     folder_ID = get_folder_ID(folder_name=folder_name, user_ID=user_id)
     if folder_ID == None:
         flash("You don't have a folder with that name.", "danger")
         return redirect(url_for("vault.vault"))
     decrypted_items = []
     try:
-        # Fetch item IDs based on the folder ID
         item_IDs = query_db("SELECT ID FROM ITEM WHERE FOLDER_ID = ?", (folder_ID,))
         if item_IDs:
-            print(f"Item IDs: {item_IDs}")
             for item in item_IDs:
                 item_ID = item[0]
-
                 decrypted_item = decrypt_item(item_ID)
-                if decrypt_item:
+                if decrypted_item:
                     decrypted_items.append(decrypted_item)
-                print(f"Items:", decrypted_items)
-
     except Error as e:
         print("Database Error:", e)
-
-    return render_template(
-        "folder.html", folder_name=folder_name, items=decrypted_items
-    )
-
+    return render_template("folder.html", folder_name=folder_name, items=decrypted_items)
 
 @bp.route("/search", methods=["POST"])
 @login_required
@@ -277,34 +216,23 @@ def search():
             searched = form.searched.data
             item_IDs = query_db(
                 "SELECT ID FROM ITEM WHERE USER_ID = ? AND LOWER(NAME) LIKE LOWER(?)",
-                (
-                    user_ID,
-                    f"%{searched}%",
-                ),
+                (user_ID, f"%{searched}%",),
             )
             if item_IDs:
                 for item in item_IDs:
                     item_ID = item[0]
                     decrypted_item = decrypt_item(item_ID)
-                    if decrypt_item:
+                    if decrypted_item:
                         decrypted_items.append(decrypted_item)
             else:
                 flash("No matching results.", "warning")
-
         except Error as e:
             flash("Database Error: {}".format(str(e)), "danger")
-            flash("Database Error: {}".format(str(e)), "danger")
-
-        return render_template(
-            "search.html", form=form, searched=searched, items=decrypted_items
-        )
+        return render_template("search.html", form=form, searched=searched, items=decrypted_items)
     return redirect(url_for("vault.vault"))
 
-
 @bp.route("/generate-password", methods=["GET", "POST"])
-# @login_required
 def password_generator():
-    # def handle_generate_password():
     if request.method == "POST":
         length = int(request.form.get("total_length", 15))
         min_capitals = int(request.form.get("min_capitals"))
@@ -312,19 +240,14 @@ def password_generator():
         min_special_chars = int(request.form.get("min_special_chars", 0))
         special_chars = []
         password_type = request.form.get("password_type")
-        # Handle options
         options = request.form.get("options")
         if options == "username":
             username = generate_username()
-            return render_template(
-                "password-generator.html", generated_password=username
-            )
+            return render_template("password-generator.html", generated_password=username)
         if options == "password":
             if password_type == "password":
                 special_chars = request.form.getlist("special_chars")
-                # Generate password with alphabetic characters, numbers, and selected special characters
                 special_chars = "".join(special_chars)
-                # characters = string.ascii_letters + string.digits + special_chars
                 password = generate_password(
                     length=length,
                     number_digits=min_numbers,
@@ -332,12 +255,9 @@ def password_generator():
                     number_special=min_special_chars,
                     special=special_chars,
                 )
-                # return render_template("password-generator.html", generated_password=password)
             if password_type == "pin":
                 password = generate_number(length)
             if password_type == "passphrase":
                 password = generate_passphrase(length=length)
-            return render_template(
-                "password-generator.html", generated_password=password
-            )
+            return render_template("password-generator.html", generated_password=password)
     return render_template("password-generator.html")

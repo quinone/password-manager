@@ -11,10 +11,8 @@ from flask import (
     url_for,
 )
 from argon2 import PasswordHasher
-
-
+from datetime import datetime
 from app.db import get_db
-
 
 bp = Blueprint("auth", __name__, url_prefix="/auth", template_folder="templates")
 
@@ -58,7 +56,6 @@ def register():
         if error is None:
             try:
                 # Establish database connection
-                # conn = database.connect(db_file)
                 conn = get_db()
                 if conn is None:
                     raise Error("Failed to connect to the database.")
@@ -104,14 +101,12 @@ def register():
                     )  # Return early
 
                 password_hasher = PasswordHasher()
-                # hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
                 hashed_password = password_hasher.hash(password)
                 # Execute SQL query
                 cursor.execute(
                     "INSERT INTO USER (EMAIL, NAME, PASSWORD, PASSWORD_HINT) VALUES (?, ?, ?, ?)",
                     (email, name, hashed_password, password_hint),
                 )
-                conn.commit()
                 conn.commit()
                 flash("Account created successfully.", "success")
                 message_type = "success"
@@ -126,8 +121,6 @@ def register():
                 if conn:
                     conn.close()
         flash(error, "danger")
-        # Render the template with the messages and message type
-        # return redirect(url_for("login"))
     return render_template("register.html")
 
 
@@ -158,20 +151,22 @@ def login():
                 else:
                     error_message = "Invalid email or password. Please try again."
                     log_action(action_type="UNSUCCESSFUL LOGIN")
+                    print("action_type UNSUCCESSFUL LOGIN")
             except Exception as e:
                 error_message = "Invalid email or password. Please try again."
                 log_action(action_type="UNSUCCESSFUL LOGIN")
+                print("action_type UNSUCCESSFUL LOGIN")
                 print(f"Login failed: {e}")
         else:
             error_message = "Invalid email or password. Please try again."
             log_action(action_type="UNSUCCESSFUL LOGIN")
+            print("action_type UNSUCCESSFUL LOGIN")
 
         print("Error Message:", error_message)
         flash(error_message, "danger")
         return render_template("index.html", error_message=error_message)
 
     return render_template("index.html")
-
 
 
 @bp.route("/logout")
@@ -188,19 +183,25 @@ def logout():
     return redirect(url_for("auth.login"))
 
 
-from datetime import datetime
-from flask import session
-from app.db import get_db
-
 def log_action(entity_type_id=None, entity_id=None, action_type=None):
     try:
         conn = get_db()
         cursor = conn.cursor()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        user_id = session.get("user_id")
+
+        # Adjust action_type if entity_id matches "Create new folder"
+        if entity_id.startswith("Create new folder"):
+            action_type = entity_id
+
+        # Debug prints to check values
+        print(f"Logging action: {action_type} for user_id: {user_id} at {timestamp}")
+
         cursor.execute(
             "INSERT INTO AUDIT (ENTITY_TYPE_ID, ENTITY_ID, ACTION_TYPE, USER_ID, TIMESTAMP) VALUES (?, ?, ?, ?, ?)",
-            (entity_type_id, entity_id, action_type, session.get("user_id"), timestamp)
+            (entity_type_id, entity_id, action_type, user_id, timestamp)
         )
+
         conn.commit()
         print("Audit log successfully recorded.")
     except Exception as e:
@@ -208,6 +209,7 @@ def log_action(entity_type_id=None, entity_id=None, action_type=None):
     finally:
         if conn:
             conn.close()
+
 
 def login_required(view):
     @functools.wraps(view)
@@ -221,10 +223,6 @@ def login_required(view):
     return wrapped_view
 
 
-
-
-
-# to handle account deletion// not deleting data related to user just user profile
 @bp.route("/delete_account", methods=["POST"])
 @login_required
 def delete_account():
@@ -234,8 +232,6 @@ def delete_account():
         conn = get_db()
         try:
             # Connect to the database
-            # conn = database.connect(db_file)
-            # cursor = conn.cursor()
             # TODO User should have to reauthenticate before deletion
             # Delete user's data from related tables
             conn.execute("DELETE FROM REGISTRATION WHERE USER_ID = ?", (user_id,))
