@@ -7,6 +7,7 @@ from flask import current_app, flash
 
 from app.db import get_db, query_db
 
+
 def get_cipher():
     key = current_app.config[
         "ENCRYPTION_KEY"

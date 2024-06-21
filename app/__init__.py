@@ -144,5 +144,3 @@ def create_app(test_config=None):
     # Update your settings HTML template to include a form or button to trigger the account deletion
 
     return app
-
-

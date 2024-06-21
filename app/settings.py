@@ -1,4 +1,4 @@
-#from _sqlite3 import Error
+# from _sqlite3 import Error
 from flask import (
     Blueprint,
     jsonify,
@@ -9,16 +9,17 @@ from flask import (
     url_for,
     render_template,
 )
-#from werkzeug.security import generate_password_hash, check_password_hash
+
+# from werkzeug.security import generate_password_hash, check_password_hash
 from app.forms import ChangePasswordForm
 from argon2 import PasswordHasher, exceptions
-
 
 
 # from flask_login import login_required, current_user, LoginManager
 from app.auth import login_required
 from app.db import get_db
-#from app.db_cryptography import decrypt_data, encrypt_data
+
+# from app.db_cryptography import decrypt_data, encrypt_data
 
 # login_manager = LoginManager()
 # login_manager.init_app(app)
@@ -62,6 +63,7 @@ def settings():
 
     return render_template("settings.html")
 
+
 @bp.route("/get_user_preferences", methods=["GET"])
 @login_required
 def get_user_preferences():
@@ -86,6 +88,7 @@ def get_user_preferences():
         {"vault_timeout": "00:05:00", "theme_id": "light", "settings_html": ""}
     )
 
+
 @bp.route("/change_password", methods=["GET", "POST"])
 @login_required
 def change_password():
@@ -107,14 +110,13 @@ def change_password():
                 current_password_hash = row[0]
                 password_hasher = PasswordHasher()
 
-
                 try:
                     password_hasher.verify(current_password_hash, current_password)
                     new_password_hash = password_hasher.hash(new_password)
 
                     cursor.execute(
                         "UPDATE USER SET PASSWORD = ? WHERE USER_ID = ?",
-                        (new_password_hash, user_id)
+                        (new_password_hash, user_id),
                     )
                     conn.commit()
                     flash("Password updated successfully", "success")
@@ -137,6 +139,7 @@ def change_password():
 
     return render_template("change_password.html", form=form)
 
+
 @bp.route("/delete_account", methods=["GET", "POST"])
 @login_required
 def delete_account():
@@ -148,7 +151,9 @@ def delete_account():
         cursor = conn.cursor()
 
         try:
-            cursor.execute("SELECT PASSWORD, EMAIL FROM USER WHERE USER_ID = ?", (user_id,))
+            cursor.execute(
+                "SELECT PASSWORD, EMAIL FROM USER WHERE USER_ID = ?", (user_id,)
+            )
             row = cursor.fetchone()
 
             if row:
@@ -158,14 +163,19 @@ def delete_account():
 
                 try:
                     password_hasher.verify(stored_password_hash, current_password)
-                    cursor.execute("DELETE FROM PREFERENCES WHERE USER_ID = ?", (user_id,))
+                    cursor.execute(
+                        "DELETE FROM PREFERENCES WHERE USER_ID = ?", (user_id,)
+                    )
                     cursor.execute("DELETE FROM ITEM WHERE USER_ID = ?", (user_id,))
                     cursor.execute("DELETE FROM FOLDER WHERE USER_ID = ?", (user_id,))
                     cursor.execute("DELETE FROM AUDIT WHERE USER_ID = ?", (user_id,))
                     cursor.execute("DELETE FROM USER WHERE USER_ID = ?", (user_id,))
                     conn.commit()
 
-                    flash("Your account and all related data have been deleted successfully", "success")
+                    flash(
+                        "Your account and all related data have been deleted successfully",
+                        "success",
+                    )
                     session.clear()
                     return redirect(url_for("auth.logout"))
 
