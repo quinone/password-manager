@@ -226,7 +226,7 @@ def delete_encrypted_item(item_ID, user_ID):
         )
         conn.commit()
         after_delete = query_db("SELECT COUNT(*) AS after_delete FROM ITEM", one=True)
-        return before_delete[0] - after_delete[0] == 1
+        return before_delete[0] - after_delete[0]
 
     except Error as e:
         flash("Failed to delete, please try again.")
