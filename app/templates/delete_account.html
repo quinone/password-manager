@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Account{% endblock %}
+
+{% block content %}
+<script src="/MyJavaScript.js" defer></script>
+<h1>Delete Account</h1>
+<p>Are you sure you want to delete your account? This action cannot be undone.</p>
+<form method="POST">
+    <p>
+        <label for="currentPassword">Enter Your Password:</label>
+        <input type="password" id="currentPassword" name="currentPassword" required>
+    </p>
+    <button type="submit" onclick="return confirm('Are you sure you want to delete your account?')">Delete Account</button>
+    <a href="{{ url_for('settings.settings') }}">Cancel</a>
+</form>
+{% endblock %}

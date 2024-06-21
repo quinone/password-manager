@@ -181,4 +181,10 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .catch(error => console.error('Error saving preferences:', error));
     });
+
+    // Function to handle "Change Password" button click
+    document.getElementById("changePasswordBtn").addEventListener("click", function() {
+        // Redirect to change_password.html
+        window.location.href = "/change_password.html";
+    });
 });

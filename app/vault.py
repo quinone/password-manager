@@ -48,21 +48,18 @@ def vault():
         conn = get_db()
         cursor = conn.cursor()
 
-        # Retrieve folders
         user_id = session.get("user_id")
         cursor.execute(
             "SELECT FOLDER_NAME, ID FROM FOLDER WHERE USER_ID = ?", (user_id,)
         )
         folders = cursor.fetchall()
 
-        # Retrieve items with no folder  along with decrypted data
         cursor.execute(
             "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID IS NULL AND USER_ID = ?",
             (user_id,),
         )
         items = cursor.fetchall()
 
-        # added here decryption
         decrypted_items = []
         for item in items:
             decrypted_item = {
@@ -129,7 +126,7 @@ def new_item():
         new_folder_name = form.new_folder_name.data
 
         if folder_id == "0" and new_folder_name:
-            conn = get_db()  # Ensure a new connection is obtained
+            conn = get_db()
             cursor = conn.cursor()
             cursor.execute(
                 "INSERT INTO FOLDER (USER_ID, FOLDER_NAME) VALUES (?, ?)",
