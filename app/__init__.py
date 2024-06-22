@@ -1,7 +1,7 @@
 import time
 from datetime import datetime, timedelta
 import os
-
+from app.vault import bp as vault_bp
 from _sqlite3 import Error
 from flask import (
     Flask,

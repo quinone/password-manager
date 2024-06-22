@@ -117,50 +117,30 @@ def decrypt_item(item_ID):
     #    conn.close()
 
 
-def update_encrypted_item(
-    item_ID, user_ID, name, username, password, uri, notes, folder_ID
-):
-    conn = get_db()
-    cursor = conn.cursor()
-
+def update_encrypted_item(item_id, user_id, name, username, password, uri, notes, folder_id):
     try:
+        conn = get_db()
+        cursor = conn.cursor()
         encrypted_username = encrypt_data(username)
         encrypted_password = encrypt_data(password)
         encrypted_uri = encrypt_data(uri)
         encrypted_notes = encrypt_data(notes)
-
         cursor.execute(
             """
-                UPDATE ITEM 
-                SET USER_ID = ?, name = ?, username = ?, password = ?, uri = ?, NOTES = ?, FOLDER_ID = ?
-                WHERE ID = ? AND USER_ID = ?
+            UPDATE ITEM
+            SET NAME = ?, USERNAME = ?, PASSWORD = ?, URI = ?, NOTES = ?, FOLDER_ID = ?
+            WHERE ID = ? AND USER_ID = ?
             """,
-            (
-                user_ID,
-                name,
-                encrypted_username,
-                encrypted_password,
-                encrypted_uri,
-                encrypted_notes,
-                folder_ID,
-                item_ID,
-                user_ID,
-            ),
+            (name, encrypted_username, encrypted_password, encrypted_uri, encrypted_notes, folder_id, item_id, user_id),
         )
         conn.commit()
-        return item_ID
-    except Error as e:
-        flash("Failed to save, please try again.")
-        print("Database Error:", e)
-        conn.rollback()
-
+        cursor.close()
+        conn.close()
+        return True
     except Exception as e:
-        flash("Failed to save, please try again.")
-        print("Exception:", e)
+        print("Error updating item:", e)
+        return False
 
-    # finally:
-    # cursor.close()
-    # conn.close()
 
 
 def get_folder_ID(folder_name, user_ID):

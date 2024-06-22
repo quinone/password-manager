@@ -1,12 +1,19 @@
 {% extends 'base.html' %}
-{% block title %}Vault{% endblock %}
+{% block title %}Vault - Add New Folder{% endblock %}
 
 {% block content %}
-     <h1>Add New Folder</h1>
+<div class="container">
+    <h1>Add New Folder</h1>
     <form action="/vault/new-folder" method="post">
-        <label for="folder_name">Folder Name:</label>
-        <input type="text" id="folder_name" name="folder_name">
-        <button type="submit">Add Folder</button>
+        <div class="mb-3">
+            <label for="folder_name" class="form-label">Folder Name:</label>
+            <div class="input-group">
+                <input type="text" id="folder_name" name="folder_name" class="form-control">
+
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Folder</button>
+        <a href="/vault" class="btn btn-secondary">Cancel</a>
     </form>
+</div>
 {% endblock %}
-</html>

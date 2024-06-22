@@ -2,17 +2,19 @@
 {% block title %}Profile{% endblock %}
 {% block content %}
 
-<div>
+<div class="container text-center">  {# Add container and text-center classes for center alignment #}
 
     {% if user_info %}
 
     <h1>Welcome {{ user_info[2] }}</h1>
-    <ul>
-           <li><a href="/vault">Vault</a></li>
-           <li><a href="{{ url_for('settings.settings') }}">Settings</a></li>
-        </ul>
-
-
+    <ul class="list-inline">  {# Use list-inline for horizontal list #}
+        <li class="mb-2">  {# Add mb-2 class for margin bottom between buttons #}
+            <a href="/vault" class="btn btn-primary">Vault</a>
+        </li>
+        <li class="mb-2">  {# Add mb-2 class for margin bottom between buttons #}
+            <a href="{{ url_for('settings.settings') }}" class="btn btn-primary">Settings</a>
+        </li>
+    </ul>
 
     <p>Email: {{ user_info[1] }}</p>
     <p>Name: {{ user_info[2] }}</p>
@@ -24,4 +26,3 @@
 
 </div>
 {% endblock %}
-

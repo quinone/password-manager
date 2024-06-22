@@ -1,10 +1,36 @@
 {% extends 'base.html' %}
-{% block title %}Folder{% endblock %}
-
+{% block title %}Folder: {{ folder_name }}{% endblock %}
 {% block content %}
-<script src="/MyJavaScript.js" defer></script>
-<h2>Folder Name: {{ folder_name }}</h2>
-{% include 'item-table.html' %}
-<a href="{{ url_for('vault.vault') }}">Back to Vault</a>
-
+<div class="container">
+    <h1>Folder: {{ folder_name }}</h1>
+    <div>
+        <h2>Items</h2>
+        {% if items %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>URI</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.get('NAME', '') }}</td>
+                    <td>{{ item.get('USERNAME', '') }}</td>
+                    <td>{{ item.get('PASSWORD', '') }}</td>
+                    <td>{{ item.get('URI', '') }}</td>
+                    <td>{{ item.get('NOTES', '') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No items found.</p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

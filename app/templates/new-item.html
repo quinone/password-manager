@@ -1,16 +1,95 @@
 {% extends 'base.html' %}
-{% import "bootstrap/wtf.html" as wtf %}
-{% block title %}Add New Item{% endblock %}
+
+{% block title %}Edit Item - Vault{% endblock %}
+
 {% block content %}
-<div class="d-flex">
-<div class="d-flex flex-grow-1">
-    {{ wtf.quick_form(form) }}
+<div class="container">
+    <h1>Edit Item</h1>
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}
+            {% if form.name.errors %}
+                <div class="alert alert-danger mt-1">
+                    {% for error in form.name.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control") }}
+            {% if form.username.errors %}
+                <div class="alert alert-danger mt-1">
+                    {% for error in form.username.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <div class="input-group">
+                {{ form.password(class="form-control", id="password", type="password") }}
+                <button type="button" class="btn btn-outline-secondary reveal-password">
+                    <span class="password-toggle">********</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye reveal-password" viewBox="0 0 16 16">
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+                    </svg>
+                </button>
+            </div>
+            {% if form.password.errors %}
+                <div class="alert alert-danger mt-1">
+                    {% for error in form.password.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            {{ form.folder_select.label(class="form-label") }}
+            {{ form.folder_select(class="form-control") }}
+            {% if form.folder_select.errors %}
+                <div class="alert alert-danger mt-1">
+                    {% for error in form.folder_select.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            {{ form.uri.label(class="form-label") }}
+            {{ form.uri(class="form-control") }}
+            {% if form.uri.errors %}
+                <div class="alert alert-danger mt-1">
+                    {% for error in form.uri.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            {{ form.notes.label(class="form-label") }}
+            {{ form.notes(class="form-control", rows=4) }}
+            {% if form.notes.errors %}
+                <div class="alert alert-danger mt-1">
+                    {% for error in form.notes.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{{ url_for('vault.vault') }}" class="btn btn-secondary">Cancel</a>
+    </form>
 </div>
-<div class="d-flex"></div>
-<div class="d-flex justify-content-end">
+
+<div class="container d-flex justify-content-center">
     {% include 'password-widget.html' %}
 </div>
-</div>
+
+<script src="{{ url_for('static', filename='MyJavaScript.js') }}"></script>
 {% endblock %}
-
-

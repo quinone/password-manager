@@ -1,90 +1,32 @@
 {% extends 'base.html' %}
-
 {% block title %}Settings{% endblock %}
-
 {% block content %}
-<h1>User Preferences</h1>
-<form id="preferencesForm" method="POST">
-    <p>
-        <label for="vaultTimeout">Vault Timeout:</label>
-        <select id="vaultTimeout" name="vaultTimeout">
-            <option value="00:05:00">5 minutes</option>
-            <option value="00:10:00">10 minutes</option>
-            <option value="00:15:00">15 minutes</option>
-        </select>
-    </p>
-    <p>
-        <label for="themeId">Theme:</label>
-        <select id="themeId" name="themeId">
-            <option value="dark">Dark</option>
-            <option value="light">Light</option>
-        </select>
-    </p>
+<div class="container">
+    <h1>User Preferences</h1>
+    <form id="preferencesForm" method="POST">
+        <p>
+            <label for="vaultTimeout">Vault Timeout:</label>
+            <select id="vaultTimeout" name="vaultTimeout" class="form-control">
+                <option value="00:05:00">5 minutes</option>
+                <option value="00:10:00">10 minutes</option>
+                <option value="00:15:00">15 minutes</option>
+            </select>
+        </p>
+        <p>
+            <label for="themeId">Theme:</label>
+            <select id="themeId" name="themeId" class="form-control">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+            </select>
+        </p>
 
-    <p>
-        <button type="submit">Save Preferences</button>
-    </p>
-    <p>
-        <button type="button" id="changePasswordBtn">Change Password</button>
-    </p>
-    <p>
-        <button type="button" id="deleteAccountBtn">Delete Account</button>
-    </p>
-</form>
+        <p>
+            <button type="submit" class="btn btn-primary">Save Preferences</button>
+        </p>
+    </form>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Fetch current preferences and preselect options
-        fetch('/settings/get_user_preferences')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('vaultTimeout').value = data.vault_timeout;
-                document.getElementById('themeId').value = data.theme_id;
-            })
-            .catch(error => console.error('Error fetching preferences:', error));
+    <p><a href="{{ url_for('settings.change_password') }}" class="btn btn-warning">Change Password</a></p>
+    <p><a href="{{ url_for('settings.delete_account') }}" class="btn btn-danger">Delete Account</a></p>
 
-        // Submit form handler
-        document.getElementById("preferencesForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // Prevent the form from submitting
-
-            // Fetch values from input fields
-            var vaultTimeout = document.getElementById("vaultTimeout").value;
-            var themeId = document.getElementById("themeId").value;
-
-            // Prepare data to send to the server
-            var data = {
-                vaultTimeout: vaultTimeout,
-                themeId: themeId
-            };
-
-            // Send an AJAX request to save preferences
-            fetch('/settings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json()) // Parse response as JSON
-            .then(data => {
-                // Check if the response indicates success
-                if (data.message) {
-                    console.log(data.message); // Log success message
-                    alert('Preferences saved successfully'); // Show alert
-                } else {
-                    throw new Error('Failed to save preferences'); // Throw error if no success message
-                }
-            })
-            .catch(error => {
-                console.error('Error saving preferences:', error); // Log error
-                alert('Failed to save preferences'); // Show alert for failure
-            });
-        });
-    });
-</script>
-
-<p><a href="{{ url_for('settings.change_password') }}">Change Password</a></p>
-<p><a href="{{ url_for('settings.delete_account') }}">Delete Account</a></p>
-
-
+</div>
 {% endblock %}

@@ -56,7 +56,7 @@ def vault():
 
         cursor.execute(
             "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID IS NULL AND USER_ID = ?",
-            (user_id,),
+            (user_id,)
         )
         items = cursor.fetchall()
 
@@ -139,11 +139,10 @@ def new_item():
             flash("Please enter a new folder name", "error")
             return render_template("new-item.html", form=form)
 
-        folder_id = (
-            int(folder_id)
-            if isinstance(folder_id, str) and folder_id.isdigit()
-            else folder_id
-        )
+        if folder_id == "None":
+            folder_id = None
+        else:
+            folder_id = int(folder_id) if folder_id.isdigit() else folder_id
 
         if insert_encrypted_item(
             user_id, name, username, password, uri, notes, folder_id
@@ -154,25 +153,50 @@ def new_item():
     return render_template("new-item.html", form=form)
 
 
-@bp.route("/edit-item/<item_ID>", methods=["GET", "POST"])
+@bp.route("/edit-item/<int:item_id>", methods=["GET", "POST"])
 @login_required
-def edit_item(item_ID):
+def edit_item(item_id):
     form = NewItemForm()
-    user_ID = session.get("user_id")
-    item = query_db(
-        "SELECT * FROM ITEM WHERE USER_ID = ? AND ID = ?",
-        (
-            user_ID,
-            item_ID,
-        ),
-        one=True,
-    )
-    folders = query_db(
-        "SELECT ID, FOLDER_NAME FROM FOLDER WHERE USER_ID = ?", (user_ID,), one=False
-    )
+    user_id = session.get("user_id")
+
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM ITEM WHERE ID = ? AND USER_ID = ?", (item_id, user_id))
+    item = cursor.fetchone()
+    cursor.close()
+
+    if not item:
+        flash("Item not found or you don't have permission to edit it.", "danger")
+        return redirect(url_for("vault.vault"))
+
+    decrypted_item = {
+        "ID": item["ID"],
+        "NAME": item["NAME"],
+        "USERNAME": decrypt_data(item["USERNAME"]),
+        "PASSWORD": decrypt_data(item["PASSWORD"]),
+        "URI": decrypt_data(item["URI"]),
+        "NOTES": decrypt_data(item["NOTES"]),
+        "FOLDER_ID": item["FOLDER_ID"]
+    }
+
+    if request.method == "GET":
+        form.name.data = decrypted_item["NAME"]
+        form.username.data = decrypted_item["USERNAME"]
+        form.password.data = decrypted_item["PASSWORD"]
+        form.uri.data = decrypted_item["URI"]
+        form.notes.data = decrypted_item["NOTES"]
+        form.folder_select.data = str(decrypted_item["FOLDER_ID"]) if decrypted_item["FOLDER_ID"] else "None"
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT ID, FOLDER_NAME FROM FOLDER WHERE USER_ID = ?", (user_id,))
+    folders = cursor.fetchall()
+    cursor.close()
+
     form.folder_select.choices = [(str(folder[0]), folder[1]) for folder in folders]
     form.folder_select.choices.append(("0", "Add New Folder"))
     form.folder_select.choices.append(("None", "No Folder"))
+
     if request.method == "POST" and form.validate():
         name = form.name.data
         username = form.username.data
@@ -181,27 +205,35 @@ def edit_item(item_ID):
         notes = form.notes.data
         folder_id = form.folder_select.data
         new_folder_name = form.new_folder_name.data
-        if folder_id == "0" and new_folder_name:
-            folder_id = query_db(
-                "INSERT INTO FOLDER (USER_ID, FOLDER_NAME) VALUES (?, ?)",
-                (user_ID, new_folder_name),
-                last=True,
-            )
 
-        if update_encrypted_item(
-            item_ID, user_ID, name, username, password, uri, notes, folder_id
-        ):
-            flash("Successfully updated the item", "success")
+        if not password:
+            flash("Please enter a password.", "error")
+            return render_template("edit-item.html", form=form, item_id=item_id, decrypted_item=decrypted_item)
+
+        if folder_id == "0" and new_folder_name:
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO FOLDER (USER_ID, FOLDER_NAME) VALUES (?, ?)",
+                (user_id, new_folder_name),
+            )
+            conn.commit()
+            folder_id = cursor.lastrowid
+            cursor.close()
+        elif folder_id == "0" and not new_folder_name:
+            flash("Please enter a new folder name", "error")
+            return render_template("edit-item.html", form=form, item_id=item_id, decrypted_item=decrypted_item)
+
+        if folder_id == "None":
+            folder_id = None
+        else:
+            folder_id = int(folder_id) if folder_id.isdigit() else folder_id
+
+        if update_encrypted_item(item_id, user_id, name, username, password, uri, notes, folder_id):
+            flash("Item successfully updated", "success")
             return redirect(url_for("vault.vault"))
 
-    form.name.data = item["name"]
-    form.username.data = decrypt_data(item["username"])
-    form.password.data = decrypt_data(item["password"])
-    form.uri.data = decrypt_data(item["uri"])
-    form.notes.data = decrypt_data(item["notes"])
-    form.folder_select.data = item["folder_id"]
-
-    return render_template("edit-item.html", form=form, item_ID=item_ID)
+    return render_template("edit-item.html", form=form, item_id=item_id, decrypted_item=decrypted_item)
 
 
 @bp.route("/new-folder", methods=["GET", "POST"])
@@ -242,33 +274,32 @@ def new_folder():
 @bp.route("/folder/<folder_name>")
 @login_required
 def view_folder(folder_name):
-    # Loads "user_id" in session:
     user_id = session["user_id"]
-    # Verity folder exists
     folder_ID = get_folder_ID(folder_name=folder_name, user_ID=user_id)
-    if folder_ID == None:
+
+    if folder_ID is None:
         flash("You don't have a folder with that name.", "danger")
         return redirect(url_for("vault.vault"))
+
     decrypted_items = []
     try:
-        # Fetch item IDs based on the folder ID
         item_IDs = query_db("SELECT ID FROM ITEM WHERE FOLDER_ID = ?", (folder_ID,))
+
         if item_IDs:
-            print(f"Item IDs: {item_IDs}")
             for item in item_IDs:
                 item_ID = item[0]
-
                 decrypted_item = decrypt_item(item_ID)
-                if decrypt_item:
+
+                if decrypted_item:
                     decrypted_items.append(decrypted_item)
-                print(f"Items:", decrypted_items)
+                else:
+                    # Handle case where decryption fails or returns None
+                    print(f"Failed to decrypt item with ID: {item_ID}")
 
     except Error as e:
         print("Database Error:", e)
 
-    return render_template(
-        "folder.html", folder_name=folder_name, items=decrypted_items
-    )
+    return render_template("folder.html", folder_name=folder_name, items=decrypted_items)
 
 
 @bp.route("/search", methods=["POST"])
@@ -328,7 +359,6 @@ def password_generator():
                 special_chars = request.form.getlist("special_chars")
                 # Generate password with alphabetic characters, numbers, and selected special characters
                 special_chars = "".join(special_chars)
-                # characters = string.ascii_letters + string.digits + special_chars
                 password = generate_password(
                     length=length,
                     number_digits=min_numbers,
@@ -336,7 +366,6 @@ def password_generator():
                     number_special=min_special_chars,
                     special=special_chars,
                 )
-                # return render_template("password-generator.html", generated_password=password)
             if password_type == "pin":
                 password = generate_number(length)
             if password_type == "passphrase":
@@ -357,3 +386,5 @@ def delete_item():
         return redirect(url_for("vault.vault"))
     flash("Item does not exist or is not yours.")
     return redirect(url_for("vault.vault"))
+
+
