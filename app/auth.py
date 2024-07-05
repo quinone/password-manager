@@ -11,6 +11,7 @@ from flask import (
     url_for,
 )
 from argon2 import PasswordHasher
+from datetime import datetime
 
 
 from app.db import get_db
@@ -180,13 +181,10 @@ def login():
 def logout():
     if "user_id" in session:
         user_id = session["user_id"]
-
         # Log logout action to AUDIT table
         log_action(action_type="LOGOUT")
-
         session.clear()
         flash("You have been logged out.", "warning")
-
     return redirect(url_for("auth.login"))
 
 

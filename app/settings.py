@@ -1,4 +1,3 @@
-# from _sqlite3 import Error
 import logging
 from flask import (
     Blueprint,
@@ -10,24 +9,16 @@ from flask import (
     url_for,
     render_template,
 )
-
 from app.forms import ChangePasswordForm
 from argon2 import PasswordHasher, exceptions
-from app.auth import login_required
+from app.auth import login_required, log_action  # Ensure log_action is imported
 from app.db import get_db
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Function to log actions
-
-
-
-
-bp = Blueprint(
-    "settings", __name__, url_prefix="/settings", template_folder="templates"
-)
+bp = Blueprint("settings", __name__, url_prefix="/settings", template_folder="templates")
 
 def get_audit_data(user_id):
     try:
@@ -37,7 +28,7 @@ def get_audit_data(user_id):
             """
             SELECT ENTITY_TYPE_ID, ENTITY_ID, ACTION_TYPE, TIMESTAMP
             FROM AUDIT
-            WHERE USER_ID = ? OR USER_ID IS NULL
+            WHERE USER_ID = ?
             ORDER BY TIMESTAMP DESC
             LIMIT 30
             """,
@@ -46,13 +37,22 @@ def get_audit_data(user_id):
         audit_data = cursor.fetchall()
         cursor.close()
         conn.close()
-        return audit_data
+
+        # Ensuring data is in dictionary format for templates
+        formatted_audit_data = [
+            {
+                'TIMESTAMP': row[3],
+                'ACTION_TYPE': row[2],
+                'ENTITY_ID': row[1],
+            }
+            for row in audit_data
+        ]
+        return formatted_audit_data
     except Exception as e:
         logger.error(f"Failed to fetch audit data: {e}")
         return []
 
-
-@bp.route("/", methods=["GET", "POST"])
+@bp.route('/', methods=["GET", "POST"])
 @login_required
 def settings():
     if request.method == "POST":
@@ -75,11 +75,11 @@ def settings():
         except Exception as e:
             logger.error(f"Failed to save preferences: {e}")
             return jsonify({"error": f"Failed to save preferences: {str(e)}"}), 500
-    user_id = session.get("user_id")
-    user_name = session.get("user_name")  # Get the user's name from session
-    audit_data = get_audit_data(user_id)
-    return render_template("settings.html")
 
+    user_id = session.get("user_id")
+    audit_data = get_audit_data(user_id)
+    logging.debug(f"Audit Data: {audit_data}")  # Debug line to check audit_data
+    return render_template("settings.html", audit_data=audit_data)
 
 @bp.route("/get_user_preferences", methods=["GET"])
 @login_required
@@ -101,17 +101,15 @@ def get_user_preferences():
             return jsonify({"vault_timeout": vault_timeout, "theme_id": theme_id})
         # Return default preferences if no preferences found or an error occurred
         return jsonify(
-        {"vault_timeout": "00:05:00", "theme_id": "light", "settings_html": ""}
-    )
+            {"vault_timeout": "00:05:00", "theme_id": "light"}
+        )
     except Exception as e:
         return jsonify({"error": f"Failed to fetch preferences: {str(e)}"}), 500
-
 
 @bp.route("/change_password", methods=["GET", "POST"])
 @login_required
 def change_password():
     form = ChangePasswordForm()
-
     if form.validate_on_submit():
         user_id = session.get("user_id")
         current_password = form.current_password.data
@@ -138,6 +136,7 @@ def change_password():
                     )
                     conn.commit()
                     flash("Password updated successfully", "success")
+                    log_action(user_id, f"Changed password")
                     return redirect(url_for("settings.settings"))
                 except exceptions.VerifyMismatchError:
                     flash("Current password is incorrect", "danger")
@@ -156,7 +155,6 @@ def change_password():
             conn.close()
 
     return render_template("change_password.html", form=form)
-
 
 @bp.route("/delete_account", methods=["GET", "POST"])
 @login_required
