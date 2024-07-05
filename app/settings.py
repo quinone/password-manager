@@ -10,6 +10,8 @@ from flask import (
     url_for,
     render_template,
 )
+
+import app
 from app.forms import ChangePasswordForm
 from argon2 import PasswordHasher, exceptions
 from app.auth import login_required, log_action  # Ensure log_action is imported
@@ -137,7 +139,6 @@ def change_password():
         try:
             conn = get_db()
             cursor = conn.cursor()
-
             cursor.execute("SELECT PASSWORD FROM USER WHERE USER_ID = ?", (user_id,))
             row = cursor.fetchone()
 
@@ -155,7 +156,7 @@ def change_password():
                     )
                     conn.commit()
                     flash("Password updated successfully", "success")
-                    log_action(user_id, None, "CHANGE_PASSWORD")
+                    log_action(user_id, None, "PASSWORD CHANGED")
                     return redirect(url_for("settings.settings"))
                 except exceptions.VerifyMismatchError:
                     flash("Current password is incorrect", "danger")
@@ -169,11 +170,8 @@ def change_password():
             flash("Database error: Failed to update password", "danger")
             logger.error(f"Database error: {str(e)}")
 
-        finally:
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
+        cursor.close()
+        conn.close()
 
     return render_template("change_password.html", form=form)
 @bp.route("/delete_account", methods=["GET", "POST"])
@@ -230,10 +228,7 @@ def delete_account():
             flash(f"Failed to delete account: {str(e)}", "danger")
             logger.error(f"Exception deleting account: {str(e)}")
 
-        finally:
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
+        cursor.close()
+        conn.close()
 
     return render_template("delete_account.html")
