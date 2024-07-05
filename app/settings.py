@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 from flask import (
     Blueprint,
     jsonify,
@@ -21,6 +22,8 @@ logger = logging.getLogger(__name__)
 bp = Blueprint("settings", __name__, url_prefix="/settings", template_folder="templates")
 
 def get_audit_data(user_id):
+    conn = None
+    cursor = None
     try:
         conn = get_db()
         cursor = conn.cursor()
@@ -35,9 +38,6 @@ def get_audit_data(user_id):
             (user_id,)
         )
         audit_data = cursor.fetchall()
-        cursor.close()
-        conn.close()
-
         # Ensuring data is in dictionary format for templates
         formatted_audit_data = [
             {
@@ -51,6 +51,11 @@ def get_audit_data(user_id):
     except Exception as e:
         logger.error(f"Failed to fetch audit data: {e}")
         return []
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @bp.route('/', methods=["GET", "POST"])
 @login_required
@@ -60,6 +65,10 @@ def settings():
         vault_timeout = request.json.get("vaultTimeout", "00:05:00")
         theme_id = request.json.get("themeId", "light")
 
+        # Convert vault_timeout to seconds
+        vault_timeout_seconds = sum(
+            int(x) * 60 ** i for i, x in enumerate(reversed(vault_timeout.split(':')))
+        )
         try:
             conn = get_db()
             cursor = conn.cursor()
@@ -70,7 +79,12 @@ def settings():
             conn.commit()
             cursor.close()
             conn.close()
-            log_action(user_id, f"Updated preferences: vault_timeout={vault_timeout}, theme_id={theme_id}")
+            log_action(user_id, None, "UPDATED_PREFERENCES")
+
+            # Store the vault_timeout in session
+            session['vault_timeout'] = vault_timeout_seconds
+            app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(seconds=vault_timeout_seconds)
+
             return jsonify({"message": "Preferences saved successfully"}), 200
         except Exception as e:
             logger.error(f"Failed to save preferences: {e}")
@@ -78,13 +92,14 @@ def settings():
 
     user_id = session.get("user_id")
     audit_data = get_audit_data(user_id)
-    logging.debug(f"Audit Data: {audit_data}")  # Debug line to check audit_data
+    logger.debug(f"Audit Data: {audit_data}")  # Debug line to check audit_data
     return render_template("settings.html", audit_data=audit_data)
 
 @bp.route("/get_user_preferences", methods=["GET"])
 @login_required
 def get_user_preferences():
-    user_id = session.get("user_id")
+    conn = None
+    cursor = None
     try:
         conn = get_db()
         cursor = conn.cursor()
@@ -93,8 +108,6 @@ def get_user_preferences():
             (user_id,),
         )
         preferences = cursor.fetchone()
-        cursor.close()
-        conn.close()
 
         if preferences:
             vault_timeout, theme_id = preferences
@@ -105,6 +118,12 @@ def get_user_preferences():
         )
     except Exception as e:
         return jsonify({"error": f"Failed to fetch preferences: {str(e)}"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 
 @bp.route("/change_password", methods=["GET", "POST"])
 @login_required
@@ -115,10 +134,10 @@ def change_password():
         current_password = form.current_password.data
         new_password = form.new_password.data
 
-        conn = get_db()
-        cursor = conn.cursor()
-
         try:
+            conn = get_db()
+            cursor = conn.cursor()
+
             cursor.execute("SELECT PASSWORD FROM USER WHERE USER_ID = ?", (user_id,))
             row = cursor.fetchone()
 
@@ -136,26 +155,27 @@ def change_password():
                     )
                     conn.commit()
                     flash("Password updated successfully", "success")
-                    log_action(user_id, f"Changed password")
+                    log_action(user_id, None, "CHANGE_PASSWORD")
                     return redirect(url_for("settings.settings"))
                 except exceptions.VerifyMismatchError:
                     flash("Current password is incorrect", "danger")
                 except Exception as e:
                     flash(f"Error updating password: {str(e)}", "danger")
-                    print(f"Exception updating password: {str(e)}")
+                    logger.error(f"Exception updating password: {str(e)}")
             else:
                 flash("User not found", "danger")
 
         except Exception as e:
             flash("Database error: Failed to update password", "danger")
-            print(f"Database error: {str(e)}")
+            logger.error(f"Database error: {str(e)}")
 
         finally:
-            cursor.close()
-            conn.close()
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
 
     return render_template("change_password.html", form=form)
-
 @bp.route("/delete_account", methods=["GET", "POST"])
 @login_required
 def delete_account():
@@ -163,10 +183,12 @@ def delete_account():
         current_password = request.form.get("currentPassword")
         user_id = session.get("user_id")
 
-        conn = get_db()
-        cursor = conn.cursor()
+        conn = None
+        cursor = None
 
         try:
+            conn = get_db()
+            cursor = conn.cursor()
             cursor.execute(
                 "SELECT PASSWORD, EMAIL FROM USER WHERE USER_ID = ?", (user_id,)
             )
@@ -192,6 +214,7 @@ def delete_account():
                         "Your account and all related data have been deleted successfully",
                         "success",
                     )
+                    log_action(user_id, None, "DELETE_ACCOUNT")
                     session.clear()
                     return redirect(url_for("auth.logout"))
 
@@ -205,10 +228,12 @@ def delete_account():
 
         except Exception as e:
             flash(f"Failed to delete account: {str(e)}", "danger")
-            print(f"Exception deleting account: {str(e)}")
+            logger.error(f"Exception deleting account: {str(e)}")
 
         finally:
-            cursor.close()
-            conn.close()
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
 
     return render_template("delete_account.html")
