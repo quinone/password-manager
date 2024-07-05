@@ -102,7 +102,6 @@ def profile():
     conn.close()
     return render_template("profile.html", user_info=user_info)
 
-
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
@@ -138,7 +137,7 @@ def new_item():
             conn.commit()
             folder_id = cursor.lastrowid
             cursor.close()
-            log_action(user_id, folder_id, "Create a New Category")
+            log_action(user_id, folder_id, f"CREATED NEW CATEGORY: {new_folder_name}")
         elif folder_id == "0" and not new_folder_name:
             flash("Please enter a new folder name", "error")
             return render_template("new-item.html", form=form)
@@ -152,7 +151,7 @@ def new_item():
         if insert_encrypted_item(
             user_id, name, username, password, uri, notes, folder_id
         ):
-            log_action(user_id, folder_id,"Created new item: {name}")  # Auditing Item
+            log_action(user_id, folder_id, f"CREATED NEW ITEM: {name}")  # Auditing Item
             flash("Successfully submitted new item", "success")
             return redirect(url_for("vault.vault"))
 
