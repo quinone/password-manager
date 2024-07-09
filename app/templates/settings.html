@@ -25,6 +25,17 @@
         color: white; /* Set text color for the header row */
     }
 </style>
+    <p>
+        <button type="button" id="changePasswordBtn">Change Password</button>
+    </p>
+    <p>
+        <button type="button" id="deleteAccountBtn">Delete Account</button>
+    </p>
+
+    <p><a href="{{ url_for('settings.change_password') }}">Change Password</a></p>
+    <p><a href="{{ url_for('settings.delete_account') }}">Delete Account</a></p>
+
+
 
 <table>
     <thead>
@@ -53,12 +64,7 @@
 
 
 
-    <p>
-        <button type="button" id="changePasswordBtn">Change Password</button>
-    </p>
-    <p>
-        <button type="button" id="deleteAccountBtn">Delete Account</button>
-    </p>
+
 </form>
 
 <script>
@@ -111,9 +117,6 @@
         });
     });
 </script>
-
-<p><a href="{{ url_for('settings.change_password') }}">Change Password</a></p>
-<p><a href="{{ url_for('settings.delete_account') }}">Delete Account</a></p>
 
 
 {% endblock %}

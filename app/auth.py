@@ -115,6 +115,7 @@ def register():
                 conn.commit()
                 conn.commit()
                 flash("Account created successfully.", "success")
+                log_action(action_type="USER REGISTERED")
                 message_type = "success"
                 return redirect(url_for("auth.login"))
             except Error as e:
@@ -166,10 +167,13 @@ def login():
                     return redirect(url_for("vault.profile"))
                 else:
                     error_message = "Invalid email or password. Please try again."
+                    log_action(action_type="INVALID LOGIN")
             except Exception as e:
                 error_message = "Invalid email or password. Please try again."
+                log_action(action_type="INVALID LOGIN")
         else:
             error_message = "Invalid email or password. Please try again."
+            log_action(action_type="INVALID LOGIN")
         # Debug: Print error message
         print("Error Message:", error_message)
         # Render login page with error message
