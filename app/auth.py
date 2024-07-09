@@ -12,7 +12,7 @@ from flask import (
 )
 from argon2 import PasswordHasher
 from datetime import datetime
-
+from flask import session
 
 from app.db import get_db
 
@@ -190,13 +190,6 @@ def logout():
         session.clear()
         flash("You have been logged out.", "warning")
     return redirect(url_for("auth.login"))
-
-
-from datetime import datetime
-from flask import session
-from app.db import get_db
-
-
 def log_action(entity_type_id=None, entity_id=None, action_type=None):
     try:
         conn = get_db()
