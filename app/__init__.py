@@ -17,6 +17,7 @@ from flask import (
 )
 from flask_bootstrap import Bootstrap
 
+from app.auth import logout_required
 from app.errors import page_not_found, internal_server_error
 
 from app.forms import SearchForm
@@ -104,6 +105,7 @@ def create_app(test_config=None):
         return "Hello, World!"
 
     @app.route("/", methods=["GET", "POST"])
+    @logout_required
     def index():
         return render_template("index.html")
 
