@@ -5,12 +5,17 @@
 {% block content %}
 <h1>Vault: Items Table</h1>
 
+<div class="mb-3">
+    <a href="{{ url_for('vault.new_item') }}" class="btn btn-success">Create New Item</a>
+    <a href="{{ url_for('vault.new_folder') }}" class="btn btn-info">Create New Folder</a>
+    <a href="{{ url_for('vault.password_generator') }}" class="btn btn-warning">Generate Password</a>
+</div>
+
 <style>
     .button-container button {
         width: 100%; /* Set equal width for all buttons */
     }
 </style>
-{% include 'item-table.html' %}
 
 <div class="left-pane">
     <h3>Folders</h3>
@@ -20,19 +25,6 @@
         {% endfor %}
     </ul>
 </div>
+{% include 'item-table.html' %}
 
-<div class="button-container">
-    <form action="{{ url_for('vault.new_item') }}" method="get">
-        <button type="submit">Create New Item</button>
-    </form>
-    <form action="{{ url_for('vault.new_folder') }}" method="get">
-        <button type="submit">Create New Folder</button>
-    </form>
-        <form action="{{ url_for('vault.password_generator') }}" method="get">
-        <button type="submit"> Password Generator </button>
-    </form>
-    <form action="{{ url_for('vault.profile') }}" method="get">
-        <button type="submit">Back</button>
-    </form>
-</div>
 {% endblock %}
