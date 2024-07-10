@@ -2,11 +2,11 @@
 {% block title %}Vault{% endblock %}
 
 {% block content %}
-     <h1>Add New Folder</h1>
+     <h1>Add New Category</h1>
     <form action="/vault/new-folder" method="post">
-        <label for="folder_name">Folder Name:</label>
+        <label for="folder_name">Category Name:</label>
         <input type="text" id="folder_name" name="folder_name">
-        <button type="submit">Add Folder</button>
+        <button type="submit">Add Category</button>
     </form>
 {% endblock %}
 </html>

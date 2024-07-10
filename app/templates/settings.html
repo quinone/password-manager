@@ -6,32 +6,13 @@
 {% block content %}
 <h1>User Preferences</h1>
 
-<div class="button-container">
-    <form action="{{ url_for('settings.change_password') }}" method="get">
-        <button type="submit">Change Password</button>   
-    </form>
-    <form action="{{ url_for('settings.delete_account') }}" method="get">
-        <button type="submit">Delete Account</button>
-    </form>
+<div class="mb-2">
+    <a href="{{ url_for('settings.change_password') }}" class="btn btn-warning">Change Password</a>
+    <a href="{{ url_for('settings.delete_account') }}" class="btn btn-danger">Delete Account</a>
 </div>
 <h2>Audit for current user:</h2>
-<style>
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        border: 2px solid white; /* Set the table border color */
-    }
-    th, td {
-        border: 1px solid white; /* Set the cell border color */
-        padding: 8px;
-        text-align: left;
-    }
-    th {
-        background-color: #666; /* Set a background color for the header row */
-        color: white; /* Set text color for the header row */
-    }
-</style>
-<table>
+
+<table class="table">
     <thead>
         <tr>
 

@@ -11,8 +11,8 @@ class NewItemForm(FlaskForm):
     # show_password = BooleanField("Show Password")
     uri = StringField("URI", validators=[Length(0, 250)])
     notes = TextAreaField("Notes")
-    folder_select = SelectField("Select Folder", choices=[], coerce=str)
-    new_folder_name = StringField("New Folder Name", validators=[Length(0, 50)])
+    folder_select = SelectField("Select Category", choices=[], coerce=str)
+    new_folder_name = StringField("New Category Name", validators=[Length(0, 50)])
     submit = SubmitField("Submit")
 
 
