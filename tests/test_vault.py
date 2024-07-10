@@ -126,9 +126,8 @@ def test_authenticated_route_access(client, auth, test_path):
 
 def test_authenticated_vault_view_users_items(client, auth):
     """This test should check if the items are shown for the users items"""
-    pass
 
-    """# Simulate a login
+    # Simulate a login
     response = auth.login()
     with client:
         # Check if login was successful
@@ -147,19 +146,20 @@ def test_authenticated_vault_view_users_items(client, auth):
             assert user_id == 1
 
         # Check for rendering of test items
-        assert b'test' in response.data 
-        for item in ['1',
-        '1',
-        'Fake Name',
-        'Fake Username',
-        'asdf1234',
-        'www.google.com',
-        'note' ]:
-            assert item.encode('utf-8') in response.data
+        assert b"test" in response.data
+        assert b"Null Folder" in response.data
+        for item in [
+            "Null Folder",
+            "Fake Username",
+            "asdf1234",
+            "www.google.com",
+            "note",
+        ]:
+            assert item.encode("utf-8") in response.data
         # Print response to help debug
         print("Post response status code:", response.status_code)
         print("Post response headers:", response.headers)
-        print("Post response data:", response.data)"""
+        print("Post response data:", response.data)
 
 
 def test_authenticated_vault_view_others_items():

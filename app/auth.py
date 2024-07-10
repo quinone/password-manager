@@ -44,6 +44,7 @@ def logout_required(view):
 
     return wrapped_view
 
+
 @bp.route("/register", methods=("GET", "POST"))
 @logout_required
 def register():
@@ -103,7 +104,7 @@ def register():
                     messages.append(
                         "Password must contain at least one capital letter."
                     )
-                elif not any(char in "!@#$%^&*?" for char in password):
+                elif not any(char in "!@#$%^&*?-" for char in password):
                     messages.append("Password must contain at least one symbol.")
                 else:
                     messages.append("Password meets complexity requirements.")
@@ -232,6 +233,7 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
+
 
 # to handle account deletion// not deleting data related to user just user profile
 @bp.route("/delete_account", methods=["POST"])

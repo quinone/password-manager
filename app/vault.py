@@ -102,6 +102,7 @@ def profile():
     conn.close()
     return render_template("profile.html", user_info=user_info)
 
+
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():

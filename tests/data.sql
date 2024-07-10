@@ -44,6 +44,15 @@ VALUES
         'gAAAAABmX1FTrrviVO7X-9oZHufGGmBeNijnX-k98aOOUff8VuASIocfkOcYYPeb6mSKuOTxbJ0qWCtgodiw1ih7U8pWQneOcXxm01tRKaSgAroTubXuVR4=', --www.otherusersite.com
         'gAAAAABmX1FzkDPPErYQlmIzPp9bW-PDZU0yqfyUOHr5b2l2eoTGJtaD5A81YQ70Mz8NUGuMYFLy1-Jdj0ZJRawz7WkAhcOEGw==' -- otherusers note
 
+    ),
+    (
+        '1',-- user 1
+        NULL, -- folder 2
+        'Null Folder', 
+        'gAAAAABmWxC258GXTjpFXPauNJD8Bx7QoC3ErN_-esqi7wg4F46sjOQTLpumMOeWGw3eckns5A8Vvml6T3L_DBhFGAj8Bouq-Q==',--'Fake Username',
+        'gAAAAABmWxDqNfCLv1twNzBsOW4A3pR-xRkR9rDFkhZFUeDeXAK_A9wOWkXzpubK5Q80hBHiIFcAyciZIivdXGRlOQkizZ6JHA==',--'asdf1234',
+        'gAAAAABmWxEmuGdhPyUIBboX1JBviHPrFqHhF84qqhAcEKKS6UbQ0qJUgF5hYgK-t42C4XGRRmSqOh8w6478NHAokSrAClfS8A==',--'www.google.com',
+        'gAAAAABmWxFRYsLdWk1MRpIKOtatEeueSJ5THi2xLHvzea6ZLcZk8ii7Br96nEy84vpbhXSy5Uq4ka13R2KLmb3ZnoSxujqCwg=='--'note'    
     );
 
 

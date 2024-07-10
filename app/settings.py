@@ -21,7 +21,10 @@ from app.db import get_db
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-bp = Blueprint("settings", __name__, url_prefix="/settings", template_folder="templates")
+bp = Blueprint(
+    "settings", __name__, url_prefix="/settings", template_folder="templates"
+)
+
 
 def get_audit_data(user_id):
     conn = None
@@ -37,15 +40,15 @@ def get_audit_data(user_id):
             ORDER BY TIMESTAMP DESC
             LIMIT 30
             """,
-            (user_id,)
+            (user_id,),
         )
         audit_data = cursor.fetchall()
         # Ensuring data is in dictionary format for templates
         formatted_audit_data = [
             {
-                'TIMESTAMP': row[3],
-                'ACTION_TYPE': row[2],
-                'ENTITY_ID': row[1],
+                "TIMESTAMP": row[3],
+                "ACTION_TYPE": row[2],
+                "ENTITY_ID": row[1],
             }
             for row in audit_data
         ]
@@ -59,7 +62,8 @@ def get_audit_data(user_id):
         if conn:
             conn.close()
 
-@bp.route('/', methods=["GET", "POST"])
+
+@bp.route("/", methods=["GET", "POST"])
 @login_required
 def settings():
     if request.method == "POST":
@@ -69,7 +73,7 @@ def settings():
 
         # Convert vault_timeout to seconds
         vault_timeout_seconds = sum(
-            int(x) * 60 ** i for i, x in enumerate(reversed(vault_timeout.split(':')))
+            int(x) * 60**i for i, x in enumerate(reversed(vault_timeout.split(":")))
         )
         try:
             conn = get_db()
@@ -84,8 +88,10 @@ def settings():
             log_action(user_id, None, "UPDATED_PREFERENCES")
 
             # Store the vault_timeout in session
-            session['vault_timeout'] = vault_timeout_seconds
-            app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(seconds=vault_timeout_seconds)
+            session["vault_timeout"] = vault_timeout_seconds
+            app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(
+                seconds=vault_timeout_seconds
+            )
 
             return jsonify({"message": "Preferences saved successfully"}), 200
         except Exception as e:
@@ -96,6 +102,7 @@ def settings():
     audit_data = get_audit_data(user_id)
     logger.debug(f"Audit Data: {audit_data}")  # Debug line to check audit_data
     return render_template("settings.html", audit_data=audit_data)
+
 
 @bp.route("/get_user_preferences", methods=["GET"])
 @login_required
@@ -115,9 +122,7 @@ def get_user_preferences():
             vault_timeout, theme_id = preferences
             return jsonify({"vault_timeout": vault_timeout, "theme_id": theme_id})
         # Return default preferences if no preferences found or an error occurred
-        return jsonify(
-            {"vault_timeout": "00:05:00", "theme_id": "light"}
-        )
+        return jsonify({"vault_timeout": "00:05:00", "theme_id": "light"})
     except Exception as e:
         return jsonify({"error": f"Failed to fetch preferences: {str(e)}"}), 500
     finally:
