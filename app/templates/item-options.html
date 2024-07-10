@@ -1,15 +1,6 @@
-{% extends 'base.html' %}
-{% block title %}Folder{% endblock %}
-
-{% block content %}
-<script src="/MyJavaScript.js" defer></script>
-<h2>Folder Name: {{ folder_name }}</h2>
-<div class="fixed-bottom mb-3">
+<div class="mb-3">
     <a href="{{ url_for('vault.new_item') }}" class="btn btn-success">Create New Item</a>
     <a href="{{ url_for('vault.new_folder') }}" class="btn btn-info">Create New Folder</a>
     <a href="{{ url_for('vault.password_generator') }}" class="btn btn-warning">Generate Password</a>
     <a href="{{ url_for('vault.vault') }}" class="btn btn-primary" >Back to Vault</a>
 </div>
-{% include 'item-table.html' %}
-
-{% endblock %}

@@ -278,11 +278,12 @@ def view_folder(folder_name):
     )
 
 
-@bp.route("/folder/select-folder", methods=['POST'])
+@bp.route("/folder/select-folder", methods=["POST"])
 @login_required
 def select_folder():
-    folder_name = request.form.get('folder')
+    folder_name = request.form.get("folder")
     return redirect(url_for("vault.view_folder", folder_name=folder_name))
+
 
 @bp.route("/search", methods=["POST"])
 @login_required

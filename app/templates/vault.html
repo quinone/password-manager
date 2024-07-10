@@ -3,25 +3,19 @@
 {% block title %}Vault: Items Table{% endblock %}
 
 {% block content %}
+<div class="container text-center">
 <h1>Vault: Items Table</h1>
-
-<div class="mb-3">
+<div class="fixed-bottom mb-3">
     <a href="{{ url_for('vault.new_item') }}" class="btn btn-success">Create New Item</a>
     <a href="{{ url_for('vault.new_folder') }}" class="btn btn-info">Create New Folder</a>
     <a href="{{ url_for('vault.password_generator') }}" class="btn btn-warning">Generate Password</a>
 </div>
 
-<style>
-    .button-container button {
-        width: 100%; /* Set equal width for all buttons */
-    }
-</style>
-
 <div class="left-pane">
     <h3>Folders</h3>
 
     <form action="{{ url_for('vault.select_folder') }}" method="post">
-        <label for="folder">Choose a category:</label>
+        <label for="folder">Choose a folder:</label>
         <select name="folder" id="folder">
         {% for folder in folders %}
             
@@ -32,5 +26,5 @@
     </form>
 </div>
 {% include 'item-table.html' %}
-
+</div>
 {% endblock %}
