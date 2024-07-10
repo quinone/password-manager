@@ -5,31 +5,66 @@
 {% block content %}
 <h1>User Preferences</h1>
 <form id="preferencesForm" method="POST">
-    <p>
-        <label for="vaultTimeout">Vault Timeout:</label>
-        <select id="vaultTimeout" name="vaultTimeout">
-            <option value="00:05:00">5 minutes</option>
-            <option value="00:10:00">10 minutes</option>
-            <option value="00:15:00">15 minutes</option>
-        </select>
-    </p>
-    <p>
-        <label for="themeId">Theme:</label>
-        <select id="themeId" name="themeId">
-            <option value="dark">Dark</option>
-            <option value="light">Light</option>
-        </select>
-    </p>
 
-    <p>
-        <button type="submit">Save Preferences</button>
-    </p>
+
+<h2>Audit for current user:</h2>
+
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        border: 2px solid white; /* Set the table border color */
+    }
+    th, td {
+        border: 1px solid white; /* Set the cell border color */
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #666; /* Set a background color for the header row */
+        color: white; /* Set text color for the header row */
+    }
+</style>
     <p>
         <button type="button" id="changePasswordBtn">Change Password</button>
     </p>
     <p>
         <button type="button" id="deleteAccountBtn">Delete Account</button>
     </p>
+
+    <p><a href="{{ url_for('settings.change_password') }}">Change Password</a></p>
+    <p><a href="{{ url_for('settings.delete_account') }}">Delete Account</a></p>
+
+
+
+<table>
+    <thead>
+        <tr>
+
+            <th>Action Type</th>
+            <th>Date</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in audit_data %}
+        <tr>
+
+            <td>{{ record['ACTION_TYPE'] }}</td>
+            <td>{{ record['TIMESTAMP'] }}</td>
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
 </form>
 
 <script>
@@ -82,9 +117,6 @@
         });
     });
 </script>
-
-<p><a href="{{ url_for('settings.change_password') }}">Change Password</a></p>
-<p><a href="{{ url_for('settings.delete_account') }}">Delete Account</a></p>
 
 
 {% endblock %}

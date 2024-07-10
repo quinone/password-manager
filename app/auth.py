@@ -11,7 +11,8 @@ from flask import (
     url_for,
 )
 from argon2 import PasswordHasher
-
+from datetime import datetime
+from flask import session
 
 from app.db import get_db
 
@@ -114,6 +115,7 @@ def register():
                 conn.commit()
                 conn.commit()
                 flash("Account created successfully.", "success")
+                log_action(action_type="USER REGISTERED")
                 message_type = "success"
                 return redirect(url_for("auth.login"))
             except Error as e:
@@ -165,10 +167,13 @@ def login():
                     return redirect(url_for("vault.profile"))
                 else:
                     error_message = "Invalid email or password. Please try again."
+                    log_action(action_type="INVALID LOGIN")
             except Exception as e:
                 error_message = "Invalid email or password. Please try again."
+                log_action(action_type="INVALID LOGIN")
         else:
             error_message = "Invalid email or password. Please try again."
+            log_action(action_type="INVALID LOGIN")
         # Debug: Print error message
         print("Error Message:", error_message)
         # Render login page with error message
@@ -180,21 +185,11 @@ def login():
 def logout():
     if "user_id" in session:
         user_id = session["user_id"]
-
         # Log logout action to AUDIT table
         log_action(action_type="LOGOUT")
-
         session.clear()
         flash("You have been logged out.", "warning")
-
     return redirect(url_for("auth.login"))
-
-
-from datetime import datetime
-from flask import session
-from app.db import get_db
-
-
 def log_action(entity_type_id=None, entity_id=None, action_type=None):
     try:
         conn = get_db()

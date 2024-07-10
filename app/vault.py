@@ -8,7 +8,7 @@ from app.PassGenerator import (
     generate_username,
 )
 
-from app.auth import login_required
+from app.auth import login_required, log_action  # Import the log_action function
 from app.db import get_db, query_db
 from app.db_cryptography import (
     delete_encrypted_item,
@@ -48,18 +48,21 @@ def vault():
         conn = get_db()
         cursor = conn.cursor()
 
+        # Retrieve folders
         user_id = session.get("user_id")
         cursor.execute(
             "SELECT FOLDER_NAME, ID FROM FOLDER WHERE USER_ID = ?", (user_id,)
         )
         folders = cursor.fetchall()
 
+        # Retrieve items with no folder along with decrypted data
         cursor.execute(
             "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID IS NULL AND USER_ID = ?",
             (user_id,),
         )
         items = cursor.fetchall()
 
+        # added here decryption
         decrypted_items = []
         for item in items:
             decrypted_item = {
@@ -99,7 +102,6 @@ def profile():
     conn.close()
     return render_template("profile.html", user_info=user_info)
 
-
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
@@ -135,6 +137,7 @@ def new_item():
             conn.commit()
             folder_id = cursor.lastrowid
             cursor.close()
+            log_action(user_id, folder_id, f"CREATED NEW CATEGORY: {new_folder_name}")
         elif folder_id == "0" and not new_folder_name:
             flash("Please enter a new folder name", "error")
             return render_template("new-item.html", form=form)
@@ -148,6 +151,7 @@ def new_item():
         if insert_encrypted_item(
             user_id, name, username, password, uri, notes, folder_id
         ):
+            log_action(user_id, folder_id, f"CREATED NEW ITEM: {name}")  # Auditing Item
             flash("Successfully submitted new item", "success")
             return redirect(url_for("vault.vault"))
 
@@ -225,6 +229,8 @@ def new_folder():
                         ),
                     )
                     conn.commit()
+
+                    log_action(user_id, f"Created new folder: {folder_name}")
                     flash("Folder added successfully.", "success")
                     return redirect(url_for("vault.vault"))
                 else:
