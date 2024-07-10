@@ -19,11 +19,17 @@
 
 <div class="left-pane">
     <h3>Folders</h3>
-    <ul>
+
+    <form action="{{ url_for('vault.select_folder') }}" method="post">
+        <label for="folder">Choose a category:</label>
+        <select name="folder" id="folder">
         {% for folder in folders %}
-                <li><a href="{{ url_for('vault.view_folder', folder_id=folder[1], folder_name=folder[0]) }}">{{ folder[0] }}</a></li>
+            
+                    <option value="{{ folder[0] }}" >{{folder[0]}}</option>
         {% endfor %}
-    </ul>
+        </select>
+        <button type="submit">View Folder</button>
+    </form>
 </div>
 {% include 'item-table.html' %}
 
