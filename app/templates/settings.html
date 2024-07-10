@@ -1,14 +1,20 @@
 {% extends 'base.html' %}
 
+
 {% block title %}Settings{% endblock %}
 
 {% block content %}
 <h1>User Preferences</h1>
-<form id="preferencesForm" method="POST">
 
-
+<div class="button-container">
+    <form action="{{ url_for('settings.change_password') }}" method="get">
+        <button type="submit">Change Password</button>   
+    </form>
+    <form action="{{ url_for('settings.delete_account') }}" method="get">
+        <button type="submit">Delete Account</button>
+    </form>
+</div>
 <h2>Audit for current user:</h2>
-
 <style>
     table {
         border-collapse: collapse;
@@ -25,18 +31,6 @@
         color: white; /* Set text color for the header row */
     }
 </style>
-    <p>
-        <button type="button" id="changePasswordBtn">Change Password</button>
-    </p>
-    <p>
-        <button type="button" id="deleteAccountBtn">Delete Account</button>
-    </p>
-
-    <p><a href="{{ url_for('settings.change_password') }}">Change Password</a></p>
-    <p><a href="{{ url_for('settings.delete_account') }}">Delete Account</a></p>
-
-
-
 <table>
     <thead>
         <tr>
@@ -57,14 +51,7 @@
         {% endfor %}
     </tbody>
 </table>
-
-
-
-
-
-
-
-
+<form id="preferencesForm" method="POST">
 </form>
 
 <script>

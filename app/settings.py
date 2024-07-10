@@ -174,6 +174,8 @@ def change_password():
         conn.close()
 
     return render_template("change_password.html", form=form)
+
+
 @bp.route("/delete_account", methods=["GET", "POST"])
 @login_required
 def delete_account():
