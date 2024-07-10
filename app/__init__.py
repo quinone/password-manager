@@ -64,7 +64,7 @@ def create_app(test_config=None):
     app.register_error_handler(404, page_not_found)
     app.register_error_handler(500, internal_server_error)
 
-    app.secret_key = "super secret key"  # secret key for captcha
+    #app.secret_key = "super secret key"  # secret key for captcha
 
     # Define session timeout duration in seconds
     SESSION_TIMEOUT = 300
@@ -109,41 +109,7 @@ def create_app(test_config=None):
     def index():
         return render_template("index.html")
 
-    # Add this route to handle account deletion// not deleting data related to user just user profile
-    @app.route("/delete_account", methods=["POST"])
-    def delete_account():
-        # Check if the user is authenticated
-        if "user_id" in session:
-            user_id = session["user_id"]
-            conn = db.get_db()
-            try:
-                # Connect to the database
-                # conn = database.connect(db_file)
-                # cursor = conn.cursor()
-                # TODO User should have to reauthenticate before deletion
-                # Delete user's data from related tables
-                conn.execute("DELETE FROM REGISTRATION WHERE USER_ID = ?", (user_id,))
-                # You may need additional delete operations for related tables, such as items, folders, etc.
 
-                conn.commit()
-                flash("Your account has been successfully deleted.")
-                # Clear the session
-                session.clear()
-                return redirect(url_for("index"))
-
-            except Exception as e:
-                # Handle any errors appropriately
-                print("Error deleting account:", e)
-                flash("Failed to delete your account. Please try again later.")
-
-            finally:
-                if conn:
-                    conn.close()
-
-        else:
-            # Redirect to login page or handle unauthorized access
-            flash("You are not logged in.")
-            return redirect(url_for("login"))
 
     # Update your settings HTML template to include a form or button to trigger the account deletion
 
