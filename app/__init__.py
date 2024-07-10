@@ -64,7 +64,7 @@ def create_app(test_config=None):
     app.register_error_handler(404, page_not_found)
     app.register_error_handler(500, internal_server_error)
 
-    #app.secret_key = "super secret key"  # secret key for captcha
+    # app.secret_key = "super secret key"  # secret key for captcha
 
     # Define session timeout duration in seconds
     SESSION_TIMEOUT = 300
@@ -108,8 +108,6 @@ def create_app(test_config=None):
     @logout_required
     def index():
         return render_template("index.html")
-
-
 
     # Update your settings HTML template to include a form or button to trigger the account deletion
 

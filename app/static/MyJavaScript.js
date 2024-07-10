@@ -43,35 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('theme', newTheme);
     });
 
-    // Existing script
-    var passwordToggles = document.querySelectorAll('.password-toggle');
-    var revealIcons = document.querySelectorAll('.reveal-password');
-    var copyIcons = document.querySelectorAll('.copy-password');
-
-    revealIcons.forEach((icon, index) => {
-        icon.addEventListener('click', function() {
-            var passwordToggle = passwordToggles[index];
-            var password = passwordToggle.getAttribute('data-password');
-            if (passwordToggle.textContent === password) {
-                passwordToggle.textContent = '********';
-            } else {
-                passwordToggle.textContent = password;
-            }
-        });
-    });
-
-    copyIcons.forEach((icon, index) => {
-        icon.addEventListener('click', function() {
-            var passwordToggle = passwordToggles[index];
-            var password = passwordToggle.getAttribute('data-password');
-            navigator.clipboard.writeText(password).then(function() {
-                console.log('Password copied to clipboard');
-            }, function() {
-                console.error('Failed to copy password to clipboard');
-            });
-        });
-    });
-
     document.getElementById('login-form').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent the default form submission
 
