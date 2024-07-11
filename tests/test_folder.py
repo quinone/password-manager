@@ -82,7 +82,7 @@ def test_create_new_folder(auth, client):
         # Test redirection to vault
         assert response.request.path == "/vault/"
         # Test for successful message
-        assert b"Folder added successfully." in response.data
+        assert b"New Category added successfully." in response.data
 
 
 def test_create_duplicate_folder_same_user():

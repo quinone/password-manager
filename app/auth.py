@@ -210,6 +210,7 @@ def log_action(entity_type_id=None, entity_id=None, action_type=None):
         conn = get_db()
         cursor = conn.cursor()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         cursor.execute(
             "INSERT INTO AUDIT (ENTITY_TYPE_ID, ENTITY_ID, ACTION_TYPE, USER_ID, TIMESTAMP) VALUES (?, ?, ?, ?, ?)",
             (entity_type_id, entity_id, action_type, session.get("user_id"), timestamp),

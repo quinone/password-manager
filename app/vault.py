@@ -217,7 +217,7 @@ def new_folder():
         conn = get_db()
         try:
             if not folder_name:
-                flash("Please provide a folder name.", "warning")
+                flash("Please provide a category name.", "warning")
             else:
                 user_id = session.get("user_id")
                 if user_id:
@@ -231,8 +231,10 @@ def new_folder():
                     )
                     conn.commit()
 
-                    log_action(user_id, f"Created new folder: {folder_name}")
-                    flash("Folder added successfully.", "success")
+                    print(f"Logging action for user {user_id}: Created new Folder: {folder_name}")
+
+                    log_action(user_id, f"CREATED NEW CATEGORY: {folder_name}")
+                    flash("New Category added successfully.", "success")
                     return redirect(url_for("vault.vault"))
                 else:
                     flash("User ID not found.", "danger")
