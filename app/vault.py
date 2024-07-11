@@ -172,6 +172,11 @@ def edit_item(item_ID):
         ),
         one=True,
     )
+
+    # Extract the item name for logging purposes
+    original_item_name = item["name"] if item else "Unknown Item"
+
+
     folders = query_db(
         "SELECT ID, FOLDER_NAME FROM FOLDER WHERE USER_ID = ?", (user_ID,), one=False
     )
@@ -196,6 +201,10 @@ def edit_item(item_ID):
         if update_encrypted_item(
             item_ID, user_ID, name, username, password, uri, notes, folder_id
         ):
+            # Log the edit action
+            #log_action(user_ID, f"Edited item with ID: {item_ID}")
+            log_action(user_ID, f"EDITED ITEM: {original_item_name}")
+
             flash("Successfully updated the item", "success")
             return redirect(url_for("vault.vault"))
 
