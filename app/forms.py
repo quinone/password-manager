@@ -7,7 +7,9 @@ from wtforms import SelectField, HiddenField
 class NewItemForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired(), Length(1, 50)])
     username = StringField("Username", validators=[Length(0, 250)])
-    password = PasswordField("Password")
+    # password = PasswordField("Password")
+    # Changed to string to view password. Also can be auto filled by generator
+    password = StringField("Password")
     # show_password = BooleanField("Show Password")
     uri = StringField("URI", validators=[Length(0, 250)])
     notes = TextAreaField("Notes")

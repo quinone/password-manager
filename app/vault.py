@@ -106,7 +106,45 @@ def profile():
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
+    result = None
+    length = request.args.get("total_length", 10, type=int)
+    min_capitals = request.args.get("min_capitals", 0, type=int)
+    min_numbers = request.args.get("min_numbers", 0, type=int)
+    min_special_chars = request.args.get("min_special_chars", 0, type=int)
+    special_chars = []
+    password_type = request.args.get("password_type")
+    # Handle options
+    options = request.args.get("options")
+    if options == "username":
+        username = generate_username()
+        result = username
+
+    elif options == "password":
+        if password_type == "password":
+            special_chars = request.args.getlist("special_chars")
+            if len(special_chars) == 0:
+                min_special_chars = 0
+
+            # Convert special_char list to string
+            special_chars = "".join(special_chars)
+
+            # Generate password with alphabetic characters, numbers, and selected special characters
+            password = generate_password(
+                length=length,
+                number_digits=min_numbers,
+                number_upper=min_capitals,
+                number_special=min_special_chars,
+                special=special_chars,
+            )
+            # return render_template("password-generator.html", generated_password=password)
+        if password_type == "pin":
+            password = generate_number(length)
+        if password_type == "passphrase":
+            password = generate_passphrase(length=length)
+        result = password
+    generated_password = result
     form = NewItemForm()
+    form.password.data = generated_password
     user_id = session.get("user_id")
 
     conn = get_db()
@@ -156,7 +194,16 @@ def new_item():
             flash("Successfully submitted new item", "success")
             return redirect(url_for("vault.vault"))
 
-    return render_template("new-item.html", form=form)
+    return render_template(
+        "new-item.html",
+        form=form,
+        length=length,
+        min_capitals=min_capitals,
+        min_numbers=min_numbers,
+        min_special_chars=min_special_chars,
+        password_type=password_type,
+        generated_password=generated_password,
+    )
 
 
 @bp.route("/edit-item/<item_ID>", methods=["GET", "POST"])
@@ -231,7 +278,9 @@ def new_folder():
                     )
                     conn.commit()
 
-                    print(f"Logging action for user {user_id}: Created new Folder: {folder_name}")
+                    print(
+                        f"Logging action for user {user_id}: Created new Folder: {folder_name}"
+                    )
 
                     log_action(user_id, f"CREATED NEW CATEGORY: {folder_name}")
                     flash("New Category added successfully.", "success")

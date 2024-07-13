@@ -42,7 +42,7 @@ def test_item(client, auth, route, message):
                 "password": "weakpassword",
                 "uri": "www.google.com",
                 "notes": "My sample google account info",
-                "folder_select": 1,  # Add a value for folderID
+                "folder_select": '1',  # Add a value for folderID
             },
             follow_redirects=True,
         )
@@ -51,6 +51,7 @@ def test_item(client, auth, route, message):
         print("Post response data:", response.data)
 
         # Test redirection to vault
+        print("RESPONSE REQUEST PATH: ", response.request.path)
         assert response.request.path == "/vault/"
 
         # Test for successful message
