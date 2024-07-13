@@ -42,7 +42,7 @@ def test_item(client, auth, route, message):
                 "password": "weakpassword",
                 "uri": "www.google.com",
                 "notes": "My sample google account info",
-                "folder_select": '1',  # Add a value for folderID
+                "folder_select": "1",  # Add a value for folderID
             },
             follow_redirects=True,
         )

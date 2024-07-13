@@ -106,7 +106,7 @@ def profile():
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
-    result = None
+    result = ""
     length = request.args.get("total_length", 10, type=int)
     min_capitals = request.args.get("min_capitals", 0, type=int)
     min_numbers = request.args.get("min_numbers", 0, type=int)
