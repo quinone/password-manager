@@ -331,16 +331,23 @@ def view_folder(folder_name):
     decrypted_items = []
     try:
         # Fetch item IDs based on the folder ID
-        item_IDs = query_db("SELECT ID FROM ITEM WHERE FOLDER_ID = ?", (folder_ID,))
-        if item_IDs:
-            print(f"Item IDs: {item_IDs}")
-            for item in item_IDs:
-                item_ID = item[0]
-
-                decrypted_item = decrypt_item(item_ID)
-                if decrypt_item:
-                    decrypted_items.append(decrypted_item)
-                print(f"Items:", decrypted_items)
+        items = query_db(
+            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
+            (folder_ID,),
+        )
+        # added here decryption
+        decrypted_items = []
+        for item in items:
+            decrypted_item = {
+                "ID": item["ID"],
+                "NAME": item["NAME"],
+                "FOLDER_ID": item["FOLDER_ID"],
+                "USERNAME": decrypt_data(item["USERNAME"]),
+                "PASSWORD": decrypt_data(item["PASSWORD"]),
+                "URI": decrypt_data(item["URI"]),
+                "NOTES": decrypt_data(item["NOTES"]),
+            }
+            decrypted_items.append(decrypted_item)
 
     except Error as e:
         print("Database Error:", e)
