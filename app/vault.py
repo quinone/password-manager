@@ -57,7 +57,7 @@ def vault():
 
         # Retrieve items with no folder along with decrypted data
         cursor.execute(
-            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID IS NULL AND USER_ID = ?",
+            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID IS NULL OR FOLDER_ID = 'None' AND USER_ID = ?",
             (user_id,),
         )
         items = cursor.fetchall()
