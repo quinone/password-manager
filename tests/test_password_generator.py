@@ -95,7 +95,7 @@ def test_generate_username_random():
     assert generate_username() != generate_username()
 
 
-def test_generate_password_randoom():
+def test_generate_password_random():
     assert generate_password() != generate_password()
 
 

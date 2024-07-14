@@ -22,8 +22,12 @@ from app.db import get_db
 def generate_password(
     length=15, number_digits=0, number_upper=0, number_special=0, special=None
 ):
-    alphabet = string.ascii_letters + string.digits
+    alphabet = string.ascii_letters
+    if number_upper:
+        alphabet = string.ascii_letters + string.digits
     if number_special and special:
+        # Convert special to string before adding to alphabet
+        special = "".join(special)
         alphabet += special
     while True:
         password = "".join(secrets.choice(alphabet) for i in range(length))
@@ -83,3 +87,23 @@ def generate_username(capitalize=False, include_number=True):
     if include_number:
         password += generate_number(4)
     return password
+
+
+def password_generate_by_type(
+    password_type="password",
+    length=10,
+    number_digits=0,
+    number_upper=0,
+    number_special=0,
+    special=[],
+):
+    if password_type == "password":
+        if len(special) == 0:
+            number_special = 0
+        return generate_password(
+            length, number_digits, number_upper, number_special, special
+        )
+    elif password_type == "pin":
+        return generate_number(length)
+    else:
+        return generate_passphrase(length=length)
