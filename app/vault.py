@@ -209,6 +209,7 @@ def new_item():
 @bp.route("/edit-item/<item_ID>", methods=["GET", "POST"])
 @login_required
 def edit_item(item_ID):
+    
     form = NewItemForm()
     user_ID = session.get("user_id")
     item = query_db(
