@@ -121,20 +121,37 @@ def test_update_encrypted_item(app):
         assert decrypted_item.get("NOTES") == "New secret notes"
 
 
+
+
 def test_delete_encrypted_item(app):
     with app.app_context():
+        # Retrieve the item row
         user_row = query_db(
-            "SELECT ID, USER_ID FROM ITEM WHERE NAME = ?", ("Delete item",), one=True
+            "SELECT ID, USER_ID, NAME FROM ITEM WHERE NAME = ?", ("Delete item",), one=True
         )
-        print("ID of 'Delete item': ", user_row["ID"])
-        print("User_ID of 'Delete item': ", user_row["USER_ID"])
-    with app.app_context():
-        delete_encrypted_item(user_row["ID"], user_row["USER_ID"])
+        item_id = user_row["ID"]
+        user_id = user_row["USER_ID"]
+        item_name = user_row["NAME"]
+
+        print("ID of 'Delete item': ", item_id)
+        print("User_ID of 'Delete item': ", user_id)
+        print("Name of 'Delete item': ", item_name)
+
+        # Delete the item and log the action
+        deleted_name, result = delete_encrypted_item(item_id, user_id)
+        assert result > 0
+
+
+        # Verify the item is deleted
         user_row_deleted = query_db(
             "SELECT ID FROM ITEM WHERE NAME = ?", ("Delete item",), one=True
         )
         print("ID of 'Delete item': ", user_row_deleted)
         assert user_row_deleted is None
+
+
+
+
 
 
 def test_get_folder_ID(app):
