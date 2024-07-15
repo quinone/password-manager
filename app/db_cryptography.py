@@ -215,30 +215,41 @@ def delete_encrypted_item(item_ID, user_ID):
     conn = get_db()
     cursor = conn.cursor()
     try:
+        cursor.execute("SELECT NAME FROM ITEM WHERE ID = ? AND USER_ID = ?", (item_ID, user_ID))
+        item = cursor.fetchone()
+
+        if item is None:
+            return None, 0  # No item found
+
+        item_name = item['NAME']
+
         before_delete = query_db("SELECT COUNT(*) AS before_delete FROM ITEM", one=True)
 
         cursor.execute(
             "DELETE FROM ITEM WHERE ID = ? AND USER_ID = ?",
-            (
-                item_ID,
-                user_ID,
-            ),
+            (item_ID, user_ID),
         )
         conn.commit()
+
         after_delete = query_db("SELECT COUNT(*) AS after_delete FROM ITEM", one=True)
-        return before_delete[0] - after_delete[0]
+
+        return item_name, before_delete['before_delete'] - after_delete['after_delete']
 
     except Error as e:
         flash("Failed to delete, please try again.")
         print("Database Error:", e)
         conn.rollback()
-        return None
+        return None, 0
 
     except Exception as e:
         flash("Failed to delete, please try again.")
         print("Exception:", e)
-        return None
+        return None, 0
 
     finally:
         cursor.close()
-        # conn.close()
+
+
+
+
+0

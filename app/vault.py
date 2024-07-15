@@ -204,12 +204,11 @@ def edit_item(item_ID):
     min_special_chars = request.args.get("min_special_chars", 0, type=int)
     special_chars = []
     password_type = request.args.get("password_type")
-    # Handle options
+
     options = request.args.get("options")
     if options == "username":
         username = generate_username()
         result = username
-
     elif options == "password":
         result = password_generate_by_type(
             password_type=password_type,
@@ -224,10 +223,7 @@ def edit_item(item_ID):
     user_ID = session.get("user_id")
     item = query_db(
         "SELECT * FROM ITEM WHERE USER_ID = ? AND ID = ?",
-        (
-            user_ID,
-            item_ID,
-        ),
+        (user_ID, item_ID),
         one=True,
     )
     folders = query_db(
@@ -236,6 +232,7 @@ def edit_item(item_ID):
     form.folder_select.choices = [(str(folder[0]), folder[1]) for folder in folders]
     form.folder_select.choices.append(("0", "Add New Folder"))
     form.folder_select.choices.append(("None", "No Folder"))
+
     if request.method == "POST" and form.validate():
         name = form.name.data
         username = form.username.data
@@ -244,6 +241,7 @@ def edit_item(item_ID):
         notes = form.notes.data
         folder_id = form.folder_select.data
         new_folder_name = form.new_folder_name.data
+
         if folder_id == "0" and new_folder_name:
             folder_id = query_db(
                 "INSERT INTO FOLDER (USER_ID, FOLDER_NAME) VALUES (?, ?)",
@@ -251,9 +249,12 @@ def edit_item(item_ID):
                 last=True,
             )
 
+        # Update item in the database
         if update_encrypted_item(
             item_ID, user_ID, name, username, password, uri, notes, folder_id
         ):
+            # Log the action with the item name
+            log_action(entity_type_id='ITEM', entity_id=item_ID, action_type=f'EDITED ITEM: {name}')
             flash("Successfully updated the item", "success")
             return redirect(url_for("vault.vault"))
 
@@ -275,6 +276,8 @@ def edit_item(item_ID):
         password_type=password_type,
         generated_password=generated_password,
     )
+
+
 
 
 @bp.route("/new-folder", methods=["GET", "POST"])
@@ -441,8 +444,14 @@ def password_generator():
 def delete_item():
     item_ID = request.form.get("item_ID")
     user_ID = session.get("user_id")
-    if delete_encrypted_item(item_ID, user_ID):
+
+    # Get the item name and deletion result
+    item_name, result = delete_encrypted_item(item_ID, user_ID)
+
+    if result > 0:
+        log_action(action_type=f'DELETED ITEM: {item_name}')
         flash("Item successfully deleted.", "success")
-        return redirect(url_for("vault.vault"))
-    flash("Item does not exist or is not yours.")
+    else:
+        flash("Item does not exist or is not yours.")
+
     return redirect(url_for("vault.vault"))
