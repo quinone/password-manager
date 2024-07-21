@@ -374,11 +374,16 @@ button[type="submit"]:hover {
 }
         /* Center the reCAPTCHA widget */
 .recaptcha-container {
-    display: flex;
+    display: inline-block;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px; /* Optional margin adjustment */
+    margin-bottom: 2px; /* Optional margin adjustment */
 }
+
+/* center reCAPTCHA
+.g-recaptcha > div {
+    margin: 0 auto;
+}*/
 /* Default (Light Theme) */
 body {
     background-color: #ffffff;

@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 {% block title %}Registration{% endblock %}
-
 {% block content %}
     <h1>Create Account</h1>
-    <div class="d-flex">
-        <div class="d-flex flex-grow-1">
+    <div class="container d-flex align-items-center">
+
     <form action="/auth/register" method="post">
         <table class="table">
             {% for message in messages %}
@@ -13,37 +12,52 @@
         <br>
             <tr>
                 <td><label for="email_address">Email Address:</label></td>
-                <td><input type="email" id="email_address" name="email_address" ></td>
+                <td><input class="form-control form-control-lg" type="email" id="email_address" name="email_address"></td>
             </tr>
             <tr>
                 <td><label for="name">Name:</label></td>
-                <td><input type="text" id="name" name="name" required></td>
+                <td><input class="form-control form-control-lg" type="text" id="name" name="name" required></td>
             </tr>
             <tr>
                 <td><label for="password">Password:</label></td>
-                <td><input type="password" id="password" name="password" required></td>
+                <td><input class="form-control form-control-lg" type="password" id="password" name="password" value="{{generated_password}}" required></td>
             </tr>
             <tr>
                 <td><label for="retype_password">Confirm Password:</label></td>
-                <td><input type="password" id="retype_password" name="retype_password" required></td>
+                <td><input class="form-control form-control-lg" type="password" id="retype_password" name="retype_password" value="{{generated_password}}" required></td>
             </tr>
             <tr>
                 <td><label for="hint">Password Hint:</label></td>
-                <td><input type="text" id="hint" name="hint"></td>
+                <td><input class="form-control form-control-lg" type="text" id="hint" name="hint"></td>
             </tr>
             <tr>
-                <td colspan="2"><button class="btn btn-primary" type="submit">Create Account</button></td>
+                <td rowspan="2">
+                    <div class="recaptcha-container">
+                        <div class="g-recaptcha" data-sitekey="6LclpwIlAAAAAJJGxZAVGD3a6emxmCccHn5rb_ZB"></div> 
+                    </div>
+                </td>        
             </tr>
-            <div class="recaptcha-container">
-            <div class="g-recaptcha" data-sitekey="6LclpwIlAAAAAJJGxZAVGD3a6emxmCccHn5rb_ZB"></div>
-        </div>
+            <tr>
+                <td colspan="2"><button class="btn btn-outline-light btn-lg px-5" type="submit">Create Account</button></td>
+            </tr>
+            
         </table>
     </form>
 </div>
-    <div class="d-flex"></div>
-    <div class="d-flex justify-content-end">
-        {% include 'password-widget.html' %}
-    </div>
-    </div>
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasRightLabel">Generate Password</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    {% include 'password-widget.html' %}
+  </div>
+</div>
+<div class="fixed-bottom mb-3">
+    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+        Generate Password
+      </button>         
+</div>
+
 {% endblock %}
 </html>

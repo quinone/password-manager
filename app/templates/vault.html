@@ -13,8 +13,6 @@
 
 <div class="left-pane">
     <h3>Categories</h3>
-
-# to resolve error when no categories had been created yet
     {% if folders %}
     <form action="{{ url_for('vault.select_folder') }}" method="post">
         <label for="folder">Choose a Category:</label>
