@@ -14,6 +14,7 @@ from argon2 import PasswordHasher
 from datetime import datetime
 from flask import session
 
+from app.PassGenerator import generate_username, password_generate_by_type
 from app.db import get_db
 
 
@@ -45,9 +46,34 @@ def logout_required(view):
     return wrapped_view
 
 
-@bp.route("/register", methods=("GET", "POST"))
-@logout_required
+@bp.route("/register", methods=["GET", "POST"])
+# @logout_required
 def register():
+    result = ""
+    length = request.args.get("total_length", 10, type=int)
+    min_capitals = request.args.get("min_capitals", 0, type=int)
+    min_numbers = request.args.get("min_numbers", 0, type=int)
+    min_special_chars = request.args.get("min_special_chars", 0, type=int)
+    special_chars = []
+    special_chars = request.args.getlist("special_chars")
+    password_type = request.args.get("password_type")
+    # Handle options
+    options = request.args.get("options")
+    if options == "username":
+        username = generate_username()
+        result = username
+
+    elif options == "password":
+        result = password_generate_by_type(
+            password_type=password_type,
+            length=length,
+            number_digits=min_numbers,
+            number_upper=min_capitals,
+            number_special=min_special_chars,
+            special=special_chars,
+        )
+    generated_password = result
+
     if request.method == "POST":
         email = request.form.get("email_address")
         name = request.form.get("name")
@@ -83,38 +109,41 @@ def register():
                 )
                 existing_user = cursor.fetchone()
                 if existing_user:
-                    messages.append(
-                        "Email already taken. Please choose a different email."
+                    flash(
+                        "Email already taken. Please choose a different email.",
+                        "warning",
                     )
-                    return render_template(
-                        "register.html", messages=messages, message_type=message_type
-                    )  # Return early
+                    return render_template("register.html")  # Return early
                 # Check if password and password hint match
                 if password == password_hint:
-                    messages.append(
-                        "Password hint should not be the same as the password."
+                    flash(
+                        "Password hint should not be the same as the password.",
+                        "warning",
                     )
-                    return render_template(
-                        "register.html", messages=messages, message_type=message_type
-                    )  # Return early
+                    return render_template("register.html")  # Return early
                 # Check password complexity
                 if len(password) < 8:
-                    messages.append("Password must be at least 8 characters long.")
+                    flash("Password must be at least 8 characters long.", "warning")
+                    return render_template(
+                        "register.html",
+                    )  # Return early
                 elif not any(char.isupper() for char in password):
-                    messages.append(
-                        "Password must contain at least one capital letter."
+                    flash(
+                        "Password must contain at least one capital letter.", "warning"
                     )
+                    return render_template(
+                        "register.html",
+                    )  # Return early
                 elif not any(char in "!@#$%^&*?-" for char in password):
-                    messages.append("Password must contain at least one symbol.")
-                else:
-                    messages.append("Password meets complexity requirements.")
-                    # Continue with USER process
-                # Check if passwords match
-                if password != retype_password:  # Fix: Correct field name
-                    messages.append("Passwords do not match.")
+                    flash("Password must contain at least one symbol.", "warning")
                     return render_template(
                         "register.html", messages=messages, message_type=message_type
                     )  # Return early
+
+                # Check if passwords match
+                if password != retype_password:  # Fix: Correct field name
+                    flash("Passwords do not match.", "warning")
+                    return render_template("register.html")  # Return early
 
                 password_hasher = PasswordHasher()
                 # hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -124,7 +153,6 @@ def register():
                     "INSERT INTO USER (EMAIL, NAME, PASSWORD, PASSWORD_HINT) VALUES (?, ?, ?, ?)",
                     (email, name, hashed_password, password_hint),
                 )
-                conn.commit()
                 conn.commit()
                 flash("Account created successfully.", "success")
                 log_action(action_type="USER REGISTERED")
@@ -142,7 +170,15 @@ def register():
         flash(error, "danger")
         # Render the template with the messages and message type
         # return redirect(url_for("login"))
-    return render_template("register.html")
+    return render_template(
+        "register.html",
+        length=length,
+        min_capitals=min_capitals,
+        min_numbers=min_numbers,
+        min_special_chars=min_special_chars,
+        password_type=password_type,
+        generated_password=generated_password,
+    )
 
 
 @bp.route("/login", methods=("GET", "POST"))

@@ -29,28 +29,71 @@ def test_register(client, app):
 
 
 valid_password = "Testpassword1!"
-valid_email = "test@test.com"
+valid_email = "unusedemail@test.com"
 valid_name = "Test Name"
 valid_hint = "Test Hint"
 
 
-"""@pytest.mark.parametrize(
-    ("email", "password","retype_password", "name", "password_hint", "message"),
+@pytest.mark.parametrize(
+    ("email", "password", "retype_password", "name", "password_hint", "message"),
     (
-        ("", valid_password, valid_password, valid_name,valid_hint, b"Email address is required."),
-        (valid_email, "", valid_password, valid_name, valid_hint, b"Password is required."),
-        (valid_email, valid_password, "", valid_name, valid_hint, b"Passwords do not match."),
-        (valid_email, valid_password,valid_password, "",valid_hint, b"Name is required."),
-        (valid_email, valid_password, valid_password, valid_name, "", b"Password hint is required."),
+        (
+            "",
+            valid_password,
+            valid_password,
+            valid_name,
+            valid_hint,
+            b"Email address is required.",
+        ),
+        (
+            valid_email,
+            "",
+            valid_password,
+            valid_name,
+            valid_hint,
+            b"Password is required.",
+        ),
+        (
+            valid_email,
+            valid_password,
+            "DifferentPassword",
+            valid_name,
+            valid_hint,
+            b"Passwords do not match.",
+        ),
+        (
+            valid_email,
+            valid_password,
+            valid_password,
+            "",
+            valid_hint,
+            b"Name is required.",
+        ),
+        (
+            valid_email,
+            valid_password,
+            valid_password,
+            valid_name,
+            "",
+            b"Password hint is required.",
+        ),
     ),
 )
-
-def test_register_validate_input(client, email, password, retype_password, name, password_hint, message):
+def test_register_validate_input(
+    client, email, password, retype_password, name, password_hint, message
+):
     response = client.post(
         "/auth/register",
-        data={"email_address": email, "password": password,"retype_password": retype_password, "name": name, "hint": password_hint},
+        data={
+            "email_address": email,
+            "password": password,
+            "retype_password": retype_password,
+            "name": name,
+            "hint": password_hint,
+        },
     )
-    assert message in response.data"""
+    print("response: ", response.data)
+    assert message in response.data
 
 
 def test_login(client, auth):

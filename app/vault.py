@@ -114,6 +114,7 @@ def new_item():
     min_special_chars = request.args.get("min_special_chars", 0, type=int)
     special_chars = []
     special_chars = request.args.getlist("special_chars")
+    print(special_chars)
     password_type = request.args.get("password_type")
     # Handle options
     options = request.args.get("options")
@@ -203,6 +204,7 @@ def edit_item(item_ID):
     min_numbers = request.args.get("min_numbers", 0, type=int)
     min_special_chars = request.args.get("min_special_chars", 0, type=int)
     special_chars = []
+    special_chars = request.args.getlist("special_chars")
     password_type = request.args.get("password_type")
 
     options = request.args.get("options")
@@ -254,7 +256,11 @@ def edit_item(item_ID):
             item_ID, user_ID, name, username, password, uri, notes, folder_id
         ):
             # Log the action with the item name
-            log_action(entity_type_id='ITEM', entity_id=item_ID, action_type=f'EDITED ITEM: {name}')
+            log_action(
+                entity_type_id="ITEM",
+                entity_id=item_ID,
+                action_type=f"EDITED ITEM: {name}",
+            )
             flash("Successfully updated the item", "success")
             return redirect(url_for("vault.vault"))
 
@@ -276,8 +282,6 @@ def edit_item(item_ID):
         password_type=password_type,
         generated_password=generated_password,
     )
-
-
 
 
 @bp.route("/new-folder", methods=["GET", "POST"])
@@ -449,7 +453,7 @@ def delete_item():
     item_name, result = delete_encrypted_item(item_ID, user_ID)
 
     if result > 0:
-        log_action(action_type=f'DELETED ITEM: {item_name}')
+        log_action(action_type=f"DELETED ITEM: {item_name}")
         flash("Item successfully deleted.", "success")
     else:
         flash("Item does not exist or is not yours.")

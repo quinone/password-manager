@@ -1,22 +1,6 @@
-import os
 from pathlib import Path
 import secrets
 import string
-import random
-from flask import (
-    Blueprint,
-    g,
-    request,
-    flash,
-    session,
-    redirect,
-    render_template,
-    url_for,
-    jsonify,
-)
-from app.forms import SearchForm
-from app.auth import login_required
-from app.db import get_db
 
 
 def generate_password(
