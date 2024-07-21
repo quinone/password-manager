@@ -7,6 +7,9 @@ Password management application for a college group project.
 - Add password items [complete]
 - Read password items [complete]
 - Generate random passwords [complete]
+- Delete items [complete]
+- Delete account [complete]
+- Edit items [complete]
 
 
 ## Installation 
