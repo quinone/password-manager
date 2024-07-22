@@ -58,7 +58,7 @@ def vault():
 
         # Retrieve items with no folder along with decrypted data
         cursor.execute(
-            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID IS NULL OR FOLDER_ID = 'None' AND USER_ID = ?",
+            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE (FOLDER_ID IS NULL OR FOLDER_ID = 'None') AND USER_ID = ?",
             (user_id,),
         )
         items = cursor.fetchall()
@@ -107,6 +107,7 @@ def profile():
 @bp.route("/new-item", methods=["GET", "POST"])
 @login_required
 def new_item():
+    form = NewItemForm()
     result = ""
     length = request.args.get("total_length", 10, type=int)
     min_capitals = request.args.get("min_capitals", 0, type=int)
@@ -114,13 +115,13 @@ def new_item():
     min_special_chars = request.args.get("min_special_chars", 0, type=int)
     special_chars = []
     special_chars = request.args.getlist("special_chars")
-    print(special_chars)
     password_type = request.args.get("password_type")
     # Handle options
     options = request.args.get("options")
     if options == "username":
         username = generate_username()
         result = username
+        form.username.data = username
 
     elif options == "password":
         result = password_generate_by_type(
@@ -131,16 +132,14 @@ def new_item():
             number_special=min_special_chars,
             special=special_chars,
         )
+        form.password.data = result
     generated_password = result
-    form = NewItemForm()
-    form.password.data = generated_password
-    user_id = session.get("user_id")
 
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT ID, FOLDER_NAME FROM FOLDER WHERE USER_ID = ?", (user_id,))
-    folders = cursor.fetchall()
-    cursor.close()
+    user_id = session.get("user_id")
+    # Retrieve folders
+    folders = query_db(
+        "SELECT ID, FOLDER_NAME FROM FOLDER WHERE USER_ID = ?", (user_id,)
+    )
 
     form.folder_select.choices = [(str(folder[0]), folder[1]) for folder in folders]
     form.folder_select.choices.append(("0", "Add New Folder"))
@@ -266,7 +265,10 @@ def edit_item(item_ID):
 
     form.name.data = item["name"]
     form.username.data = decrypt_data(item["username"])
-    form.password.data = decrypt_data(item["password"])
+    if options == "password":
+        form.password.data = result
+    else:
+        form.password.data = decrypt_data(item["password"])
     form.uri.data = decrypt_data(item["uri"])
     form.notes.data = decrypt_data(item["notes"])
     form.folder_select.data = item["folder_id"]
@@ -337,10 +339,17 @@ def view_folder(folder_name):
         return redirect(url_for("vault.vault"))
     decrypted_items = []
     try:
+        # Retrieve folders
+        folders = query_db(
+            "SELECT FOLDER_NAME, ID FROM FOLDER WHERE USER_ID = ?", (user_id,)
+        )
         # Fetch item IDs based on the folder ID
         items = query_db(
-            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE FOLDER_ID = ?",
-            (folder_ID,),
+            "SELECT ID, NAME, FOLDER_ID, USERNAME, PASSWORD, URI, NOTES FROM ITEM WHERE USER_ID = ? AND FOLDER_ID = ?",
+            (
+                user_id,
+                folder_ID,
+            ),
         )
         # added here decryption
         decrypted_items = []
@@ -360,7 +369,7 @@ def view_folder(folder_name):
         print("Database Error:", e)
 
     return render_template(
-        "folder.html", folder_name=folder_name, items=decrypted_items
+        "folder.html", folder_name=folder_name, items=decrypted_items, folders=folders
     )
 
 
