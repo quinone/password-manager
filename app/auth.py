@@ -226,6 +226,7 @@ def login():
         # Debug: Print error message
         print("Error Message:", error_message)
         # Render login page with error message
+        flash(error_message, 'warning')
         return render_template("index.html", error_message=error_message)
     return render_template("index.html")
 
