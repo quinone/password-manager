@@ -20,7 +20,7 @@ def generate_password(
             # Contains number of upper
             and sum(c.isupper() for c in password) == number_upper
             # Contains number of digits
-            and sum(c.isdigit() for c in password) >= number_digits
+            and sum(c.isdigit() for c in password) == number_digits
             and (
                 # Check for number of special
                 (number_special == 0)
@@ -90,4 +90,4 @@ def password_generate_by_type(
     elif password_type == "pin":
         return generate_number(length)
     else:
-        return generate_passphrase(length=length)
+        return generate_passphrase(length=length, capitalize=number_upper)
