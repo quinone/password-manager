@@ -5,6 +5,7 @@
     <div class="container d-flex align-items-center">
 
     <form action="/auth/register" method="post">
+        {{ form.hidden_tag() }}
         <table class="table">
             {% for message in messages %}
             <p class="{{ message_type }}">{{ message }}</p>
