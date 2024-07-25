@@ -6,31 +6,31 @@ import string
 def generate_password(
     length=15, number_digits=0, number_upper=0, number_special=0, special=None
 ):
-    alphabet = string.ascii_letters
-    if number_upper:
-        alphabet = string.ascii_letters + string.digits
+    length_remaining = length
+    generated_characters = ""
+    alphabet = string.ascii_letters.lower()
+    if number_digits:
+        generated_characters = generate_number(number_digits)
+        length_remaining = length_remaining - number_digits
+
     if number_special and special:
         # Convert special to string before adding to alphabet
         special = "".join(special)
-        alphabet += special
-    while True:
-        password = "".join(secrets.choice(alphabet) for i in range(length))
-        if (
-            any(c.islower() for c in password)
-            # Contains number of upper
-            and sum(c.isupper() for c in password) == number_upper
-            # Contains number of digits
-            and sum(c.isdigit() for c in password) == number_digits
-            and (
-                # Check for number of special
-                (number_special == 0)
-                # Then check for special
-                or (sum(c in special for c in password) == number_special)
-            )
-        ):
-            break
+        generated_characters = generated_characters + "".join(
+            secrets.choice(special) for i in range(number_special)
+        )
+        length_remaining = length_remaining - number_special
 
-    return password
+    password = generated_characters + "".join(
+        secrets.choice(alphabet) for i in range(length_remaining)
+    )
+
+    if number_upper and (number_upper <= length_remaining):
+        password = password[:-number_upper] + password[-number_upper:].upper()
+
+    password = list(password)
+    secrets.SystemRandom().shuffle(password)
+    return "".join(password)
 
 
 def generate_number(length):
@@ -91,3 +91,33 @@ def password_generate_by_type(
         return generate_number(length)
     else:
         return generate_passphrase(length=length, capitalize=number_upper)
+
+
+"""def generate_password(
+    length=15, number_digits=0, number_upper=0, number_special=0, special=None
+):
+    alphabet = string.ascii_letters
+    if number_upper:
+        alphabet = string.ascii_letters + string.digits
+    if number_special and special:
+        # Convert special to string before adding to alphabet
+        special = "".join(special)
+        alphabet += special
+    while True:
+        password = "".join(secrets.choice(alphabet) for i in range(length))
+        if (
+            any(c.islower() for c in password)
+            # Contains number of upper
+            and sum(c.isupper() for c in password) == number_upper
+            # Contains number of digits
+            and sum(c.isdigit() for c in password) == number_digits
+            and (
+                # Check for number of special
+                (number_special == 0)
+                # Then check for special
+                or (sum(c in special for c in password) == number_special)
+            )
+        ):
+            break
+
+    return password"""

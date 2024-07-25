@@ -119,7 +119,9 @@ def new_item():
     # Handle options
     options = request.args.get("options")
     if options == "username":
-        username = generate_username(capitalize=min_capitals, include_number=min_numbers)
+        username = generate_username(
+            capitalize=min_capitals, include_number=min_numbers
+        )
         result = username
         form.username.data = username
 
@@ -208,7 +210,9 @@ def edit_item(item_ID):
 
     options = request.args.get("options")
     if options == "username":
-        username = generate_username(capitalize=min_capitals, include_number=min_numbers)
+        username = generate_username(
+            capitalize=min_capitals, include_number=min_numbers
+        )
         result = username
     elif options == "password":
         result = password_generate_by_type(
@@ -430,7 +434,9 @@ def password_generator():
     # Handle options
     options = request.args.get("options")
     if options == "username":
-        generated_password = generate_username(capitalize=min_capitals, include_number=min_numbers)
+        generated_password = generate_username(
+            capitalize=min_capitals, include_number=min_numbers
+        )
     elif options == "password":
         generated_password = password_generate_by_type(
             password_type=password_type,

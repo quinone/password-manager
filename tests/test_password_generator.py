@@ -102,3 +102,21 @@ def test_generate_password_random():
 def test_generate_password_default():
     password = generate_password()
     assert len(password) == 15
+
+
+def test_generate_password_contain_numbers():
+    password = generate_password(number_digits=5)
+    count = 0
+    for c in password:
+        if c.isdigit():
+            count += 1
+    assert count == 5
+
+
+def test_generate_password_contain_upper():
+    password = generate_password(number_upper=5)
+    count = 0
+    for c in password:
+        if c.isupper():
+            count += 1
+    assert count == 5
